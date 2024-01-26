@@ -2,11 +2,11 @@
 
 #### Run locally (outside of docker)
 
-`docker run hs -p 8080:8080`
+`flask run --app hs_backend`
 
 #### Docker build
 
-`docker run hs -p 8080:8080`
+`docker build --tag 'hs' .`
 
 #### Docker run
 
