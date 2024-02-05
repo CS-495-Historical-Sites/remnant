@@ -3,6 +3,7 @@ package com.ua.historicalsitesapp.data
 import com.ua.historicalsitesapp.data.model.LoggedInUser
 import com.ua.historicalsitesapp.data.model.LoginDetails
 import com.ua.historicalsitesapp.data.model.RegistrationDetails
+import com.ua.historicalsitesapp.data.model.RegistrationResult
 
 /**
  * Class that requests authentication and user information from the remote data source and
@@ -40,15 +41,8 @@ class LoginRepository(val dataSource: LoginDataSource) {
         return result
     }
 
-    suspend fun register(userDetails: RegistrationDetails): Result<LoggedInUser> {
-        // handle login
-        val result = dataSource.register(userDetails)
-
-        if (result is Result.Success) {
-            setLoggedInUser(result.data)
-        }
-
-        return result
+    suspend fun register(userDetails: RegistrationDetails): RegistrationResult {
+        return dataSource.register(userDetails)
     }
 
     private fun setLoggedInUser(loggedInUser: LoggedInUser) {

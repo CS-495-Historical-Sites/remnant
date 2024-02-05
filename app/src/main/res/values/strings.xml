@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">HistoricalSitesApp</string>
     <string name="title_activity_registration">RegistrationActivity</string>
+    <string name="title_activity_main_page">MainPageActivity</string>
 </resources>
