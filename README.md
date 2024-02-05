@@ -10,4 +10,12 @@
 
 #### Docker run
 
-`docker run hs -p 8080:8080`
+`docker run -p 8080:8080 hs`
+
+### Format 
+
+`poetry run black .`
+
+### Poetry export to requirements.txt
+
+`poetry export -f requirements.txt --output requirements.txt`
