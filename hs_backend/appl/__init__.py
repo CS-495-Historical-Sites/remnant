@@ -5,7 +5,6 @@ from flask import Flask
 
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
-
 from .config import Config
 
 
@@ -25,11 +24,21 @@ def init_app():
 
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
     app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=30)
+
     db.init_app(app)
+
     with app.app_context():
-        from . import auth, routes
+        from . import auth, routes, user, locations, hs_db
+        from .models import program_metadata
 
         app.register_blueprint(routes.main_blueprint)
         app.register_blueprint(auth.auth_blueprint)
-        db.create_all()
+        app.register_blueprint(user.user_blueprint)
+        app.register_blueprint(locations.location_blueprint)
+        program_metadata.create_all(db.engine)
+
+        print("here")
+        hs_db.create_location(location_name="New York")
+        hs_db.create_location(location_name="Broadway")
+
         return app

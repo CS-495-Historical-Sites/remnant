@@ -1,9 +1,12 @@
 """Routes for user authentication."""
 
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import create_access_token
-from flask_jwt_extended import get_jwt_identity
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import (
+    create_access_token,
+    create_refresh_token,
+    get_jwt_identity,
+    jwt_required,
+)
 
 from . import hs_db, LOGGER
 from .models import RegistrationRequest, LoginRequest
@@ -13,6 +16,9 @@ auth_blueprint = Blueprint(
     "auth_blueprint",
     __name__,
 )
+
+
+NEW_YORK_LOCATION_ID = 1
 
 
 @auth_blueprint.route("/api/register", methods=["POST", "OPTIONS"])
@@ -42,6 +48,10 @@ def register():
     except Exception as e:
         LOGGER.error("error: {}".format(e))
         return jsonify({"message": "Unknown error"}), 500
+
+    user = hs_db.get_user(email=registration_info.email)
+
+    user.add_favorite_location(NEW_YORK_LOCATION_ID)
 
     return jsonify({"email": registration_info.email, "errorString": ""}), 200
 
@@ -73,8 +83,8 @@ def login():
         )
 
     access_token = create_access_token(identity=user.email)
-    LOGGER.debug("login successful")
-    return jsonify({"email": login_info.email, "accessToken": access_token}), 200
+    refresh_token = create_refresh_token(identity=user.email)
+    return jsonify(access_token=access_token, refresh_token=refresh_token), 200
 
 
 @auth_blueprint.route("/refresh", methods=["POST"])
@@ -82,4 +92,4 @@ def login():
 def refresh():
     identity = get_jwt_identity()
     access_token = create_access_token(identity=identity)
-    return jsonify(access_token=access_token)
+    return jsonify(access_token=access_token), 200

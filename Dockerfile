@@ -10,4 +10,4 @@ EXPOSE 8080
 
 COPY . .
 
-CMD ["gunicorn", "hs_backend.wsgi:app", "-w 2", "-b 0.0.0.0:8080", "-t 30"]
+CMD ["gunicorn", "hs_backend.wsgi:app", "-w 1", "-b 0.0.0.0:8080", "-t 30"]
