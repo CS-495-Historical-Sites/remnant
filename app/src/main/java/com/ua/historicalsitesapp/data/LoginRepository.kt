@@ -22,6 +22,7 @@ class LoginRepository(val dataSource: LoginDataSource) {
     init {
         // If user credentials will be cached in local storage, it is recommended it be encrypted
         // @see https://developer.android.com/training/articles/keystore
+
         user = null
     }
 
@@ -31,7 +32,6 @@ class LoginRepository(val dataSource: LoginDataSource) {
     }
 
     suspend fun login(userDetails: LoginDetails): Result<LoggedInUser> {
-        // handle login
         val result = dataSource.login(userDetails)
 
         if (result is Result.Success) {
