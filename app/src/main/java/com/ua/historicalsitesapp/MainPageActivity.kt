@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.ua.historicalsitesapp.ui.theme.HistoricalSitesAppTheme
 
@@ -36,7 +37,8 @@ class MainPageActivity : ComponentActivity() {
 
 @Composable
 fun Greeting(modifier: Modifier = Modifier) {
-    val view = MainPageViewModel()
+    val context = LocalContext.current
+    val view = MainPageViewModel(context)
 
     Column(
         modifier = Modifier

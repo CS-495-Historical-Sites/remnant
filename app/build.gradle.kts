@@ -78,4 +78,14 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
     implementation("io.ktor:ktor-client-auth:$ktor_version")
+    // Preferences DataStore (SharedPreferences like APIs)
+    dependencies {
+        implementation("androidx.datastore:datastore-preferences:1.0.0")
+
+        // optional - RxJava2 support
+        implementation("androidx.datastore:datastore-preferences-rxjava2:1.0.0")
+
+        // optional - RxJava3 support
+        implementation("androidx.datastore:datastore-preferences-rxjava3:1.0.0")
+    }
 }

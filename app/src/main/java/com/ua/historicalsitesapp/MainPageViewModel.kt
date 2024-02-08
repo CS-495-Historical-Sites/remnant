@@ -1,5 +1,6 @@
 package com.ua.historicalsitesapp
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import com.ua.historicalsitesapp.data.LoginDataSource
 import com.ua.historicalsitesapp.data.LoginRepositoryProvider
@@ -14,8 +15,10 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.post
 import io.ktor.serialization.kotlinx.json.json
 
-class MainPageViewModel() : ViewModel() {
-    private val loginRepository = LoginRepositoryProvider.provideLoginRepository(LoginDataSource())
+class MainPageViewModel(context: Context) : ViewModel() {
+
+    private val loginRepository =
+        LoginRepositoryProvider.provideLoginRepository(LoginDataSource(), context)
 
     fun getUserClient(): HttpClient {
         val user = getUser()

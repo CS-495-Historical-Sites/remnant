@@ -60,7 +60,7 @@ fun LoginCard(
     onLoginClick: () -> Unit,
     onRegisterClick: () -> Unit
 ) {
-    Card() {
+    Card {
         Column(
             modifier = modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -79,8 +79,8 @@ fun LoginCard(
 
 @Composable
 fun LoginMenu(modifier: Modifier = Modifier) {
-    val loginView = LoginViewModel()
     val context = LocalContext.current
+    val loginView = LoginViewModel(context)
     LoginCard(
         onUsernameChange = { loginView.username = it },
         onPasswordChange = { loginView.password = it },

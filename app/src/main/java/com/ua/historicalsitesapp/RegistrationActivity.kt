@@ -93,7 +93,7 @@ fun RegistrationCard(
     onRegisterClick: () -> Unit,
     onLoginClick: () -> Unit
 ) {
-    Card() {
+    Card {
         Column(
             modifier = modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -109,8 +109,15 @@ fun RegistrationCard(
 
 @Composable
 fun RegistrationMenu(modifier: Modifier = Modifier) {
-    val registrationView = RegistrationViewModel()
     val context = LocalContext.current
+    val registrationView = RegistrationViewModel(context)
+
+    if (registrationView.isLoggedIn()) {
+        val intent = Intent(context, MainPageActivity::class.java)
+        context.startActivity(intent)
+    }
+
+
     RegistrationCard(
         onUsernameChange = { registrationView.username = it },
         onPasswordChange = { registrationView.password = it },

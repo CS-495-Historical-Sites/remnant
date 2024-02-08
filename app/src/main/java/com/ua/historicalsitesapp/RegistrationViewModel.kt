@@ -1,6 +1,7 @@
 package com.ua.historicalsitesapp
 
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import com.ua.historicalsitesapp.data.LoginDataSource
 import com.ua.historicalsitesapp.data.LoginRepositoryProvider
@@ -9,12 +10,14 @@ import com.ua.historicalsitesapp.data.model.RegistrationResult
 import kotlinx.coroutines.runBlocking
 
 
-class RegistrationViewModel() : ViewModel() {
+class RegistrationViewModel(context: Context) : ViewModel() {
     var username = ""
     var password = ""
     var registrationStatusText = ""
 
-    private val loginRepository = LoginRepositoryProvider.provideLoginRepository(LoginDataSource())
+    private val loginRepository =
+        LoginRepositoryProvider.provideLoginRepository(LoginDataSource(), context)
+
     fun performRegistration(): RegistrationResult? {
         var result: RegistrationResult? = null
         runBlocking {
@@ -23,5 +26,10 @@ class RegistrationViewModel() : ViewModel() {
 
         return result
     }
+
+    fun isLoggedIn(): Boolean {
+        return loginRepository.isLoggedIn
+    }
+
 
 }
