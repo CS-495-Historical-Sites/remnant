@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
-from sqlalchemy import Table, Column, ForeignKey, Integer, MetaData
+from sqlalchemy import Table, Column, ForeignKey, Integer, MetaData, UniqueConstraint
 from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -53,6 +53,8 @@ class Visit(db.Model):
     location_id = db.Column(db.Integer, db.ForeignKey('location.id'), nullable=False)
     visit_time = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
+    #to prevent duplicate rows no row can share the same user_id and location_id
+    __table_args__ = (UniqueConstraint('user_id', 'location_id'),)
 
 
 
