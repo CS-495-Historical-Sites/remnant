@@ -38,16 +38,13 @@ def create_visited_location(location_num: int, user_num: int):
     db.session.flush()
     db.session.commit()
 
-def delete_visited_location(location_num: int, user_num: int):
-    location_to_delete = Visit.query.filter_by(location_id=location_num, user_id=user_num).first()
-
+def delete_visited_location(location_to_delete: Visit):
     if location_to_delete:
         db.session.delete(location_to_delete)
-        db.session.flush()
         db.session.commit()
         return True
     else:
-        print(f"No record found for visited location")
+        app.logger.warning("Attempting to delete a non-existent visited location")
         return False
 
 

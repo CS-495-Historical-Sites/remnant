@@ -34,14 +34,17 @@ def delete_visited_location():
     if user is None:
         return jsonify({"message": "User not found"}), 400
     
-    # name should be name of location to be deleted
-    # may need to make this less ambiguous
-
     data = request.get_json()
-    location_key = data.get('id')
+
+    try:
+        location_key = int(data.get('id'))
+    except ValueError:
+        return jsonify({"message": "Invalid location ID"}), 400
+
     location_to_delete = Visit.query.filter_by(location_id=location_key, user_id=user.id).first()
+    
     if location_to_delete:
-        hs_db.delete_visited_location(location_to_delete, user.id)
+        hs_db.delete_visited_location(location_to_delete)
         return jsonify({"message": "Removed Location"}), 200
     else:
         return jsonify({"message": "Location not found"}), 404
