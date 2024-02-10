@@ -15,7 +15,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
 import com.ua.historicalsitesapp.ui.theme.HistoricalSitesAppTheme
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberCameraPositionState
 
 class MainPageActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,32 +34,24 @@ class MainPageActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Greeting()
+                    val singapore = LatLng(1.35, 103.87)
+                    val cameraPositionState = rememberCameraPositionState {
+                        position = CameraPosition.fromLatLngZoom(singapore, 10f)
+                    }
+                    GoogleMap(
+                        modifier = Modifier.fillMaxSize(),
+                        cameraPositionState = cameraPositionState
+                    ) {
+                        Marker(
+                            state = MarkerState(position = singapore),
+                            title = "Singapore",
+                            snippet = "Marker in Singapore"
+                        )
+                    }
+
                 }
             }
         }
     }
-}
-
-
-@Composable
-fun Greeting(modifier: Modifier = Modifier) {
-    val context = LocalContext.current
-    val view = MainPageViewModel(context)
-
-    Column(
-        modifier = Modifier
-            .padding(16.dp)
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-
-        Text(
-            text = "Hello user",
-            modifier = modifier
-        )
-    }
-
 }
 
