@@ -20,9 +20,11 @@ def get_visited_locations():
     
     visited_locations = hs_db.get_visited_location(user.id)
 
-    locations_json = [{'name': name} for (name,) in visited_locations]
-
-    return jsonify({'visited_locations': locations_json})
+    if visited_locations:
+        locations_json = [{'name': name} for name in visited_locations]
+        return jsonify({'visited_locations': locations_json}), 200
+    else:
+        return jsonify({"message": "No visited locations found for the user"}), 404
 
 @visit_blueprint.route("/api/user/visited_locations", methods=["DELETE"])
 @jwt_required()
@@ -36,11 +38,10 @@ def delete_visited_location():
     # may need to make this less ambiguous
 
     data = request.get_json()
-    location_name = data.get('name')
-    location_key = hs_db.get_location(location_name)
-    location_to_delete = Visit.query.filter_by(location_id=location_key.id, user_id=user.id).first()
+    location_key = data.get('id')
+    location_to_delete = Visit.query.filter_by(location_id=location_key, user_id=user.id).first()
     if location_to_delete:
-        hs_db.delete_visited_location(location_to_delete.id, user.id)
+        hs_db.delete_visited_location(location_to_delete, user.id)
         return jsonify({"message": "Removed Location"}), 200
     else:
         return jsonify({"message": "Location not found"}), 404
@@ -63,7 +64,7 @@ def add_visited_location():
         hs_db.create_visited_location(location_to_add.id, user.id)
         return jsonify({"message": "Location Successfully Added"}), 200
     else:
-        return jsonify({"message": "Location not found"})
+        return jsonify({"message": "Location not found"}), 404
         
 
 

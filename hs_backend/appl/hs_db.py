@@ -35,15 +35,20 @@ def create_visited_location(location_num: int, user_num: int):
     curr_time = datetime.utcnow()
     visit = Visit(location_id = location_num, user_id = user_num, visit_time = curr_time)
     db.session.add(visit)
+    db.session.flush()
     db.session.commit()
 
 def delete_visited_location(location_num: int, user_num: int):
     location_to_delete = Visit.query.filter_by(location_id=location_num, user_id=user_num).first()
+
     if location_to_delete:
         db.session.delete(location_to_delete)
+        db.session.flush()
         db.session.commit()
+        return True
     else:
         print(f"No record found for visited location")
+        return False
 
 
 
@@ -55,4 +60,6 @@ def get_visited_location(user_id: int) -> list:
         .filter(Visit.user_id == user_id)
         .all()
     )
-    return visited_locations
+    location_names = [location.name for location in visited_locations]
+
+    return location_names
