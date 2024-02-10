@@ -59,9 +59,13 @@ def add_visited_location():
         return jsonify({"message": "User not found"}), 400
     
     data = request.get_json()
-    location_name = data.get('name')
 
-    location_to_add = Location.query.filter_by(name = location_name).first()
+    try:
+        location_key = int(data.get('id'))
+    except ValueError:
+        return jsonify({"message": "Invalid location ID"}), 400
+
+    location_to_add = Location.query.filter_by(id = location_key).first()
 
     if location_to_add:
         hs_db.create_visited_location(location_to_add.id, user.id)
