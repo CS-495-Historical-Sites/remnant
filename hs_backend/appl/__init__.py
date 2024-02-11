@@ -1,5 +1,9 @@
 from datetime import timedelta
 import logging
+import json
+import time
+from datetime import timedelta
+
 
 from flask import Flask
 
@@ -17,6 +21,7 @@ db = SQLAlchemy()
 
 
 def init_app():
+    start_time = time.time()
     app = Flask(__name__)
     jwt = JWTManager(app)
 
@@ -37,17 +42,23 @@ def init_app():
         app.register_blueprint(locations.location_blueprint)
         app.register_blueprint(visit.visit_blueprint)
         program_metadata.create_all(db.engine)
+        with open("wikidata.json") as f:
+            data = json.load(f)
+            for location in data:
+                name = location["name"]
+                desc = location["descriptions"]
+                coordinates = location["coordinates"]
+                hs_db.create_location(
+                    name,
+                    coordinates["lat"],
+                    coordinates["long"],
+                    desc,
+                    suspend_commit=True,
+                )
 
-        print("here")
-        hs_db.create_location(location_name="New York")
-        hs_db.create_location(location_name="Broadway")
-        hs_db.create_location(location_name="Jacksonville")
-        hs_db.create_location(location_name="London")
-        hs_db.create_location(location_name="Birmingham")
-        hs_db.create_location(location_name="Sarasota")
-        hs_db.create_location(location_name="New Brunswick")
-        hs_db.create_location(location_name="Toronto")
+            hs_db.commit()
 
-
-
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+        LOGGER.info(f"Elapsed time for app init: {elapsed_time} seconds")
         return app

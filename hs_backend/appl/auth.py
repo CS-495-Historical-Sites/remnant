@@ -87,7 +87,7 @@ def login():
     return jsonify(access_token=access_token, refresh_token=refresh_token), 200
 
 
-@auth_blueprint.route("/refresh", methods=["POST"])
+@auth_blueprint.route("/api/refresh", methods=["POST"])
 @jwt_required(refresh=True)
 def refresh():
     identity = get_jwt_identity()
