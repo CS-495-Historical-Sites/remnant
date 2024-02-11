@@ -52,7 +52,6 @@ class Visit(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     location_id = db.Column(db.Integer, db.ForeignKey('location.id'), nullable=False)
     visit_time = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-    location = db.relationship('Location', backref='visits')
 
     #to prevent duplicate rows no row can share the same user_id and location_id
     __table_args__ = (UniqueConstraint('user_id', 'location_id'),)
