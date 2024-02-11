@@ -50,12 +50,11 @@ def delete_visited_location(location_to_delete: Visit):
 
 
 def get_visited_location(user_id: int) -> list:
-    visited_locations = (
+    location_rows = (
         db.session.query(Location.name)
         .join(Visit, Location.id == Visit.location_id)
         .filter(Visit.user_id == user_id)
         .all()
     )
-    location_names = [location.name for location in visited_locations]
 
-    return location_names
+    return location_rows

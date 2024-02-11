@@ -21,8 +21,8 @@ def get_visited_locations():
     visited_locations = hs_db.get_visited_location(user.id)
 
     if visited_locations:
-        locations_json = [{'location_id': location.id, 'name': location.name} for location in visited_locations]
-        return jsonify({'visited_locations': locations_json}), 200
+        location_data = [{'id': location_id, 'name': name} for location_id, name in visited_locations]
+        return jsonify({'visited_locations': location_data}), 200
     else:
         return jsonify({"message": "No visited locations found for the user", "visited_locations": []}), 200
 
