@@ -35,7 +35,6 @@ def create_visited_location(location_num: int, user_num: int):
     curr_time = datetime.utcnow()
     visit = Visit(location_id = location_num, user_id = user_num, visit_time = curr_time)
     db.session.add(visit)
-    db.session.flush()
     db.session.commit()
 
 def delete_visited_location(location_to_delete: Visit):
