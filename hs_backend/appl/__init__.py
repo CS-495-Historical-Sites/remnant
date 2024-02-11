@@ -33,13 +33,14 @@ def init_app():
     db.init_app(app)
 
     with app.app_context():
-        from . import auth, routes, user, locations, hs_db
+        from . import auth, routes, user, locations, hs_db, visit
         from .models import program_metadata
 
         app.register_blueprint(routes.main_blueprint)
         app.register_blueprint(auth.auth_blueprint)
         app.register_blueprint(user.user_blueprint)
         app.register_blueprint(locations.location_blueprint)
+        app.register_blueprint(visit.visit_blueprint)
         program_metadata.create_all(db.engine)
         with open("wikidata.json") as f:
             data = json.load(f)

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
-
-from sqlalchemy import Table, Column, ForeignKey, Integer, MetaData
+from datetime import datetime
+from sqlalchemy import Table, Column, ForeignKey, Integer, MetaData, UniqueConstraint
 from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -48,6 +48,24 @@ user_favorite_locations = Table(
     Column("user_id", Integer, ForeignKey("user.id")),
     Column("location_id", Integer, ForeignKey("location.id")),
 )
+# table for every location a user gets. Identical to favorite location table
+class Visit(db.Model):
+    __tablename__ = "user_visited_locations"
+    metadata = program_metadata
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    location_id = db.Column(db.Integer, db.ForeignKey('location.id'), nullable=False)
+    visit_time = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+    #to prevent duplicate rows no row can share the same user_id and location_id
+    __table_args__ = (UniqueConstraint('user_id', 'location_id'),)
+
+
+
+
+
+
+
 
 
 class User(db.Model):
