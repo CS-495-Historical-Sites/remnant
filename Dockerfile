@@ -4,6 +4,8 @@ WORKDIR /hs_backend
 
 COPY requirements.txt requirements.txt
 
+COPY sources/wikidata.json wikidata.json
+
 RUN pip install -r requirements.txt
 
 EXPOSE 8080

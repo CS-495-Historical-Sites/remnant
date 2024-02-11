@@ -17,9 +17,16 @@ def get_user(email: str) -> User | None:
     return User.query.filter_by(email=email).first()
 
 
-def create_location(location_name: str) -> None:
-    loc = Location(name=location_name)
+def create_location(
+    loc_name: str, lat: int, long: int, desc: str, suspend_commit=False
+) -> None:
+    loc = Location(name=loc_name, latitude=lat, longitude=long, description=desc)
     db.session.add(loc)
+    if not suspend_commit:
+        db.session.commit()
+
+
+def commit():
     db.session.commit()
 
 
