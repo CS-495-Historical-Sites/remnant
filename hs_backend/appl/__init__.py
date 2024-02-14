@@ -42,17 +42,24 @@ def init_app():
         app.register_blueprint(locations.location_blueprint)
         app.register_blueprint(visit.visit_blueprint)
         program_metadata.create_all(db.engine)
+
+        skipped = 0
         with open("wikidata.json") as f:
             data = json.load(f)
             for location in data:
                 name = location["name"]
-                desc = location["descriptions"]
+                short_desc = location["short_description"]
+                long_desc = location["long_description"]
                 coordinates = location["coordinates"]
+                if not coordinates:
+                    skipped += 1
+                    continue
                 hs_db.create_location(
                     name,
                     coordinates["lat"],
                     coordinates["long"],
-                    desc,
+                    short_desc=short_desc,
+                    long_desc=long_desc,
                     suspend_commit=True,
                 )
 
@@ -61,4 +68,6 @@ def init_app():
         end_time = time.time()
         elapsed_time = end_time - start_time
         LOGGER.info(f"Elapsed time for app init: {elapsed_time} seconds")
+
+        LOGGER.warning(f"Skipped {skipped} locations during app init")
         return app

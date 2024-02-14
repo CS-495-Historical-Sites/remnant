@@ -3,3 +3,8 @@ __pycache__/
 hs_backend/app.db
 poetry.lock
 requirements.txt
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
+.elasticbeanstalk

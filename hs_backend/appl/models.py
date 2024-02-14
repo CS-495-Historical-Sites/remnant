@@ -36,10 +36,16 @@ class Location(db.Model):
     name = db.Column(db.String(120), index=True, unique=False, nullable=False)
     latitude = db.Column(db.Float, nullable=False)
     longitude = db.Column(db.Float, nullable=False)
-    description = db.Column(db.Text, nullable=True)
+    short_description = db.Column(db.Text, nullable=True)
+    long_description = db.Column(db.Text, nullable=True)
 
     def location_repr(self):
-        return {"id": self.id, "name": self.name}
+        return {
+            "id": self.id,
+            "name": self.name,
+            "latitude": self.latitude,
+            "longitude": self.longitude,
+        }
 
 
 user_favorite_locations = Table(
@@ -48,24 +54,19 @@ user_favorite_locations = Table(
     Column("user_id", Integer, ForeignKey("user.id")),
     Column("location_id", Integer, ForeignKey("location.id")),
 )
+
+
 # table for every location a user gets. Identical to favorite location table
 class Visit(db.Model):
     __tablename__ = "user_visited_locations"
     metadata = program_metadata
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    location_id = db.Column(db.Integer, db.ForeignKey('location.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    location_id = db.Column(db.Integer, db.ForeignKey("location.id"), nullable=False)
     visit_time = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
-    #to prevent duplicate rows no row can share the same user_id and location_id
-    __table_args__ = (UniqueConstraint('user_id', 'location_id'),)
-
-
-
-
-
-
-
+    # to prevent duplicate rows no row can share the same user_id and location_id
+    __table_args__ = (UniqueConstraint("user_id", "location_id"),)
 
 
 class User(db.Model):
