@@ -1,7 +1,7 @@
 from flask import jsonify, Blueprint, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from . import hs_db
-from .models import Visit, Location, User
+from .models import Visit, Location
 
 visit_blueprint = Blueprint(
     "visit_blueprint",
@@ -24,16 +24,16 @@ def get_visited_locations():
             {"id": location_id, "name": name} for location_id, name in visited_locations
         ]
         return jsonify({"visited_locations": location_data}), 200
-    else:
-        return (
-            jsonify(
-                {
-                    "message": "No visited locations found for the user",
-                    "visited_locations": [],
-                }
-            ),
-            200,
-        )
+
+    return (
+        jsonify(
+            {
+                "message": "No visited locations found for the user",
+                "visited_locations": [],
+            }
+        ),
+        200,
+    )
 
 
 @visit_blueprint.route("/api/user/visited_locations", methods=["DELETE"])
@@ -58,8 +58,8 @@ def delete_visited_location():
     if location_to_delete:
         hs_db.delete_visited_location(location_to_delete)
         return jsonify({"message": "Removed Location"}), 200
-    else:
-        return jsonify({"message": "Location not found"}), 404
+
+    return jsonify({"message": "Location not found"}), 404
 
 
 @visit_blueprint.route("/api/user/visited_locations", methods=["POST"])
@@ -82,5 +82,5 @@ def add_visited_location():
     if location_to_add:
         hs_db.create_visited_location(location_to_add.id, user.id)
         return jsonify({"message": "Location Successfully Added"}), 200
-    else:
-        return jsonify({"message": "Location not found"}), 404
+
+    return jsonify({"message": "Location not found"}), 404

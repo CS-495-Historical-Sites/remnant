@@ -1,7 +1,7 @@
-from . import db
-from .models import RegistrationRequest, User, Location, Visit
 from datetime import datetime
-from . import LOGGER
+
+from . import db, LOGGER
+from .models import RegistrationRequest, User, Location, Visit
 
 
 # user related commands
@@ -84,9 +84,9 @@ def delete_visited_location(location_to_delete: Visit):
         db.session.delete(location_to_delete)
         db.session.commit()
         return True
-    else:
-        LOGGER.warning("Attempting to delete a non-existent visited location")
-        return False
+
+    LOGGER.warning("Attempting to delete a non-existent visited location")
+    return False
 
 
 def get_visited_location(user_id: int) -> list:

@@ -1,6 +1,7 @@
 .PHONY: run docker-build docker-run format export
 
 docker-build:
+	poetry export -f requirements.txt --output requirements.txt
 	docker build --tag 'hs' .
 
 docker-run: docker-build
@@ -9,5 +10,5 @@ docker-run: docker-build
 format:
 	poetry run black .
 
-export:
-	poetry export -f requirements.txt --output requirements.txt
+lint:
+	poetry run pylint hs_backend/

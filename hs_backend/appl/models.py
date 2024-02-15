@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
-from sqlalchemy import Table, Column, ForeignKey, Integer, MetaData, UniqueConstraint
-from sqlalchemy.orm import relationship
+from sqlalchemy import MetaData, UniqueConstraint
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from . import db
@@ -17,11 +16,6 @@ class RegistrationRequest:
 class LoginRequest:
     email: str
     password: str
-
-
-@dataclass
-class FavoriteLocationDeleteRequest:
-    location_id: int
 
 
 program_metadata = MetaData()
@@ -48,15 +42,6 @@ class Location(db.Model):
         }
 
 
-user_favorite_locations = Table(
-    "user_favorite_locations",
-    program_metadata,
-    Column("user_id", Integer, ForeignKey("user.id")),
-    Column("location_id", Integer, ForeignKey("location.id")),
-)
-
-
-# table for every location a user gets. Identical to favorite location table
 class Visit(db.Model):
     __tablename__ = "user_visited_locations"
     metadata = program_metadata
@@ -77,24 +62,8 @@ class User(db.Model):
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128), nullable=False)
 
-    favorite_locations = relationship(
-        "Location", secondary=user_favorite_locations, backref="users"
-    )
-
     def set_password(self, supplied_password: str):
         self.password_hash = generate_password_hash(supplied_password)
 
     def password_matches_hash(self, password: str) -> bool:
         return check_password_hash(self.password_hash, password)
-
-    def add_favorite_location(self, location_id: int):
-        location = Location.query.get(location_id)
-        if location:
-            self.favorite_locations.append(location)
-            db.session.commit()
-
-    def remove_favorite_location(self, location_id: int):
-        location: Location | None = Location.query.get(location_id)
-        if location:
-            self.favorite_locations.remove(location)
-            db.session.commit()

@@ -1,21 +1,14 @@
 ### Build commands
 
-#### Run locally (outside of docker)
 
-`flask run --app hs_backend`
+#### Run
 
-#### Docker build
-
-`docker build --tag 'hs' .`
-
-#### Docker run
-
-`docker run -p 8080:8080 hs`
+`make docker-run`
 
 ### Format 
 
-`poetry run black .`
+`make format`
 
-### Poetry export to requirements.txt
+### Format 
 
-`poetry export -f requirements.txt --output requirements.txt`
+`make lint`

@@ -18,9 +18,6 @@ auth_blueprint = Blueprint(
 )
 
 
-NEW_YORK_LOCATION_ID = 1
-
-
 @auth_blueprint.route("/api/register", methods=["POST", "OPTIONS"])
 def register():
     LOGGER.debug("register() reached")
@@ -29,10 +26,10 @@ def register():
 
     data = request.get_json()
     if not data:
-        return jsonify({"message": "No data supplied"})
+        return jsonify({"message": "No data supplied"}), 400
 
     if "email" not in data or "password" not in data:
-        LOGGER.debug(f"Recieved incomplete request... ")
+        LOGGER.debug("Recieved incomplete request... ")
         return jsonify({"message": "Incomplete request"})
 
     registration_info = RegistrationRequest(data["email"], data["password"])
@@ -43,15 +40,7 @@ def register():
         LOGGER.debug(f"Email {registration_info.email} already exists")
         return jsonify({"message": "Email already exists"}), 422
 
-    try:
-        hs_db.create_user(registration_info)
-    except Exception as e:
-        LOGGER.error("error: {}".format(e))
-        return jsonify({"message": "Unknown error"}), 500
-
-    user = hs_db.get_user(email=registration_info.email)
-
-    user.add_favorite_location(NEW_YORK_LOCATION_ID)
+    hs_db.create_user(registration_info)
 
     return jsonify({"email": registration_info.email, "errorString": ""}), 200
 
@@ -67,7 +56,7 @@ def login():
         return jsonify({"message": "No data supplied"})
 
     if "email" not in data or "password" not in data:
-        LOGGER.debug(f"Recieved incomplete request... ")
+        LOGGER.debug("Recieved incomplete request... ")
         return jsonify({"message": "Incomplete request"})
 
     login_info = LoginRequest(data["email"], data["password"])
