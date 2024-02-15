@@ -1,16 +1,11 @@
 package com.ua.historicalsitesapp.data.model
 
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Location(
+data class HsLocation(
     val id: Int,
-    val name: String
+    val name: String,
+    val latitude: Float,
+    val longitude: Float
 )
-
-@Serializable
-data class UserFavoriteLocationDeleteRequest(
-    @SerialName("location_id") val id: Int,
-)
-

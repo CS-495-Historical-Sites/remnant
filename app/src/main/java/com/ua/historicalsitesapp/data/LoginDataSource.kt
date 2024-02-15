@@ -1,5 +1,6 @@
 package com.ua.historicalsitesapp.data
 
+import com.ua.historicalsitesapp.ServerConfig
 import com.ua.historicalsitesapp.data.model.LoggedInUser
 import com.ua.historicalsitesapp.data.model.LoginDetails
 import com.ua.historicalsitesapp.data.model.RegistrationDetails
@@ -32,7 +33,9 @@ class LoginDataSource {
                 })
             }
         }
-        val response: HttpResponse = client.post("http://10.0.2.2:8080/api/login") {
+        val response: HttpResponse = client.post(
+            ServerConfig.SERVER_URL + "/login"
+        ) {
             contentType(ContentType.Application.Json)
             setBody(details)
         }
@@ -53,7 +56,7 @@ class LoginDataSource {
             }
         }
         try {
-            val response: HttpResponse = client.post("http://10.0.2.2:8080/api/register") {
+            val response: HttpResponse = client.post(ServerConfig.SERVER_URL + "/register") {
                 contentType(ContentType.Application.Json)
                 setBody(regDetails)
             }
