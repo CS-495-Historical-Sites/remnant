@@ -38,12 +38,12 @@
             android:label="@string/title_activity_main_page"
             android:theme="@style/Theme.HistoricalSitesApp" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".authUI.LoginActivity"
             android:exported="false"
             android:label="@string/title_activity_main_page"
             android:theme="@style/Theme.HistoricalSitesApp" />
         <activity
-            android:name=".RegistrationActivity"
+            android:name=".authUI.RegistrationActivity"
             android:exported="true"
             android:label="@string/title_activity_registration"
             android:theme="@style/Theme.HistoricalSitesApp">

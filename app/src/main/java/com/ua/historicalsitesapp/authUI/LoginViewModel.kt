@@ -1,4 +1,4 @@
-package com.ua.historicalsitesapp
+package com.ua.historicalsitesapp.authUI
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
@@ -11,7 +11,7 @@ import kotlinx.coroutines.runBlocking
 
 
 class LoginViewModel(context: Context) : ViewModel() {
-    var username = ""
+    var email = ""
     var password = ""
     private val loginRepository =
         LoginRepositoryProvider.provideLoginRepository(LoginDataSource(), context)
@@ -19,7 +19,7 @@ class LoginViewModel(context: Context) : ViewModel() {
     fun performLogin(): Result<LoggedInUser> {
         var result: Result<LoggedInUser> = Result.Error(Exception(("Unknown Error")))
         runBlocking {
-            result = loginRepository.login(LoginDetails(username, password))
+            result = loginRepository.login(LoginDetails(email, password))
         }
 
         return result

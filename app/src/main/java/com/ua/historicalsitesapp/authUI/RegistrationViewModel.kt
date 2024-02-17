@@ -1,4 +1,4 @@
-package com.ua.historicalsitesapp
+package com.ua.historicalsitesapp.authUI
 
 
 import android.content.Context
@@ -11,7 +11,7 @@ import kotlinx.coroutines.runBlocking
 
 
 class RegistrationViewModel(context: Context) : ViewModel() {
-    var username = ""
+    var email = ""
     var password = ""
     var registrationStatusText = ""
 
@@ -21,7 +21,7 @@ class RegistrationViewModel(context: Context) : ViewModel() {
     fun performRegistration(): RegistrationResult? {
         var result: RegistrationResult? = null
         runBlocking {
-            result = loginRepository.register(RegistrationDetails(username, password))
+            result = loginRepository.register(RegistrationDetails(email, password))
         }
 
         return result

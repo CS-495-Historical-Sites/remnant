@@ -1,4 +1,4 @@
-package com.ua.historicalsitesapp
+package com.ua.historicalsitesapp.authUI
 
 import android.content.Intent
 import android.os.Bundle
@@ -10,15 +10,21 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.ua.historicalsitesapp.MainPageActivity
 import com.ua.historicalsitesapp.data.Result
 import com.ua.historicalsitesapp.ui.theme.HistoricalSitesAppTheme
 
@@ -53,9 +59,38 @@ private fun LoginButton(onClick: () -> Unit) {
 }
 
 @Composable
-fun LoginCard(
+private fun EmailTextField(onEmailChange: (String) -> Unit) {
+    var text by remember { mutableStateOf("") }
+    OutlinedTextField(
+        value = text,
+        onValueChange = {
+            text = it
+            onEmailChange(it)
+        },
+        label = { Text("Email") },
+        maxLines = 1
+    )
+}
+
+@Composable
+private fun PasswordTextField(onPasswordChange: (String) -> Unit) {
+    var text by remember { mutableStateOf("") }
+    OutlinedTextField(
+        value = text,
+        onValueChange = {
+            text = it
+            onPasswordChange(it)
+        },
+        label = { Text("Password") },
+        maxLines = 1
+    )
+}
+
+
+@Composable
+private fun LoginCard(
     modifier: Modifier = Modifier,
-    onUsernameChange: (String) -> Unit,
+    onEmailChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
     onLoginClick: () -> Unit,
     onRegisterClick: () -> Unit
@@ -66,7 +101,7 @@ fun LoginCard(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text("Sign in", style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold))
-            UsernameTextField(onUsernameChange = onUsernameChange)
+            EmailTextField(onEmailChange = onEmailChange)
             PasswordTextField(onPasswordChange = onPasswordChange)
 
             LoginButton(onLoginClick)
@@ -78,11 +113,11 @@ fun LoginCard(
 }
 
 @Composable
-fun LoginMenu(modifier: Modifier = Modifier) {
+private fun LoginMenu(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val loginView = LoginViewModel(context)
     LoginCard(
-        onUsernameChange = { loginView.username = it },
+        onEmailChange = { loginView.email = it },
         onPasswordChange = { loginView.password = it },
         onLoginClick = {
             val loginResult = loginView.performLogin()
