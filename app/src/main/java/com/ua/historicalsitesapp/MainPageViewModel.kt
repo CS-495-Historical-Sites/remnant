@@ -29,6 +29,7 @@ class MainPageViewModel(context: Context) : ViewModel() {
         val client = HttpClient(CIO) {
             install(ContentNegotiation) {
                 json()
+
             }
 
             install(Auth) {
