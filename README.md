@@ -5,10 +5,14 @@
 
 `make docker-run`
 
+#### Test
+
+`make docker-test`
+
 ### Format 
 
 `make format`
 
-### Format 
+### Lint 
 
 `make lint`

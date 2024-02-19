@@ -33,6 +33,15 @@ class Location(db.Model):
     short_description = db.Column(db.Text, nullable=True)
     long_description = db.Column(db.Text, nullable=True)
 
+    def __init__(
+        self, name, latitude, longitude, short_description=None, long_description=None
+    ):
+        self.name = name
+        self.latitude = latitude
+        self.longitude = longitude
+        self.short_description = short_description
+        self.long_description = long_description
+
     def location_repr(self):
         return {
             "id": self.id,
@@ -54,6 +63,11 @@ class Visit(db.Model):
     # to prevent duplicate rows no row can share the same user_id and location_id
     __table_args__ = (UniqueConstraint("user_id", "location_id"),)
 
+    def __init__(self, user_id, location_id, visit_time=None):
+        self.user_id = user_id
+        self.location_id = location_id
+        self.visit_time = visit_time
+
 
 class User(db.Model):
     __tablename__ = "user"
@@ -63,7 +77,8 @@ class User(db.Model):
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128), nullable=False)
 
-    def set_password(self, supplied_password: str):
+    def __init__(self, email: str, supplied_password: str):
+        self.email = email
         self.password_hash = generate_password_hash(supplied_password)
 
     def password_matches_hash(self, password: str) -> bool:

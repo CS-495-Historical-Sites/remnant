@@ -18,13 +18,13 @@ LOGGER.setLevel(Config.LOG_LEVEL)
 db = SQLAlchemy()
 
 
-def init_app():
+def init_app(testing=False, db_uri=Config.SQLALCHEMY_DATABASE_URI):
     start_time = time.time()
     app = Flask(__name__)
     jwt = JWTManager(app)
 
     app.config.from_object(Config)
-
+    app.config["SQLALCHEMY_DATABASE_URI"] = db_uri
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
     app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=30)
 
@@ -40,31 +40,32 @@ def init_app():
         app.register_blueprint(visit.visit_blueprint)
         program_metadata.create_all(db.engine)
 
-        skipped = 0
-        with open("wikidata.json", "r", encoding="utf-8") as f:
-            data = json.load(f)
-            for location in data:
-                name = location["name"]
-                short_desc = location["short_description"]
-                long_desc = location["long_description"]
-                coordinates = location["coordinates"]
-                if not coordinates:
-                    skipped += 1
-                    continue
-                hs_db.create_location(
-                    name,
-                    coordinates["lat"],
-                    coordinates["long"],
-                    short_desc=short_desc,
-                    long_desc=long_desc,
-                    suspend_commit=True,
-                )
+        if not testing:
+            skipped = 0
+            with open("sources/wikidata.json", "r", encoding="utf-8") as f:
+                data = json.load(f)
+                for location in data:
+                    name = location["name"]
+                    short_desc = location["short_description"]
+                    long_desc = location["long_description"]
+                    coordinates = location["coordinates"]
+                    if not coordinates:
+                        skipped += 1
+                        continue
+                    hs_db.create_location(
+                        name,
+                        coordinates["lat"],
+                        coordinates["long"],
+                        short_desc=short_desc,
+                        long_desc=long_desc,
+                        suspend_commit=True,
+                    )
 
-            hs_db.commit()
+                hs_db.commit()
 
-        end_time = time.time()
-        elapsed_time = end_time - start_time
-        LOGGER.info(f"Elapsed time for app init: {elapsed_time} seconds")
+            end_time = time.time()
+            elapsed_time = end_time - start_time
+            LOGGER.info(f"Elapsed time for app init: {elapsed_time} seconds")
 
-        LOGGER.warning(f"Skipped {skipped} locations during app init")
+            LOGGER.warning(f"Skipped {skipped} locations during app init")
         return app

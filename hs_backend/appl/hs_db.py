@@ -10,8 +10,9 @@ def email_exists(email: str) -> bool:
 
 
 def create_user(registration_info: RegistrationRequest) -> None:
-    user = User(email=registration_info.email)
-    user.set_password(registration_info.password)
+    user = User(
+        email=registration_info.email, supplied_password=registration_info.password
+    )
     db.session.add(user)
     db.session.commit()
 
