@@ -39,6 +39,7 @@ class Location(db.Model):
             "name": self.name,
             "latitude": self.latitude,
             "longitude": self.longitude,
+            "short_description": self.short_description,
         }
 
 
