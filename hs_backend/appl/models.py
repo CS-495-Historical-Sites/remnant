@@ -1,5 +1,8 @@
 from dataclasses import dataclass
 from datetime import datetime
+from typing import TypedDict
+
+
 from sqlalchemy import MetaData, UniqueConstraint
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -16,6 +19,23 @@ class RegistrationRequest:
 class LoginRequest:
     email: str
     password: str
+
+
+class ShortLocationDescription(TypedDict):
+    id: str
+    name: str
+    latitude: float
+    longitude: float
+    short_description: str
+
+
+class LongLocationDescription(TypedDict):
+    id: str
+    name: str
+    latitude: float
+    longitude: float
+    short_description: str
+    long_description: str
 
 
 program_metadata = MetaData()
@@ -42,13 +62,23 @@ class Location(db.Model):
         self.short_description = short_description
         self.long_description = long_description
 
-    def location_repr(self):
+    def short_repr(self) -> ShortLocationDescription:
         return {
             "id": self.id,
             "name": self.name,
             "latitude": self.latitude,
             "longitude": self.longitude,
             "short_description": self.short_description,
+        }
+
+    def long_repr(self) -> LongLocationDescription:
+        return {
+            "id": self.id,
+            "name": self.name,
+            "latitude": self.latitude,
+            "longitude": self.longitude,
+            "short_description": self.short_description,
+            "long_description": self.long_description,
         }
 
 

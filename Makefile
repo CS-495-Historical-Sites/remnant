@@ -1,10 +1,8 @@
-.PHONY: run docker-build docker-run format export
+.PHONY: docker-run docker-test format lint
 
-docker-build:
+docker-run: 
 	poetry export -f requirements.txt --output requirements.txt
 	docker build --tag 'hs' -f Dockerfile .
-
-docker-run: docker-build
 	docker run -p 8080:8080 hs
 
 docker-test:

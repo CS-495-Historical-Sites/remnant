@@ -41,8 +41,8 @@ def create_location(
         db.session.commit()
 
 
-def get_location(name: str) -> Location | None:
-    return Location.query.filter_by(name=name).first()
+def get_location(id: int) -> Location | None:
+    return Location.query.filter_by(id=id).first()
 
 
 def commit():

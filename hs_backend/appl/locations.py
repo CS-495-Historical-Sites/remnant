@@ -20,7 +20,21 @@ def get_all_locations():
         latitude = float(latitude)
         longitude = float(longitude)
         near_locations = hs_db.get_locations_near(latitude, longitude)
-        return jsonify([l.location_repr() for l in near_locations]), 200
+        return jsonify([l.short_repr() for l in near_locations]), 200
 
     all_locations = hs_db.get_all_locations()
-    return jsonify([l.location_repr() for l in all_locations]), 200
+    return jsonify([l.short_repr() for l in all_locations]), 200
+
+
+@location_blueprint.route("/api/locations/<location_id>", methods=["GET"])
+def get_location_info(location_id):
+    try:
+        location_key = int(location_id)
+    except ValueError:
+        return jsonify({"message": "Invalid location ID"}), 400
+
+    location = hs_db.get_location(location_key)
+    if not location:
+        return jsonify({"message": "Location not found"}), 404
+
+    return jsonify(location.long_repr()), 200
