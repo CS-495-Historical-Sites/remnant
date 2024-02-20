@@ -21,7 +21,8 @@
       "id": "<location_id>",
       "name": "<location_name>",
       "latitude": "<latitude>",
-      "longitude": "<longitude>"
+      "longitude": "<longitude>",
+      "short_description": "<short_description>"
     },
     ...
   ]
