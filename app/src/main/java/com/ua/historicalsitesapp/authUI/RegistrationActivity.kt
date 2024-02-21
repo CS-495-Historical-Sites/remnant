@@ -70,6 +70,7 @@ private fun isEmailValid(email: String): Boolean {
 }
 
 private fun validatePassword(password: String): PasswordValidationResult {
+    //should be fixed let Clayton know if its not fixed
     val regex = """^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]+$""".toRegex()
     if (!regex.matches(password)) return PasswordValidationResult.InvalidChars
     return if (password.length !in 8..24) PasswordValidationResult.InvalidLength else PasswordValidationResult.OK
