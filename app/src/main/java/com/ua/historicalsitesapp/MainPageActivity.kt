@@ -1,19 +1,18 @@
 package com.ua.historicalsitesapp
 
+import android.annotation.SuppressLint
+import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -21,14 +20,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,13 +31,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.navigation.compose.rememberNavController
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.GoogleMapOptions
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.clustering.ClusterItem
 import com.google.maps.android.clustering.algo.NonHierarchicalViewBasedAlgorithm
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapsComposeExperimentalApi
 import com.google.maps.android.compose.clustering.Clustering
 import com.google.maps.android.compose.clustering.rememberClusterManager
@@ -62,6 +57,7 @@ class MainPageActivity : ComponentActivity() {
         setContent {
             HistoricalSitesAppTheme {
                 // A surface container using the 'background' color from the theme
+
                 MainScreen()
             }
         }
@@ -87,15 +83,100 @@ fun MainScreen() {
 }
 
 @Composable
+fun LocationScreen(onPermissionGranted: () -> Unit) {
+    val context = LocalContext.current
+    var location by remember { mutableStateOf("Your location") }
+
+    // Create a permission launcher
+    val requestPermissionLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission(),
+            onResult = { isGranted: Boolean ->
+                if (isGranted) {
+                    // Permission granted, update the location
+                    getCurrentLocation(context) { lat, long ->
+                        location = "Latitude: $lat, Longitude: $long"
+                    }
+                    onPermissionGranted()
+                }
+            })
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Button(
+            onClick = {
+                if (hasLocationPermission(context)) {
+                    // Permission already granted, update the location
+                    getCurrentLocation(context) { lat, long ->
+                        location = "Latitude: $lat, Longitude: $long"
+                    }
+                } else {
+                    // Request location permission
+                    requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
+                }
+            }
+        ) {
+            Text(text = "Allow")
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(text = location)
+    }
+}
+
+private fun hasLocationPermission(context: Context): Boolean {
+    return ContextCompat.checkSelfPermission(
+        context,
+        android.Manifest.permission.ACCESS_FINE_LOCATION
+    ) == PackageManager.PERMISSION_GRANTED
+}
+
+@SuppressLint("MissingPermission")
+private fun getCurrentLocation(context: Context, callback: (Double, Double) -> Unit) {
+    val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+    fusedLocationClient.lastLocation
+        .addOnSuccessListener { location ->
+            if (location != null) {
+                val lat = location.latitude
+                val long = location.longitude
+                callback(lat, long)
+            }
+        }
+        .addOnFailureListener { exception ->
+            // Handle location retrieval failure
+            exception.printStackTrace()
+        }
+}
+
+
+@Composable
 fun HomeScreen(modifier: Modifier) {
     Surface(
         modifier = modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
+        val context = LocalContext.current
+        var hasPermission by remember { mutableStateOf(false) }
 
+        LaunchedEffect(Unit) {
+            // Check for permissions when the composable is initially launched
+            hasPermission = hasLocationPermission(context)
+        }
 
-        Box(modifier = Modifier.fillMaxSize()) {
-            GoogleMapContent(modifier = Modifier.fillMaxSize())
+        if (hasPermission) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                GoogleMapContent(modifier = Modifier.fillMaxSize())
+            }
+        } else {
+            // Show the LocationScreen if permissions are not granted
+            LocationScreen {
+                // Callback to update the state when permissions are granted
+                hasPermission = true
+            }
         }
     }
 }
@@ -175,7 +256,8 @@ fun GoogleMapClustering(mainPageViewModel: MainPageViewModel, items: List<MyItem
                 },
                 googleMapOptionsFactory = {
                     GoogleMapOptions().mapId("ed053e0f6a3454e8")
-                }
+                },
+                properties = MapProperties(isMyLocationEnabled = true)
             ) {
                 CustomRendererClustering(
                     items = items,

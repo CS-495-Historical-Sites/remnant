@@ -88,6 +88,7 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.navigation:navigation-runtime-ktx:2.7.7")
     implementation("androidx.navigation:navigation-compose:2.7.7")
+    implementation("com.google.android.gms:play-services-location:21.1.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -102,6 +103,7 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
     implementation("io.ktor:ktor-client-auth:$ktor_version")
     implementation("com.google.maps.android:maps-compose-utils:4.3.2")
+    implementation("com.google.accompanist:accompanist-permissions:0.25.0")
     // Preferences DataStore (SharedPreferences like APIs)
     dependencies {
         implementation("androidx.datastore:datastore-preferences:1.0.0")
