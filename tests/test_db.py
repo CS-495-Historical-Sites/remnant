@@ -60,9 +60,10 @@ class TestLocation(TestIsolator):
         loc_name = "Tuscaloosa"
         lat = 68.004
         long = 87.0003
+        image = "pictureoftuscaloosa.png"
         short = " i love tuscaloosa"
         long_description = "lsdfkaslkjflasjlfkdjsaldfjlsajfdjsaldfjlsajdfljsaldfjlasjdflkasjdlfjaslfjalsjflsajdfjasldfjalsjdflaskjdflasjdflasjldfjasldjfklasjdfljas"
-        hs_db.create_location(loc_name, lat, long, short, long_description)
+        hs_db.create_location(loc_name, lat, long, short, long_description, image)
 
         fetched_location = Location.query.filter_by(name=loc_name).first()
 
@@ -72,5 +73,6 @@ class TestLocation(TestIsolator):
         assert fetched_location.longitude == long
         assert fetched_location.short_description == short
         assert fetched_location.long_description == long_description
+        assert fetched_location.wikidata_image_name == image
 
         self.teardown_app()

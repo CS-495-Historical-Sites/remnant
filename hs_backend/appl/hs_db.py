@@ -27,6 +27,7 @@ def create_location(
     long: int,
     short_desc: str,
     long_desc: str,
+    wikidata_image_name: str,
     suspend_commit=False,
 ) -> None:
     loc = Location(
@@ -35,6 +36,7 @@ def create_location(
         longitude=long,
         short_description=short_desc,
         long_description=long_desc,
+        wikidata_image_name=wikidata_image_name,
     )
     db.session.add(loc)
     if not suspend_commit:

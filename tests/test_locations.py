@@ -52,7 +52,14 @@ class TestVisitedLocations(TestIsolator):
     def test_get_specific_locoation(self, client):
         self.setup_app()
         locations = [
-            Location("city1", 45.0283, 143.2030, "description1", "longdecription0"),
+            Location(
+                "city1",
+                45.0283,
+                143.2030,
+                "image_name",
+                "description1",
+                "longdecription0",
+            ),
         ]
 
         db.session.add_all(locations)
@@ -70,6 +77,7 @@ class TestVisitedLocations(TestIsolator):
             "longitude": 143.203,
             "name": "city1",
             "short_description": "description1",
+            "wikidata_image_name": "image_name",
         }
 
         self.teardown_app()
@@ -77,7 +85,14 @@ class TestVisitedLocations(TestIsolator):
     def test_get_specific_location_404(self, client):
         self.setup_app()
         locations = [
-            Location("city1", 45.0283, 143.2030, "description1", "longdecription0"),
+            Location(
+                "city1",
+                45.0283,
+                143.2030,
+                "image_name",
+                "description1",
+                "longdecription0",
+            ),
         ]
 
         db.session.add_all(locations)

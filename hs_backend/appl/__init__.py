@@ -49,6 +49,7 @@ def init_app(testing=False, db_uri=Config.SQLALCHEMY_DATABASE_URI):
                     short_desc = location["short_description"]
                     long_desc = location["long_description"]
                     coordinates = location["coordinates"]
+                    image_name = location["wikidata_image_name"]
                     if not coordinates:
                         skipped += 1
                         continue
@@ -58,6 +59,7 @@ def init_app(testing=False, db_uri=Config.SQLALCHEMY_DATABASE_URI):
                         coordinates["long"],
                         short_desc=short_desc,
                         long_desc=long_desc,
+                        wikidata_image_name=image_name,
                         suspend_commit=True,
                     )
 

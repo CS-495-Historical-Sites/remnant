@@ -52,15 +52,23 @@ class Location(db.Model):
     longitude = db.Column(db.Float, nullable=False)
     short_description = db.Column(db.Text, nullable=True)
     long_description = db.Column(db.Text, nullable=True)
+    wikidata_image_name = db.Column(db.Text, nullable=False)
 
     def __init__(
-        self, name, latitude, longitude, short_description=None, long_description=None
+        self,
+        name,
+        latitude,
+        longitude,
+        wikidata_image_name,
+        short_description=None,
+        long_description=None,
     ):
         self.name = name
         self.latitude = latitude
         self.longitude = longitude
         self.short_description = short_description
         self.long_description = long_description
+        self.wikidata_image_name = wikidata_image_name
 
     def short_repr(self) -> ShortLocationDescription:
         return {
@@ -79,6 +87,7 @@ class Location(db.Model):
             "longitude": self.longitude,
             "short_description": self.short_description,
             "long_description": self.long_description,
+            "wikidata_image_name": self.wikidata_image_name,
         }
 
 
