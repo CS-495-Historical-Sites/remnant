@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
@@ -23,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ua.historicalsitesapp.MainPageActivity
 import com.ua.historicalsitesapp.data.Result
@@ -34,7 +36,7 @@ class LoginActivity : ComponentActivity() {
         setContent {
             HistoricalSitesAppTheme {
                 Surface(
-                    modifier = Modifier.fillMaxSize(),
+//                    modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
                     LoginMenu()
@@ -95,7 +97,7 @@ private fun LoginCard(
     onLoginClick: () -> Unit,
     onRegisterClick: () -> Unit
 ) {
-    Card {
+    Card(modifier = Modifier.size(300.dp)) {
         Column(
             modifier = modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally

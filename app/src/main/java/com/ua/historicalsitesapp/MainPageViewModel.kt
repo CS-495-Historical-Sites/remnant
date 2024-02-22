@@ -6,6 +6,7 @@ import com.ua.historicalsitesapp.data.LoginDataSource
 import com.ua.historicalsitesapp.data.LoginRepositoryProvider
 import com.ua.historicalsitesapp.data.model.GetBearerTokens
 import com.ua.historicalsitesapp.data.model.HsLocation
+import com.ua.historicalsitesapp.data.model.HsLocationComplete
 import com.ua.historicalsitesapp.data.model.LoggedInUser
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -55,6 +56,16 @@ class MainPageViewModel(context: Context) : ViewModel() {
         return runBlocking {
             val response: List<HsLocation> =
                 client.get(ServerConfig.SERVER_URL + "/locations") {
+                }.body()
+            return@runBlocking response
+        }
+    }
+
+    fun getLocationInfo(locationId: Int): HsLocationComplete {
+        val client = getUserClient()
+        return runBlocking {
+            val response: HsLocationComplete =
+                client.get(ServerConfig.SERVER_URL + "/locations/" + locationId) {
                 }.body()
             return@runBlocking response
         }
