@@ -15,8 +15,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.ua.historicalsitesapp.HomeScreen
-import com.ua.historicalsitesapp.UserProfilePage
+import com.ua.historicalsitesapp.ui.screens.HomeScreen
+import com.ua.historicalsitesapp.ui.screens.UserProfilePage
 
 
 @Composable

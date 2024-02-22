@@ -1,11 +1,12 @@
-package com.ua.historicalsitesapp.data
+package com.ua.historicalsitesapp.data.repository
 
-import com.ua.historicalsitesapp.ServerConfig
-import com.ua.historicalsitesapp.data.model.LoggedInUser
-import com.ua.historicalsitesapp.data.model.LoginDetails
-import com.ua.historicalsitesapp.data.model.RegistrationDetails
-import com.ua.historicalsitesapp.data.model.RegistrationResponse
-import com.ua.historicalsitesapp.data.model.RegistrationResult
+import com.ua.historicalsitesapp.data.model.auth.LoggedInUser
+import com.ua.historicalsitesapp.data.model.auth.LoginDetails
+import com.ua.historicalsitesapp.data.model.auth.RegistrationDetails
+import com.ua.historicalsitesapp.data.model.auth.RegistrationResponse
+import com.ua.historicalsitesapp.data.model.auth.RegistrationResult
+import com.ua.historicalsitesapp.util.Result
+import com.ua.historicalsitesapp.util.ServerConfig
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO

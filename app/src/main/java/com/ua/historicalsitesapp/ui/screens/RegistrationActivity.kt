@@ -1,4 +1,4 @@
-package com.ua.historicalsitesapp.authUI
+package com.ua.historicalsitesapp.ui.screens
 
 import android.content.Intent
 import android.os.Bundle
@@ -39,9 +39,9 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ua.historicalsitesapp.MainPageActivity
-import com.ua.historicalsitesapp.data.model.RegistrationResult
+import com.ua.historicalsitesapp.data.model.auth.RegistrationResult
 import com.ua.historicalsitesapp.ui.theme.HistoricalSitesAppTheme
+import com.ua.historicalsitesapp.viewmodels.AuthViewModel
 
 class RegistrationActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -225,29 +225,30 @@ private fun RegistrationCard(
 @Composable
 private fun RegistrationMenu(modifier: Modifier = Modifier) {
     val context = LocalContext.current
-    val registrationView = RegistrationViewModel(context)
+    val registrationView = AuthViewModel(context)
 
     if (registrationView.isLoggedIn()) {
         val intent = Intent(context, MainPageActivity::class.java)
         context.startActivity(intent)
     }
 
-
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
 
     RegistrationCard(
-        onEmailChange = { registrationView.email = it },
-        onPasswordChange = { registrationView.password = it },
+        onEmailChange = { email = it },
+        onPasswordChange = { password = it },
         onRegisterClick = {
-            if (!isEmailValid(registrationView.email)) {
+            if (!isEmailValid(email)) {
                 return@RegistrationCard
             }
 
-            if (validatePassword(registrationView.password) != PasswordValidationResult.OK) {
+            if (validatePassword(password) != PasswordValidationResult.OK) {
                 return@RegistrationCard
             }
 
 
-            val registrationResult = registrationView.performRegistration()
+            val registrationResult = registrationView.performRegistration(email, password)
             if (registrationResult == RegistrationResult.SUCCESS) {
                 val intent = Intent(context, LoginActivity::class.java)
                 context.startActivity(intent)

@@ -1,4 +1,4 @@
-package com.ua.historicalsitesapp.data
+package com.ua.historicalsitesapp.data.repository
 
 import android.content.Context
 import androidx.datastore.core.DataStore

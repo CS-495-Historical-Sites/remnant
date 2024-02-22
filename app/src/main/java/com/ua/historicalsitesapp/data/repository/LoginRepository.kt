@@ -1,4 +1,4 @@
-package com.ua.historicalsitesapp.data
+package com.ua.historicalsitesapp.data.repository
 
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
@@ -7,10 +7,11 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.ua.historicalsitesapp.data.model.LoggedInUser
-import com.ua.historicalsitesapp.data.model.LoginDetails
-import com.ua.historicalsitesapp.data.model.RegistrationDetails
-import com.ua.historicalsitesapp.data.model.RegistrationResult
+import com.ua.historicalsitesapp.data.model.auth.LoggedInUser
+import com.ua.historicalsitesapp.data.model.auth.LoginDetails
+import com.ua.historicalsitesapp.data.model.auth.RegistrationDetails
+import com.ua.historicalsitesapp.data.model.auth.RegistrationResult
+import com.ua.historicalsitesapp.util.Result
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import java.security.KeyStore

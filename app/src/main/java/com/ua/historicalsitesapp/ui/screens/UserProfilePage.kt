@@ -1,4 +1,4 @@
-package com.ua.historicalsitesapp
+package com.ua.historicalsitesapp.ui.screens
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

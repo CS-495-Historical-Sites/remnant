@@ -1,4 +1,4 @@
-package com.ua.historicalsitesapp.authUI
+package com.ua.historicalsitesapp.ui.screens
 
 import android.content.Intent
 import android.os.Bundle
@@ -26,9 +26,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ua.historicalsitesapp.MainPageActivity
-import com.ua.historicalsitesapp.data.Result
 import com.ua.historicalsitesapp.ui.theme.HistoricalSitesAppTheme
+import com.ua.historicalsitesapp.util.Result
+import com.ua.historicalsitesapp.viewmodels.AuthViewModel
 
 class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -117,12 +117,16 @@ private fun LoginCard(
 @Composable
 private fun LoginMenu(modifier: Modifier = Modifier) {
     val context = LocalContext.current
-    val loginView = LoginViewModel(context)
+    val view = AuthViewModel(context)
+
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+
     LoginCard(
-        onEmailChange = { loginView.email = it },
-        onPasswordChange = { loginView.password = it },
+        onEmailChange = { email = it },
+        onPasswordChange = { password = it },
         onLoginClick = {
-            val loginResult = loginView.performLogin()
+            val loginResult = view.performLogin(email, password)
 
             if (loginResult is Result.Success) {
                 val intent = Intent(context, MainPageActivity::class.java)

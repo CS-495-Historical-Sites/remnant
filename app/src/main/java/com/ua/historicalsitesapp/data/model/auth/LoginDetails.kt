@@ -1,9 +1,9 @@
-package com.ua.historicalsitesapp.data.model
+package com.ua.historicalsitesapp.data.model.auth
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class RegistrationDetails(
+data class LoginDetails(
     val email: String,
     val password: String
 )

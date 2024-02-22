@@ -1,4 +1,4 @@
-package com.ua.historicalsitesapp
+package com.ua.historicalsitesapp.util
 
 object ServerConfig {
     // server on AWS

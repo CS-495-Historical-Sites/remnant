@@ -1,4 +1,4 @@
-package com.ua.historicalsitesapp.data
+package com.ua.historicalsitesapp.util
 
 /**
  * A generic class that holds a value with its loading status.

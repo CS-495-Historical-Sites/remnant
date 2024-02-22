@@ -1,13 +1,14 @@
-package com.ua.historicalsitesapp
+package com.ua.historicalsitesapp.viewmodels
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
-import com.ua.historicalsitesapp.data.LoginDataSource
-import com.ua.historicalsitesapp.data.LoginRepositoryProvider
-import com.ua.historicalsitesapp.data.model.GetBearerTokens
-import com.ua.historicalsitesapp.data.model.HsLocation
-import com.ua.historicalsitesapp.data.model.HsLocationComplete
-import com.ua.historicalsitesapp.data.model.LoggedInUser
+import com.ua.historicalsitesapp.data.model.auth.GetBearerTokens
+import com.ua.historicalsitesapp.data.model.auth.LoggedInUser
+import com.ua.historicalsitesapp.data.model.map.HsLocation
+import com.ua.historicalsitesapp.data.model.map.HsLocationComplete
+import com.ua.historicalsitesapp.data.repository.LoginDataSource
+import com.ua.historicalsitesapp.data.repository.LoginRepositoryProvider
+import com.ua.historicalsitesapp.util.ServerConfig
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO

@@ -1,4 +1,4 @@
-package com.ua.historicalsitesapp.data.model
+package com.ua.historicalsitesapp.data.model.auth
 
 import io.ktor.client.plugins.auth.providers.BearerTokens
 import kotlinx.serialization.SerialName
