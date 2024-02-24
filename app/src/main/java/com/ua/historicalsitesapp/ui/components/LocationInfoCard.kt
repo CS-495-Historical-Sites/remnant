@@ -5,7 +5,6 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import com.ua.historicalsitesapp.data.model.map.ClusterItem
-
 import com.ua.historicalsitesapp.viewmodels.MainPageViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -18,11 +17,11 @@ fun LocationInfoCard(
     val sheetState = rememberModalBottomSheetState()
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
-        sheetState = sheetState
+        sheetState = sheetState,
     ) {
         // Sheet content
         val info = selectedLocation.let { mainPageViewModel.getLocationInfo(it.itemId) }
-
-        LocationInfoCardContent(location = info)
+        LocationInfoCardContent(location = info, sheetState)
     }
+
 }

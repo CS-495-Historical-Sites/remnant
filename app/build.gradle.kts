@@ -103,6 +103,7 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
     implementation("io.ktor:ktor-client-auth:$ktor_version")
     implementation("com.google.maps.android:maps-compose-utils:4.3.2")
+    implementation("androidx.compose.material:material:1.6.2")
     implementation("io.coil-kt:coil-compose:2.5.0")
     implementation("io.coil-kt:coil:2.5.0")
     implementation("com.google.accompanist:accompanist-permissions:0.25.0")

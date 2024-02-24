@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.GoogleMapOptions
 import com.google.maps.android.clustering.algo.NonHierarchicalViewBasedAlgorithm
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapsComposeExperimentalApi
 import com.google.maps.android.compose.clustering.Clustering
 import com.google.maps.android.compose.clustering.rememberClusterManager
@@ -38,6 +39,7 @@ private fun CustomRendererClustering(
     val screenHeight = configuration.screenHeightDp.dp
     val screenWidth = configuration.screenWidthDp.dp
     val clusterManager = rememberClusterManager<ClusterItem>()
+
 
     val algorithm =
         NonHierarchicalViewBasedAlgorithm<ClusterItem>(
@@ -112,7 +114,9 @@ fun GoogleMapsScreen(view: MainPageViewModel, items: List<ClusterItem>) {
                 modifier = Modifier.fillMaxSize(),
                 googleMapOptionsFactory = {
                     GoogleMapOptions().mapId("ed053e0f6a3454e8")
-                }
+
+                },
+                properties = MapProperties(isMyLocationEnabled = true),
             ) {
                 CustomRendererClustering(
                     items = items,
