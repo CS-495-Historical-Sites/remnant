@@ -3,4 +3,15 @@ plugins {
     id("com.android.application") version "8.2.2" apply false
     id("org.jetbrains.kotlin.android") version "1.9.0" apply false
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin") version "2.0.1" apply false
+    id("com.autonomousapps.dependency-analysis") version "1.3.0"
+}
+
+dependencyAnalysis {
+    issues {
+        all {
+            onAny {
+                severity("fail") // default is 'warn'
+            }
+        }
+    }
 }
