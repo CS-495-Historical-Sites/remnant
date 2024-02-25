@@ -55,8 +55,8 @@ def init_app(testing=False, db_uri=Config.SQLALCHEMY_DATABASE_URI):
                         continue
                     hs_db.create_location(
                         name,
-                        coordinates["lat"],
-                        coordinates["long"],
+                        coordinates["latitude"],
+                        coordinates["longtitude"],
                         short_desc=short_desc,
                         long_desc=long_desc,
                         wikidata_image_name=image_name,
