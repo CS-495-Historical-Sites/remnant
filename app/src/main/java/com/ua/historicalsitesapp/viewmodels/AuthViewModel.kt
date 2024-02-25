@@ -7,8 +7,8 @@ import com.ua.historicalsitesapp.data.model.auth.LoggedInUser
 import com.ua.historicalsitesapp.data.model.auth.LoginDetails
 import com.ua.historicalsitesapp.data.model.auth.RegistrationDetails
 import com.ua.historicalsitesapp.data.model.auth.RegistrationResult
-import com.ua.historicalsitesapp.data.repository.LoginDataSource
-import com.ua.historicalsitesapp.data.repository.LoginRepositoryProvider
+import com.ua.historicalsitesapp.data.repository.auth.LoginDataSource
+import com.ua.historicalsitesapp.data.repository.auth.LoginRepositoryProvider
 import com.ua.historicalsitesapp.util.Result
 import kotlinx.coroutines.runBlocking
 

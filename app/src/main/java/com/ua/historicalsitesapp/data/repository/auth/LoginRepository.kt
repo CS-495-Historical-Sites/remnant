@@ -1,4 +1,4 @@
-package com.ua.historicalsitesapp.data.repository
+package com.ua.historicalsitesapp.data.repository.auth
 
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties

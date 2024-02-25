@@ -1,4 +1,4 @@
-package com.ua.historicalsitesapp.data.repository
+package com.ua.historicalsitesapp.data.repository.auth
 
 import com.ua.historicalsitesapp.data.model.auth.LoggedInUser
 import com.ua.historicalsitesapp.data.model.auth.LoginDetails

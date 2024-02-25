@@ -1,5 +1,6 @@
 package com.ua.historicalsitesapp.ui.components
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,8 +16,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMapOptions
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.clustering.algo.NonHierarchicalViewBasedAlgorithm
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
@@ -24,6 +31,7 @@ import com.google.maps.android.compose.MapsComposeExperimentalApi
 import com.google.maps.android.compose.clustering.Clustering
 import com.google.maps.android.compose.clustering.rememberClusterManager
 import com.google.maps.android.compose.clustering.rememberClusterRenderer
+import com.google.maps.android.compose.rememberCameraPositionState
 import com.ua.historicalsitesapp.data.model.map.ClusterItem
 import com.ua.historicalsitesapp.ui.screens.TAG
 import com.ua.historicalsitesapp.viewmodels.MainPageViewModel
@@ -98,6 +106,8 @@ private fun CustomRendererClustering(
     }
 }
 
+
+@SuppressLint("MissingPermission")
 @Composable
 fun GoogleMapsScreen(view: MainPageViewModel, items: List<ClusterItem>) {
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -107,6 +117,25 @@ fun GoogleMapsScreen(view: MainPageViewModel, items: List<ClusterItem>) {
         showBottomSheet = true // Update the state value
         selectedLocation = item
     }
+    val context = LocalContext.current
+    val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+
+    val cameraPositionState = rememberCameraPositionState {
+        CameraPosition.NULL
+    }
+
+
+
+    fusedLocationClient.getCurrentLocation(PRIORITY_HIGH_ACCURACY, null)
+        .addOnSuccessListener { location ->
+            if (location != null) {
+                val coordinates = LatLng(location.latitude, location.longitude)
+                val cameraPosition = CameraPosition.fromLatLngZoom(coordinates, 15F)
+                cameraPositionState.move(CameraUpdateFactory.newCameraPosition(cameraPosition))
+            }
+        }
+
+    
 
     Scaffold { contentPadding ->
         Box(modifier = Modifier.padding(contentPadding)) {
@@ -117,6 +146,7 @@ fun GoogleMapsScreen(view: MainPageViewModel, items: List<ClusterItem>) {
 
                 },
                 properties = MapProperties(isMyLocationEnabled = true),
+                cameraPositionState = cameraPositionState
             ) {
                 CustomRendererClustering(
                     items = items,
