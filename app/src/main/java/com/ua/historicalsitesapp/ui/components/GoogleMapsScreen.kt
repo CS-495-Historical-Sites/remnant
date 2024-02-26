@@ -135,7 +135,7 @@ fun GoogleMapsScreen(view: MainPageViewModel, items: List<ClusterItem>) {
             }
         }
 
-    
+
 
     Scaffold { contentPadding ->
         Box(modifier = Modifier.padding(contentPadding)) {

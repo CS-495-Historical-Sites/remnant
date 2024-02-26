@@ -9,7 +9,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.ua.historicalsitesapp.ui.theme.HistoricalSitesAppTheme
+import com.example.compose.HistoricalSitesAppTheme
+
 
 class UserProfileActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
