@@ -21,7 +21,15 @@ erDiagram
         int user_id  FK
         int location_id  FK
     }
+    BlacklistToken {
+        int id PK
+        string token_id
+        string token_type
+        string user_id FK
+        datetime logout_time
+    }
 
     User ||--o{ Visit : "visits"
     Location ||--o{ Visit : "visited by"
+    User ||--o{BlacklistToken : "old token"}
 ```
