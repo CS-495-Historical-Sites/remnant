@@ -31,5 +31,5 @@ erDiagram
 
     User ||--o{ Visit : "visits"
     Location ||--o{ Visit : "visited by"
-    User ||--o{BlacklistToken : "old token"}
+    User ||--o{BlacklistToken : "old token"
 ```
