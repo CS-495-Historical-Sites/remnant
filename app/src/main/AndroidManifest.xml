@@ -47,7 +47,6 @@
         <activity
             android:name=".ui.screens.RegistrationActivity"
             android:exported="true"
-            android:label="@string/title_activity_registration"
             android:theme="@style/Theme.HistoricalSitesApp">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
