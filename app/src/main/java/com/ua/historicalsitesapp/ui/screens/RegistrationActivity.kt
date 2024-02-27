@@ -291,6 +291,7 @@ fun RegistrationCard(
 
 @Composable
 private fun RegistrationMenu(modifier: Modifier = Modifier) {
+
     val context = LocalContext.current
     val registrationView = AuthViewModel(context)
 
@@ -327,8 +328,8 @@ private fun RegistrationMenu(modifier: Modifier = Modifier) {
             context.startActivity(intent)
         }
     )
-
 }
+
 
 
 

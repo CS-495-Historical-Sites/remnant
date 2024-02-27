@@ -11,10 +11,13 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.request.delete
+import io.ktor.client.request.headers
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
@@ -84,7 +87,53 @@ class LoginDataSource {
         return sendRegistrationRequest(userDetails)
     }
 
-    fun logout() {
+    suspend fun logout(tokenObject: LoggedInUser): LogoutResult {
         // TODO: revoke authentication
+        return sendLogoutRequest(tokenObject)
+    }
+
+    sealed class LogoutResult {
+        data object Success : LogoutResult()
+        data class Failure(val error: Throwable) : LogoutResult()
+    }
+
+
+    private suspend fun sendLogoutRequest(tokenObject: LoggedInUser): LogoutResult {
+        try {
+            val client = HttpClient(CIO) {
+                install(ContentNegotiation) {
+                    json(Json {
+                        prettyPrint = true
+                        isLenient = true
+                    })
+                }
+            }
+
+            val response: HttpResponse = client.delete(ServerConfig.SERVER_URL + "/logout") {
+                contentType(ContentType.Application.Json)
+                headers {
+                    append(HttpHeaders.Authorization, "Bearer ${tokenObject.accessToken}")
+                }
+            }
+            if (response.status.value != 200) {
+                throw java.lang.Exception("logout request error")
+            }
+
+            val refreshResponse: HttpResponse = client.delete(ServerConfig.SERVER_URL + "/logout") {
+                contentType(ContentType.Application.Json)
+                headers {
+                    append(HttpHeaders.Authorization, "Bearer ${tokenObject.refreshToken}")
+                }
+            }
+            if (refreshResponse.status.value != 200) {
+                throw java.lang.Exception("logout request error")
+            }
+
+
+            return LogoutResult.Success
+        } catch (e: Exception) {
+            println("Exception during logout: ${e.message}")
+            return LogoutResult.Failure(e)
+        }
     }
 }

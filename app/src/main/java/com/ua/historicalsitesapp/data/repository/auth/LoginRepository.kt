@@ -11,6 +11,7 @@ import com.ua.historicalsitesapp.data.model.auth.LoggedInUser
 import com.ua.historicalsitesapp.data.model.auth.LoginDetails
 import com.ua.historicalsitesapp.data.model.auth.RegistrationDetails
 import com.ua.historicalsitesapp.data.model.auth.RegistrationResult
+import com.ua.historicalsitesapp.data.repository.auth.LoginDataSource.LogoutResult
 import com.ua.historicalsitesapp.util.Result
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -45,9 +46,31 @@ class LoginRepository(
         }
     }
 
-    fun logout() {
-        user = null
-        dataSource.logout()
+    fun logout(): Boolean {
+        if (user == null) {
+            return false; // or true idk
+        }
+
+        val result: LogoutResult
+        runBlocking {
+            result = dataSource.logout(user!!)
+        }
+
+        return when (result) {
+            is LogoutResult.Success -> {
+                runBlocking {
+                    clearCachedTokens()
+                    user = null
+                }
+                true
+            }
+
+            else -> {
+                println("Logout Failed")
+                false
+            }
+
+        }
     }
 
     suspend fun login(userDetails: LoginDetails): Result<LoggedInUser> {
@@ -58,6 +81,16 @@ class LoginRepository(
         }
 
         return result
+    }
+
+    private suspend fun clearCachedTokens() {
+        val datastoreAccessTokenKey = stringPreferencesKey("accessToken")
+        val datastoreRefreshTokenKey = stringPreferencesKey("refreshToken")
+
+        dataStore.edit {
+            it.remove(datastoreAccessTokenKey)
+            it.remove(datastoreRefreshTokenKey)
+        }
     }
 
     suspend fun register(userDetails: RegistrationDetails): RegistrationResult {

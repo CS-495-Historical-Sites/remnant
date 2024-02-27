@@ -39,4 +39,12 @@ class AuthViewModel(context: Context) : ViewModel() {
         return result
     }
 
+    fun performLogout(): Boolean {
+        val logoutResult: Boolean
+        if (loginRepository.isLoggedIn) {
+            logoutResult = loginRepository.logout()
+            return logoutResult
+        }
+        return false
+    }
 }
