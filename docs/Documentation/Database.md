@@ -25,7 +25,7 @@ erDiagram
         int id PK
         string token_id
         string token_type
-        string user_id FK
+        int user_id FK
         datetime logout_time
     }
 
