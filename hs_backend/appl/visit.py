@@ -78,6 +78,14 @@ def add_visited_location():
         return jsonify({"message": "Invalid location ID"}), 400
 
     location_to_add = Location.query.filter_by(id=location_key).first()
+    if not location_to_add:
+        return jsonify({"message": "Location not found"}), 404
+
+    check_duplicate = Visit.query.filter_by(
+        user_id=user.id, location_id=location_to_add.id
+    ).first()
+    if check_duplicate:
+        return jsonify({"message": "User has already visited this location"}), 409
 
     if location_to_add:
         hs_db.create_visited_location(location_to_add.id, user.id)

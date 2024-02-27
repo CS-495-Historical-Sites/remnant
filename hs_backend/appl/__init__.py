@@ -38,7 +38,14 @@ def init_app(testing=False, db_uri=Config.SQLALCHEMY_DATABASE_URI):
         app.register_blueprint(auth.auth_blueprint)
         app.register_blueprint(locations.location_blueprint)
         app.register_blueprint(visit.visit_blueprint)
+
         program_metadata.create_all(db.engine)
+
+        # register jwt blocklist function
+        @jwt.token_in_blocklist_loader
+        def check_token(jwt_header, jwt_payload: dict) -> bool:
+            jti = jwt_payload["jti"]
+            return hs_db.is_token_blacklisted(jti)
 
         if not testing:
             skipped = 0

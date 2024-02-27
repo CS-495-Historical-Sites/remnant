@@ -37,13 +37,13 @@ class TestApp(TestIsolator):
             ({"email": "", "password": "AGoodPassword5!"}, 422),
             # improper length
             ({"email": "agoodemfsfsdfsail@gmail.com", "password": "sword5!"}, 422),
-            # characters not allowed in our password constraints
+            # characters allowed in our password constraints
             (
                 {
                     "email": "asldkjfs333949959494@gmail.com",
                     "password": "AGoodPassword5_+_)(*&!",
                 },
-                422,
+                200,
             ),
             # no password entered
             ({"email": "hellow%@yahoo.gov", "password": ""}, 422),
@@ -106,5 +106,38 @@ class TestApp(TestIsolator):
 
         response = client.post("/api/register", json=VALID_REGISTRATION_REQUEST)
         assert response.status_code == 422
+
+        self.teardown_app()
+
+    def test_logout(self, client):
+        self.setup_app()
+
+        login_credentials = {
+            "email": "workingemail8@gmail.com",
+            "password": "Working65**",
+        }
+
+        response = client.post("/api/register", json=login_credentials)
+        assert response.status_code == 200
+
+        response = client.post("/api/login", json=login_credentials)
+        assert response.status_code == 200
+
+        j_token = response.json.get("access_token")
+        headers = {"Authorization": f"Bearer {j_token}"}
+
+        response = client.delete("/api/logout", headers=headers)
+        assert response.status_code == 200
+
+        response = client.post(
+            "/api/user/visited_locations",
+            json={"id": 2},
+            headers=headers,
+        )
+
+        assert response.status_code == 401
+
+        response = client.delete("/api/logout", headers=headers)
+        assert response.status_code == 401
 
         self.teardown_app()

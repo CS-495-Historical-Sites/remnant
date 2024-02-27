@@ -79,6 +79,17 @@ class TestVisitedLocations(TestIsolator):
         )
         assert response.status_code == expected_status
         if response.status_code == 200:
+            # testing duplicate requests are handled properly
+
+            response = client.post(
+                "/api/user/visited_locations",
+                json=location_data,
+                headers=headers,
+                content_type="application/json",
+            )
+            assert response.status_code == 409
+
+            # testing the database row was created
             test_query = Visit.query.filter_by(location_id=location_data["id"]).first()
             assert test_query is not None
         self.teardown_app()
@@ -183,6 +194,7 @@ class TestVisitedLocations(TestIsolator):
         assert login_response.status_code == 200
 
         j_token = login_response.json.get("access_token")
+        r_token = login_response.json.get("refresh_token")
         headers = {"Authorization": f"Bearer {j_token}"}
 
         response = client.get(
@@ -195,5 +207,23 @@ class TestVisitedLocations(TestIsolator):
 
         locations_retrieved = response.json.get("visited_locations")
         assert len(locations_retrieved) == len(locations)
+
+        """TESTING REFRESH WITH LOCATIONS"""
+
+        headers2 = {"Authorization": f"Bearer {r_token}"}
+
+        rr = client.post("/api/refresh", headers=headers2)
+        new_token = rr.json.get("access_token")
+        final_header = {"Authorization": f"Bearer {new_token}"}
+        refresh_response = client.get(
+            "/api/user/visited_locations",
+            json=user_id,
+            headers=final_header,
+            content_type="application/json",
+        )
+        assert refresh_response.status_code == expected_status
+
+        refresh_locations = refresh_response.json.get("visited_locations")
+        assert len(refresh_locations) == len(locations)
 
         self.teardown_app()

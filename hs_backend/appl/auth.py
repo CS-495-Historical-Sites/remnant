@@ -1,13 +1,15 @@
 """Routes for user authentication."""
 
+from sqlalchemy.exc import DatabaseError
 import re
-
+from datetime import datetime
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import (
     create_access_token,
     create_refresh_token,
     get_jwt_identity,
     jwt_required,
+    get_jwt,
 )
 
 from . import hs_db, LOGGER
@@ -103,20 +105,24 @@ def refresh():
     return jsonify(access_token=access_token), 200
 
 
-# @auth_blueprint.route("api/logout", methods = ["POST"])
-# @login_required
-# def logout():
-#     try:
-#         current_user = get_current_user()
-#         if current_user:
-#             revoke_token(current_user.access_token)
-#         else:
-#             return jsonify({"message": "User not found"}), 401
-#     except Exception as e:
-#         LOGGER.error(f"Error during logout: {e}")
-#         return jsonify({"message": "Logout failed"}), 500
+@auth_blueprint.route("/api/logout", methods=["DELETE", "OPTIONS"])
+@jwt_required(verify_type=False)
+def logout():
+    try:
+        user_identity = get_jwt_identity()
+        user = hs_db.get_user(user_identity)
+        if not user:
+            return jsonify({"message": "Token not found or invalid"}), 404
+        unique_token = get_jwt()["jti"]
+        token_type = get_jwt()["type"]
+        logout_date = datetime.utcnow()
+        hs_db.blacklist_token(unique_token, logout_date, token_type, user.id)
+    except KeyError:
+        return jsonify({"message": "Token not found or invalid"}), 401
+    except DatabaseError:
+        return jsonify({"message": "Database error"}), 500
 
-#     return jsonify({"message": "Successfully logged out"}), 200
+    return jsonify({"message": "Logged out successfully"}), 200
 
 
 # using regex to match the pattern with three constraints
@@ -133,7 +139,7 @@ def check_valid_email(email):
 # only allows digits, upper or lowercase letters, and the special characters @!$%*?&
 def check_valid_password(password):
     password_regex = re.compile(
-        r"^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$"
+        r"^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]+$"
     )
 
     return bool(re.fullmatch(password_regex, password)) and (

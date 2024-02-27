@@ -1,10 +1,12 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from . import db, LOGGER
-from .models import RegistrationRequest, User, Location, Visit
+from .models import RegistrationRequest, User, Location, Visit, BlacklistToken
 
 
-# user related commands
+"""USER TABLE RELATED FUNCTIONS"""
+
+
 def email_exists(email: str) -> bool:
     return User.query.filter_by(email=email).first() is not None
 
@@ -19,6 +21,9 @@ def create_user(registration_info: RegistrationRequest) -> None:
 
 def get_user(email: str) -> User | None:
     return User.query.filter_by(email=email).first()
+
+
+""" LOCATION TABLE RELATED FUNCTIONS """
 
 
 def create_location(
@@ -75,6 +80,9 @@ def get_locations_near(lat: float, long: float) -> list[Location]:
     return nearby_locations
 
 
+""" VISIT TABLE RELATED FUNCTIONS"""
+
+
 def create_visited_location(location_num: int, user_num: int):
     curr_time = datetime.utcnow()
     visit = Visit(location_id=location_num, user_id=user_num, visit_time=curr_time)
@@ -101,3 +109,32 @@ def get_visited_location(user_id: int) -> list:
     )
 
     return location_rows
+
+
+def is_in_visited(location_id, user_id) -> bool:
+    row = Visit.query.filter_by(user_id=user_id, location_id=location_id)
+    return row is not None
+
+
+""" BLACKLIST RELATED FUNCTIONS"""
+
+
+def blacklist_token(token, logout_time, token_type, user_id):
+    token_to_revoke = BlacklistToken(
+        token_id=token, logout_time=logout_time, token_type=token_type, user_id=user_id
+    )
+    db.session.add(token_to_revoke)
+    db.session.commit()
+
+
+def is_token_blacklisted(token):
+    current_token = BlacklistToken.query.filter_by(token_id=token).first()
+    return current_token is not None
+
+
+def clean_old_tokens():
+    expiration_date = datetime.utcnow() - timedelta(days=30)
+    BlacklistToken.query.filter_by(
+        BlacklistToken.logout_date < expiration_date
+    ).delete()
+    db.session.commit()

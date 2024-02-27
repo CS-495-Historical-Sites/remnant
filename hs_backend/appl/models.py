@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import TypedDict
 
 
@@ -122,3 +122,20 @@ class User(db.Model):
 
     def password_matches_hash(self, password: str) -> bool:
         return check_password_hash(self.password_hash, password)
+
+
+class BlacklistToken(db.Model):
+    __tablename__ = "blacklist_token"
+    metadata = program_metadata
+    id = db.Column(db.Integer, primary_key=True)
+    token_id = db.Column(db.String(36), nullable=False, index=True)
+    token_type = db.Column(db.String(16), nullable=False)
+    logout_time = db.Column(db.DateTime, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+
+    def __init__(self, token_id, logout_time, token_type, user_id):
+        self.token_id = token_id
+        self.logout_time = logout_time
+        self.token_type = token_type
+        self.user_id = user_id
+        self.logout_time = datetime.utcnow()
