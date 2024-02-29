@@ -87,7 +87,7 @@ class TestVisitedLocations(TestIsolator):
                 headers=headers,
                 content_type="application/json",
             )
-            assert response.status_code == 409
+            assert response.status_code == 200
 
             # testing the database row was created
             test_query = Visit.query.filter_by(location_id=location_data["id"]).first()

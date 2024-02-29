@@ -17,23 +17,12 @@ def get_visited_locations():
     if user is None:
         return jsonify({"message": "User not found"}), 400
 
-    visited_locations = hs_db.get_visited_location(user.id)
+    visited_locations: list = hs_db.get_visited_location(user.id)
 
-    if visited_locations:
-        location_data = [
-            {"id": location_id, "name": name} for location_id, name in visited_locations
-        ]
-        return jsonify({"visited_locations": location_data}), 200
-
-    return (
-        jsonify(
-            {
-                "message": "No visited locations found for the user",
-                "visited_locations": [],
-            }
-        ),
-        200,
-    )
+    location_data = [
+        {"id": location_id, "name": name} for location_id, name in visited_locations
+    ]
+    return jsonify({"visited_locations": location_data}), 200
 
 
 @visit_blueprint.route("/api/user/visited_locations", methods=["DELETE"])
@@ -51,15 +40,15 @@ def delete_visited_location():
     except ValueError:
         return jsonify({"message": "Invalid location ID"}), 400
 
-    location_to_delete = Visit.query.filter_by(
+    visit_to_delete = Visit.query.filter_by(
         location_id=location_key, user_id=user.id
     ).first()
 
-    if location_to_delete:
-        hs_db.delete_visited_location(location_to_delete)
-        return jsonify({"message": "Removed Location"}), 200
+    if visit_to_delete:
+        hs_db.delete_visited_location(visit_to_delete)
+        return jsonify({"message": "Removed Visit"}), 200
 
-    return jsonify({"message": "Location not found"}), 404
+    return jsonify({"message": "Visit not found"}), 404
 
 
 @visit_blueprint.route("/api/user/visited_locations", methods=["POST"])
@@ -85,10 +74,7 @@ def add_visited_location():
         user_id=user.id, location_id=location_to_add.id
     ).first()
     if check_duplicate:
-        return jsonify({"message": "User has already visited this location"}), 409
+        return jsonify({"message": "Visit Successfully Added"}), 200
 
-    if location_to_add:
-        hs_db.create_visited_location(location_to_add.id, user.id)
-        return jsonify({"message": "Location Successfully Added"}), 200
-
-    return jsonify({"message": "Location not found"}), 404
+    hs_db.create_visited_location(location_to_add.id, user.id)
+    return jsonify({"message": "Visit Successfully Added"}), 200
