@@ -12,6 +12,7 @@ import com.ua.historicalsitesapp.data.repository.auth.LoginDataSource
 import com.ua.historicalsitesapp.data.repository.auth.LoginRepositoryProvider
 import com.ua.historicalsitesapp.data.repository.locations.LocationDataSource
 import com.ua.historicalsitesapp.data.repository.locations.LocationRepository
+import com.ua.historicalsitesapp.util.ServerConfig
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
@@ -53,7 +54,7 @@ class MainPageViewModel(context: Context) : ViewModel() {
                     }
                     refreshTokens {
                         val refreshTokenInfo: LoggedInUser = client.post(
-                            urlString = "http://10.0.2.2:8080/api/refresh"
+                            urlString = ServerConfig.SERVER_URL + "/refresh"
                         ) { markAsRefreshTokenRequest() }.body()
                         usertokens = GetBearerTokens(refreshTokenInfo)
                         usertokens
@@ -75,7 +76,7 @@ class MainPageViewModel(context: Context) : ViewModel() {
     fun hasUserVisitedLocation(locationId: Int): Boolean {
         val client = getUserClient()
         return runBlocking {
-            val response = client.get("http://10.0.2.2:8080/api/user/visited_locations") {
+            val response = client.get(ServerConfig.SERVER_URL + " /user/visited_locations") {
                 contentType(ContentType.Application.Json)
             }
             if (response.status.value == 200) {
@@ -91,7 +92,7 @@ class MainPageViewModel(context: Context) : ViewModel() {
         val client = getUserClient()
         val visitInfo = VisitAddRequest(locationId)
         return runBlocking {
-            val response = client.post("http://10.0.2.2:8080/api/user/visited_locations") {
+            val response = client.post(ServerConfig.SERVER_URL + "/user/visited_locations") {
                 contentType(ContentType.Application.Json)
                 setBody(visitInfo)
             }
@@ -103,7 +104,7 @@ class MainPageViewModel(context: Context) : ViewModel() {
         val client = getUserClient()
         val visitInfo = VisitAddRequest(locationId)
         return runBlocking {
-            val response = client.delete("http://10.0.2.2:8080/api/user/visited_locations") {
+            val response = client.delete(ServerConfig.SERVER_URL + "/user/visited_locations") {
                 contentType(ContentType.Application.Json)
                 setBody(visitInfo)
             }
