@@ -40,6 +40,7 @@ import com.ua.historicalsitesapp.data.model.map.HsLocationComplete
 import com.ua.historicalsitesapp.data.wikidata.constructWikidataImageLink
 import com.ua.historicalsitesapp.ui.foreignintents.createGoogleMapsDirectionsIntent
 import com.ua.historicalsitesapp.ui.theme.Typography
+import com.ua.historicalsitesapp.viewmodels.MainPageViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -134,21 +135,45 @@ private fun ImageBox(imageLink: String) {
 @Composable
 private fun LocationActionItems(location: HsLocationComplete) {
     val context = LocalContext.current
+    val view = MainPageViewModel(context)
+
+
+    var hasVisitedLocation by remember { mutableStateOf(view.hasUserVisitedLocation(location.id)) }
+
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(4.dp)
     ) {
         Button(
-            onClick = { /*TODO*/ },
+            onClick = {
+                if (!hasVisitedLocation) {
+                    val successfullyMarked = view.markLocationAsVisited(location.id)
+                    if (successfullyMarked) {
+                        hasVisitedLocation = true;
+                    }
+                } else {
+                    val successfullyRemoved = view.removeLocationFromVisited(location.id)
+                    if (successfullyRemoved) {
+                        hasVisitedLocation = false;
+                    }
+                }
+
+            },
             colors = ButtonDefaults.buttonColors(contentColor = Color.White)
         ) {
-            Text("Add To Favorites")
-            Spacer(modifier = Modifier.width(4.dp))
-            Icon(Icons.Default.Add, "Add to favorites ")
+            val buttonText = if (hasVisitedLocation) {
+                "Remove from visits"
+            } else {
+                "Add to visits"
+            }
 
+            Text(buttonText)
+            Spacer(modifier = Modifier.width(4.dp))
+            Icon(Icons.Default.Add, buttonText)
         }
+
         Button(onClick = {
             val intent = createGoogleMapsDirectionsIntent(
                 location.latitude,
