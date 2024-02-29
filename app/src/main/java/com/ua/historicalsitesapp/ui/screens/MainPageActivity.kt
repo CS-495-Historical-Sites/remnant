@@ -163,7 +163,7 @@ fun HomeScreen(modifier: Modifier) {
         color = MaterialTheme.colorScheme.background
     ) {
         val context = LocalContext.current
-        var hasPermission by remember { mutableStateOf(false) }
+        var hasPermission by remember { mutableStateOf(hasLocationPermission(context)) }
 
         LaunchedEffect(Unit) {
             // Check for permissions when the composable is initially launched
