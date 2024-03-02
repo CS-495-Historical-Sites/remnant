@@ -1,21 +1,10 @@
+# pylint: disable=unused-argument, line-too-long
+
 import pytest
 
-from hs_backend.appl import init_app, db
-from hs_backend.appl import hs_db
-from tests import DB_URI
-
-from hs_backend.appl.models import Location, User, RegistrationRequest
-from tests.atomic import TestIsolator
-
-
-@pytest.fixture()
-def app():
-    flask_app = init_app(testing=True, db_uri=DB_URI)
-
-    flask_app.config.update({"TESTING": True, "SQLALCHEMY_DATABASE_URI": DB_URI})
-
-    with flask_app.app_context():
-        yield flask_app
+from src.appl import db
+from src.appl.remnant_db import user_queries, location_queries
+from src.appl.models import Location, User, RegistrationRequest
 
 
 @pytest.fixture
@@ -25,14 +14,14 @@ def valid_user() -> User:
     return User(user_email, user_unhashed_password)
 
 
-class TestUser(TestIsolator):
+class TestUser:
+
     def test_can_add_and_retrieve_user_from_db(self, app):
-        self.setup_app()
         user_email = "DamonArnette34@gmail.com"
         user_unhashed_password = "IloveSQL#667"
 
         test_info = RegistrationRequest(user_email, user_unhashed_password)
-        hs_db.create_user(test_info)
+        user_queries.create_user(test_info)
 
         fetched_user: User | None = User.query.filter_by(email=user_email).first()
 
@@ -40,30 +29,27 @@ class TestUser(TestIsolator):
         assert fetched_user.email == user_email
         assert fetched_user.password_hash != user_unhashed_password
 
-        self.teardown_app()
-
     def test_email_exists(self, app, valid_user: User):
-        self.setup_app()
 
         db.session.add(valid_user)
         db.session.commit()
 
-        assert hs_db.email_exists(valid_user.email)
-        assert not hs_db.email_exists("Totally not an email")
-
-        self.teardown_app()
+        assert user_queries.email_exists(valid_user.email)
+        assert not user_queries.email_exists("Totally not an email")
 
 
-class TestLocation(TestIsolator):
+class TestLocation:
     def test_can_add_and_retrieve_location_from_db(self, app):
-        self.setup_app()
+
         loc_name = "Tuscaloosa"
         lat = 68.004
         long = 87.0003
         image = "pictureoftuscaloosa.png"
         short = " i love tuscaloosa"
         long_description = "lsdfkaslkjflasjlfkdjsaldfjlsajfdjsaldfjlsajdfljsaldfjlasjdflkasjdlfjaslfjalsjflsajdfjasldfjalsjdflaskjdflasjdflasjldfjasldjfklasjdfljas"
-        hs_db.create_location(loc_name, lat, long, short, long_description, image)
+        location = Location(loc_name, lat, long, image, short, long_description)
+
+        location_queries.create_location(location)
 
         fetched_location = Location.query.filter_by(name=loc_name).first()
 
@@ -74,5 +60,3 @@ class TestLocation(TestIsolator):
         assert fetched_location.short_description == short
         assert fetched_location.long_description == long_description
         assert fetched_location.wikidata_image_name == image
-
-        self.teardown_app()

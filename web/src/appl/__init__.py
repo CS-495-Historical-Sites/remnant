@@ -6,9 +6,10 @@ import time
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
+from sqlalchemy import create_engine, text
+from sqlalchemy.exc import OperationalError
 
-from .config import Config
-
+from src.appl.config import Config
 
 LOGGER = logging.getLogger(__name__)
 FORMAT = "[%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
@@ -16,6 +17,18 @@ logging.basicConfig(format=FORMAT)
 LOGGER.setLevel(Config.LOG_LEVEL)
 
 db = SQLAlchemy()
+
+
+def check_postgres_database_elements(db_uri):
+    try:
+        engine = create_engine(db_uri)
+        with engine.connect() as connection:
+            query = "SELECT COUNT(*) FROM location;"
+            result = connection.execute(text(query))
+            row_count = result.fetchone()[0]
+            return row_count > 0
+    except OperationalError:
+        return False
 
 
 def init_app(testing=False, db_uri=Config.SQLALCHEMY_DATABASE_URI):
@@ -31,8 +44,9 @@ def init_app(testing=False, db_uri=Config.SQLALCHEMY_DATABASE_URI):
     db.init_app(app)
 
     with app.app_context():
-        from . import auth, routes, locations, hs_db, visit
-        from .models import program_metadata
+        from src.appl import auth, routes, locations, visit
+        from src.appl.models import program_metadata, Location
+        from src.appl.remnant_db import location_queries, token_queries
 
         app.register_blueprint(routes.main_blueprint)
         app.register_blueprint(auth.auth_blueprint)
@@ -42,10 +56,14 @@ def init_app(testing=False, db_uri=Config.SQLALCHEMY_DATABASE_URI):
         program_metadata.create_all(db.engine)
 
         # register jwt blocklist function
+        # pylint: disable=unused-argument
         @jwt.token_in_blocklist_loader
         def check_token(jwt_header, jwt_payload: dict) -> bool:
             jti = jwt_payload["jti"]
-            return hs_db.is_token_blacklisted(jti)
+            return token_queries.is_token_blacklisted(jti)
+
+        if check_postgres_database_elements(db_uri):
+            return app
 
         if not testing:
             skipped = 0
@@ -60,17 +78,22 @@ def init_app(testing=False, db_uri=Config.SQLALCHEMY_DATABASE_URI):
                     if not coordinates:
                         skipped += 1
                         continue
-                    hs_db.create_location(
+
+                    loc = Location(
                         name,
                         coordinates["latitude"],
                         coordinates["longtitude"],
-                        short_desc=short_desc,
-                        long_desc=long_desc,
-                        wikidata_image_name=image_name,
+                        image_name,
+                        short_desc,
+                        long_desc,
+                    )
+
+                    location_queries.create_location(
+                        loc,
                         suspend_commit=True,
                     )
 
-                hs_db.commit()
+                db.session.commit()
 
             end_time = time.time()
             elapsed_time = end_time - start_time

@@ -12,4 +12,4 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Test
-      run: make docker-test
+      run: make docker-ci-test

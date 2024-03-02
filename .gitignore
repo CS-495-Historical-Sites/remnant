@@ -3,11 +3,11 @@ __pycache__/
 hs_backend/app.db
 poetry.lock
 
-# Elastic Beanstalk Files
-.elasticbeanstalk/*
-!.elasticbeanstalk/*.cfg.yml
-!.elasticbeanstalk/*.global.yml
-.elasticbeanstalk
-
 # pytest
 .pytest_cache
+
+# postgres
+pgdata
+
+# environment variables
+.env

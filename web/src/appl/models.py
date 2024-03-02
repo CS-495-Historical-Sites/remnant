@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import TypedDict
 
 
@@ -54,6 +54,7 @@ class Location(db.Model):
     long_description = db.Column(db.Text, nullable=True)
     wikidata_image_name = db.Column(db.Text, nullable=False)
 
+    # pylint: disable=too-many-arguments
     def __init__(
         self,
         name,
@@ -114,7 +115,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     email = db.Column(db.String(120), index=True, unique=True)
-    password_hash = db.Column(db.String(128), nullable=False)
+    password_hash = db.Column(db.String(256), nullable=False)
 
     def __init__(self, email: str, supplied_password: str):
         self.email = email

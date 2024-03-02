@@ -1,8 +1,9 @@
 """Routes for user authentication."""
 
-from sqlalchemy.exc import DatabaseError
-import re
 from datetime import datetime
+import re
+
+
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import (
     create_access_token,
@@ -11,10 +12,11 @@ from flask_jwt_extended import (
     jwt_required,
     get_jwt,
 )
+from sqlalchemy.exc import DatabaseError
 
-from . import hs_db, LOGGER
-from .models import RegistrationRequest, LoginRequest
-
+from src.appl import LOGGER
+from src.appl.models import RegistrationRequest, LoginRequest
+from src.appl.remnant_db import user_queries, token_queries
 
 auth_blueprint = Blueprint(
     "auth_blueprint",
@@ -53,10 +55,10 @@ def register():
 
     LOGGER.debug(f"Attemping to register {registration_info.email}")
 
-    if hs_db.email_exists(registration_info.email):
+    if user_queries.email_exists(registration_info.email):
         return jsonify({"message": "Email already exists"}), 422
 
-    hs_db.create_user(registration_info)
+    user_queries.create_user(registration_info)
 
     return jsonify({"email": registration_info.email, "errorString": ""}), 200
 
@@ -85,7 +87,7 @@ def login():
 
     LOGGER.debug(f"Attemping to login {login_info.email}")
 
-    user = hs_db.get_user(login_info.email)
+    user = user_queries.get_user(login_info.email)
     if not user or not user.password_matches_hash(login_info.password):
         return (
             jsonify({"message": "Invalid email or password", "accessToken": ""}),
@@ -110,13 +112,13 @@ def refresh():
 def logout():
     try:
         user_identity = get_jwt_identity()
-        user = hs_db.get_user(user_identity)
+        user = user_queries.get_user(user_identity)
         if not user:
             return jsonify({"message": "Token not found or invalid"}), 404
         unique_token = get_jwt()["jti"]
         token_type = get_jwt()["type"]
         logout_date = datetime.utcnow()
-        hs_db.blacklist_token(unique_token, logout_date, token_type, user.id)
+        token_queries.blacklist_token(unique_token, logout_date, token_type, user.id)
     except KeyError:
         return jsonify({"message": "Token not found or invalid"}), 401
     except DatabaseError:
@@ -125,10 +127,10 @@ def logout():
     return jsonify({"message": "Logged out successfully"}), 200
 
 
-# using regex to match the pattern with three constraints
-# first constraint is upper/lowercase letters, digits, or the characters ._%+- these have to be followed by an @ symbol
-# second constraint is upper/lowercose letters, digits, or the characters .- followed by a .
-# third constraint is upper or lower case letters between the lengths of 2 and 7 for domains.
+# Regex to match pattern with 3 constraints: (1@2.3)
+# 1. Upper/lowercase letters, digits, or ._%+- followed by @
+# 2. Upper/lowercase letters, digits, or .- followed by .
+# 3. Upper/lowercase letters 2-7 characters for domains.
 def check_valid_email(email):
     if email == "":
         return False

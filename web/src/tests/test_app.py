@@ -1,27 +1,10 @@
 import pytest
-from hs_backend.appl import init_app
-from tests import DB_URI
-from tests.constants import VALID_REGISTRATION_REQUEST
-from tests.atomic import TestIsolator
-from hs_backend.appl import init_app
 
 
-@pytest.fixture()
-def app():
-    flask_app = init_app(testing=True, db_uri=DB_URI)
-
-    flask_app.config.update({"TESTING": True, "SQLALCHEMY_DATABASE_URI": DB_URI})
-
-    with flask_app.app_context():
-        yield flask_app
+from src.tests.constants import VALID_REGISTRATION_REQUEST
 
 
-@pytest.fixture()
-def client(app):
-    return app.test_client()
-
-
-class TestApp(TestIsolator):
+class TestApp:
     @pytest.mark.parametrize(
         "registration_credentials, expected_status_code",
         [
@@ -58,10 +41,9 @@ class TestApp(TestIsolator):
         ],
     )
     def test_can_register(self, client, registration_credentials, expected_status_code):
-        self.setup_app()
+
         response = client.post("/api/register", json=registration_credentials)
         assert response.status_code == expected_status_code
-        self.teardown_app()
 
     @pytest.mark.parametrize(
         "login_credentials, login_expected_status_code",
@@ -85,8 +67,6 @@ class TestApp(TestIsolator):
         ],
     )
     def test_can_login(self, client, login_credentials, login_expected_status_code):
-        self.setup_app()
-
         register_response = client.post(
             "/api/register",
             json={"email": "test@example.com", "password": "TestPassword123!"},
@@ -96,22 +76,14 @@ class TestApp(TestIsolator):
         response = client.post("/api/login", json=login_credentials)
         assert response.status_code == login_expected_status_code
 
-        self.teardown_app()
-
     def test_duplicate_registration_prevented(self, client):
-        self.setup_app()
-
         response = client.post("/api/register", json=VALID_REGISTRATION_REQUEST)
         assert response.status_code == 200
 
         response = client.post("/api/register", json=VALID_REGISTRATION_REQUEST)
         assert response.status_code == 422
 
-        self.teardown_app()
-
     def test_logout(self, client):
-        self.setup_app()
-
         login_credentials = {
             "email": "workingemail8@gmail.com",
             "password": "Working65**",
@@ -139,5 +111,3 @@ class TestApp(TestIsolator):
 
         response = client.delete("/api/logout", headers=headers)
         assert response.status_code == 401
-
-        self.teardown_app()

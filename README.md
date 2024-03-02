@@ -1,18 +1,21 @@
-### Build commands
-
+## Development commands
 
 #### Run
 
-`make docker-run`
+`make docker-dev-run`
+
+#### Clean 
+
+`make docker-dev-clean`
 
 #### Test
 
-`make docker-test`
+`make docker-ci-test`
 
-### Format 
+#### Format 
 
 `make format`
 
-### Lint 
+#### Lint 
 
 `make lint`

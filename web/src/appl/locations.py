@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 
-from . import hs_db
+from src.appl.remnant_db import location_queries
 
 location_blueprint = Blueprint(
     "location_blueprint",
@@ -19,10 +19,10 @@ def get_all_locations():
     if latitude and longitude:
         latitude = float(latitude)
         longitude = float(longitude)
-        near_locations = hs_db.get_locations_near(latitude, longitude)
+        near_locations = location_queries.get_locations_near(latitude, longitude)
         return jsonify([l.short_repr() for l in near_locations]), 200
 
-    all_locations = hs_db.get_all_locations()
+    all_locations = location_queries.get_all_locations()
     return jsonify([l.short_repr() for l in all_locations]), 200
 
 
@@ -33,7 +33,7 @@ def get_location_info(location_id):
     except ValueError:
         return jsonify({"message": "Invalid location ID"}), 400
 
-    location = hs_db.get_location(location_key)
+    location = location_queries.get_location(location_key)
     if not location:
         return jsonify({"message": "Location not found"}), 404
 

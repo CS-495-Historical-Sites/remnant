@@ -1,10 +1,9 @@
 FROM python:3.11
 
+WORKDIR /web
 
-WORKDIR /app
-
-COPY . .
+COPY ./web/ .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-CMD ["pytest", "tests"]
+CMD ["pytest", "--verbosity=2", "src/tests"]

@@ -1,16 +1,22 @@
-.PHONY: docker-run docker-test format lint
+.PHONY: docker-dev-clean docker-dev-run docker-ci-test format lint
 
-docker-run: 
-	poetry export -f requirements.txt --output requirements.txt
-	docker build --tag 'hs' -f Dockerfile .
-	docker run -p 8080:8080 hs
+docker-dev-clean:
+	@sudo rm -rf ./pgdata
 
-docker-test:
-	docker build -t testing-image:v1.0 -f TestDockerfile .  
-	docker run --rm testing-image:v1.0  
+docker-dev-run:
+	@poetry export -f requirements.txt --output web/requirements.txt
+	@docker compose -f docker-compose.dev.yml --env-file ./.env.dev up  --build --remove-orphans
+
+docker-ci-test: docker-dev-clean
+	@docker compose -f docker-compose.ci.yml --env-file ./.env.dev  up --build --remove-orphans --exit-code-from test-runner
+
+
+docker-prod-run:
+	@poetry export -f requirements.txt --output web/requirements.txt
+	@docker compose --env-file ./.env  up --build --remove-orphans
 
 format:
-	poetry run black .
+	@poetry run black .
 
 lint:
-	poetry run pylint hs_backend/
+	@poetry run pylint --rcfile=./web/.pylintrc ./web/
