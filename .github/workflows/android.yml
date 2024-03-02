@@ -22,9 +22,16 @@ jobs:
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-      - name: Build with Gradle
-        run: ./gradlew build
+
+      - name: Check Formatting
+        run: ./gradlew ktfmtCheck
+
 
       - name: Check Dependencies
         run: ./gradlew buildHealth
+
+      - name: Build with Gradle
+        run: ./gradlew build
+
+
 
