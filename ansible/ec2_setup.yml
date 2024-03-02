@@ -1,0 +1,29 @@
+- hosts: ec2_instance
+  become: yes
+  tasks:
+    - name: Update apt package cache
+      apt:
+        update_cache: yes
+
+    - name: Install Git
+      apt:
+        name: git
+        state: present
+
+    - import_tasks: install_docker.yml
+
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: present
+
+    - name: Install Poetry
+      pip:
+        name: poetry
+        executable: pip3
+        state: present
+
+    - name: Install Python 3.11
+      apt:
+        name: python3.11
+        state: present

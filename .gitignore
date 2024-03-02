@@ -11,3 +11,6 @@ pgdata
 
 # environment variables
 .env
+
+# ansible inventory file
+ansible/inventory.ini

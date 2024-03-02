@@ -13,7 +13,7 @@ docker-ci-test: docker-dev-clean
 
 docker-prod-run:
 	@poetry export -f requirements.txt --output web/requirements.txt
-	@docker compose --env-file ./.env  up --build --remove-orphans
+	@docker compose --env-file ./.env  up -d --build --remove-orphans
 
 format:
 	@poetry run black .
