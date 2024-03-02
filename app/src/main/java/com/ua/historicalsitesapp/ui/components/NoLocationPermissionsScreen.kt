@@ -18,37 +18,35 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.ua.historicalsitesapp.util.hasLocationPermission
 
-
 @Composable
 fun LocationScreen(onPermissionGranted: () -> Unit) {
-    val context = LocalContext.current
+  val context = LocalContext.current
 
-    // Create a permission launcher
-    val requestPermissionLauncher =
-        rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.RequestPermission(),
-            onResult = { isGranted: Boolean ->
-                if (isGranted) {
-                    onPermissionGranted()
-                }
-            })
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Button(
-            onClick = {
-                if (!hasLocationPermission(context)) {
-                    requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-                }
+  // Create a permission launcher
+  val requestPermissionLauncher =
+      rememberLauncherForActivityResult(
+          contract = ActivityResultContracts.RequestPermission(),
+          onResult = { isGranted: Boolean ->
+            if (isGranted) {
+              onPermissionGranted()
             }
-        ) {
-            Text(text = "Grant location permissions")
-        }
-        Spacer(modifier = Modifier.height(16.dp))
+          },
+      )
+
+  Column(
+      modifier = Modifier.fillMaxSize().padding(16.dp),
+      verticalArrangement = Arrangement.Center,
+      horizontalAlignment = Alignment.CenterHorizontally,
+  ) {
+    Button(
+        onClick = {
+          if (!hasLocationPermission(context)) {
+            requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+          }
+        },
+    ) {
+      Text(text = "Grant location permissions")
     }
+    Spacer(modifier = Modifier.height(16.dp))
+  }
 }

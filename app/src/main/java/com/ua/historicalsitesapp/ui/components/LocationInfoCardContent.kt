@@ -44,147 +44,136 @@ import com.ua.historicalsitesapp.viewmodels.MainPageViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LocationInfoCardContent(location: HsLocationComplete, sheetState: SheetState) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-
-        ) {
-        val scrollState = rememberScrollState()
-        Column(
-            modifier = Modifier
-                .padding(horizontal = 32.dp)
-                .then(Modifier.verticalScroll(scrollState))
-
-        ) {
-            RenderLocationInfo(location)
-            Spacer(modifier = Modifier.height(16.dp))
-            Divider(
-                thickness = 3.dp
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            LocationActionItems(location)
-            Spacer(modifier = Modifier.height(32.dp))
-        }
-
-
+fun LocationInfoCardContent(
+    location: HsLocationComplete,
+    sheetState: SheetState,
+) {
+  Box(
+      modifier = Modifier.fillMaxSize(),
+  ) {
+    val scrollState = rememberScrollState()
+    Column(
+        modifier = Modifier.padding(horizontal = 32.dp).then(Modifier.verticalScroll(scrollState)),
+    ) {
+      RenderLocationInfo(location)
+      Spacer(modifier = Modifier.height(16.dp))
+      Divider(
+          thickness = 3.dp,
+      )
+      Spacer(modifier = Modifier.height(16.dp))
+      LocationActionItems(location)
+      Spacer(modifier = Modifier.height(32.dp))
     }
+  }
 }
 
-
 @Composable
-private fun RenderLocationInfo(
-    location: HsLocationComplete,
-) {
-    val imageLink = constructWikidataImageLink(location.wikidataImageName, 1000)
+private fun RenderLocationInfo(location: HsLocationComplete) {
+  val imageLink = constructWikidataImageLink(location.wikidataImageName, 1000)
 
-    ImageBox(imageLink)
-    Spacer(modifier = Modifier.height(6.dp))
+  ImageBox(imageLink)
+  Spacer(modifier = Modifier.height(6.dp))
+  Text(
+      text = location.name,
+      style = Typography.headlineMedium,
+  )
+  if (location.shortDescription != null) {
     Text(
-        text = location.name,
-        style = Typography.headlineMedium
+        text = location.shortDescription,
+        style = Typography.labelMedium,
     )
-    if (location.shortDescription != null) {
-        Text(
-            text = location.shortDescription,
-            style = Typography.labelMedium
-        )
-    }
-    Spacer(modifier = Modifier.height(16.dp))
+  }
+  Spacer(modifier = Modifier.height(16.dp))
 
-    if (location.longDescription != null) {
-        var isTextExpanded by remember { mutableStateOf(false) }
+  if (location.longDescription != null) {
+    var isTextExpanded by remember { mutableStateOf(false) }
 
-        Text(
-            text = location.longDescription,
-            fontSize = 16.sp,
-            maxLines = if (isTextExpanded) Int.MAX_VALUE else 3,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.clickable(onClick = { isTextExpanded = !isTextExpanded }),
-            style = Typography.bodyMedium,
-        )
-    }
+    Text(
+        text = location.longDescription,
+        fontSize = 16.sp,
+        maxLines = if (isTextExpanded) Int.MAX_VALUE else 3,
+        overflow = TextOverflow.Ellipsis,
+        modifier = Modifier.clickable(onClick = { isTextExpanded = !isTextExpanded }),
+        style = Typography.bodyMedium,
+    )
+  }
 }
 
 @Composable
 private fun ImageBox(imageLink: String) {
-    var isImageLoading by remember { mutableStateOf(true) }
-    Box(
-        modifier = Modifier
-            .width(600.dp)
-            .then(Modifier.height(300.dp))
-    ) {
-        AsyncImage(
-            model = imageLink,
-            contentDescription = "An image of the location",
-            modifier = Modifier.fillMaxSize(),
-            onSuccess = { isImageLoading = false },
-        )
+  var isImageLoading by remember { mutableStateOf(true) }
+  Box(
+      modifier = Modifier.width(600.dp).then(Modifier.height(300.dp)),
+  ) {
+    AsyncImage(
+        model = imageLink,
+        contentDescription = "An image of the location",
+        modifier = Modifier.fillMaxSize(),
+        onSuccess = { isImageLoading = false },
+    )
 
-        if (isImageLoading) {
-            // Placeholder while loading
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.LightGray)
-            )
-        }
+    if (isImageLoading) {
+      // Placeholder while loading
+      Box(
+          modifier = Modifier.fillMaxSize().background(Color.LightGray),
+      )
     }
+  }
 }
-
 
 @Composable
 private fun LocationActionItems(location: HsLocationComplete) {
-    val context = LocalContext.current
-    val view = MainPageViewModel(context)
+  val context = LocalContext.current
+  val view = MainPageViewModel(context)
 
+  var hasVisitedLocation by remember { mutableStateOf(view.hasUserVisitedLocation(location.id)) }
 
-    var hasVisitedLocation by remember { mutableStateOf(view.hasUserVisitedLocation(location.id)) }
-
-    Row(
-        horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(4.dp)
-    ) {
-        Button(
-            onClick = {
-                if (!hasVisitedLocation) {
-                    val successfullyMarked = view.markLocationAsVisited(location.id)
-                    if (successfullyMarked) {
-                        hasVisitedLocation = true;
-                    }
-                } else {
-                    val successfullyRemoved = view.removeLocationFromVisited(location.id)
-                    if (successfullyRemoved) {
-                        hasVisitedLocation = false;
-                    }
-                }
-
-            },
-            colors = ButtonDefaults.buttonColors(contentColor = Color.White)
-        ) {
-            val buttonText = if (hasVisitedLocation) {
-                "Remove from visits"
-            } else {
-                "Add to visits"
+  Row(
+      horizontalArrangement = Arrangement.SpaceBetween,
+      modifier = Modifier.fillMaxWidth().padding(4.dp),
+  ) {
+    Button(
+        onClick = {
+          if (!hasVisitedLocation) {
+            val successfullyMarked = view.markLocationAsVisited(location.id)
+            if (successfullyMarked) {
+              hasVisitedLocation = true
             }
+          } else {
+            val successfullyRemoved = view.removeLocationFromVisited(location.id)
+            if (successfullyRemoved) {
+              hasVisitedLocation = false
+            }
+          }
+        },
+        colors = ButtonDefaults.buttonColors(contentColor = Color.White),
+    ) {
+      val buttonText =
+          if (hasVisitedLocation) {
+            "Remove from visits"
+          } else {
+            "Add to visits"
+          }
 
-            Text(buttonText)
-            Spacer(modifier = Modifier.width(4.dp))
-            Icon(Icons.Default.Add, buttonText)
-        }
-
-        Button(onClick = {
-            val intent = createGoogleMapsDirectionsIntent(
-                location.latitude,
-                location.longitude,
-                location.name
-            )
-            context.startActivity(intent)
-        }, colors = ButtonDefaults.buttonColors(contentColor = Color.White)) {
-            Text("Route Me")
-            Spacer(modifier = Modifier.width(4.dp))
-            Icon(Icons.Default.Map, "Route me")
-        }
+      Text(buttonText)
+      Spacer(modifier = Modifier.width(4.dp))
+      Icon(Icons.Default.Add, buttonText)
     }
+
+    Button(
+        onClick = {
+          val intent =
+              createGoogleMapsDirectionsIntent(
+                  location.latitude,
+                  location.longitude,
+                  location.name,
+              )
+          context.startActivity(intent)
+        },
+        colors = ButtonDefaults.buttonColors(contentColor = Color.White)) {
+          Text("Route Me")
+          Spacer(modifier = Modifier.width(4.dp))
+          Icon(Icons.Default.Map, "Route me")
+        }
+  }
 }

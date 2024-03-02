@@ -31,91 +31,84 @@ import com.ua.historicalsitesapp.util.hasLocationPermission
 import com.ua.historicalsitesapp.viewmodels.MainPageViewModel
 
 class MainPageActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
 
+    onBackPressedDispatcher.addCallback(
+        this,
+        object : OnBackPressedCallback(true) {
+          override fun handleOnBackPressed() {}
+        },
+    )
 
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-            }
-        })
-
-        setContent {
-            HistoricalSitesAppTheme {
-                // A surface container using the 'background' color from the theme
-                MainScreen()
-            }
-        }
-
+    setContent {
+      HistoricalSitesAppTheme {
+        // A surface container using the 'background' color from the theme
+        MainScreen()
+      }
     }
-
-
+  }
 }
 
 const val TAG = "INFO"
 
 @Composable
 fun MainScreen() {
-    val navController = rememberNavController()
-    Scaffold(
-        bottomBar = { AppBottomBar(navController = navController) },
-
-        ) //content:
-    { paddingValues ->
-        BottomNavigationGraph(
-            navController = navController,
-            modifier = Modifier.padding(paddingValues)
-        )
-    }
+  val navController = rememberNavController()
+  Scaffold(
+      bottomBar = { AppBottomBar(navController = navController) },
+  ) // content:
+  { paddingValues ->
+    BottomNavigationGraph(
+        navController = navController,
+        modifier = Modifier.padding(paddingValues),
+    )
+  }
 }
-
 
 @Composable
 fun HomeScreen(modifier: Modifier) {
-    Surface(
-        modifier = modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
-    ) {
-        val context = LocalContext.current
-        var hasPermission by remember { mutableStateOf(hasLocationPermission(context)) }
+  Surface(
+      modifier = modifier.fillMaxSize(),
+      color = MaterialTheme.colorScheme.background,
+  ) {
+    val context = LocalContext.current
+    var hasPermission by remember { mutableStateOf(hasLocationPermission(context)) }
 
-        LaunchedEffect(Unit) {
-            // Check for permissions when the composable is initially launched
-            hasPermission = hasLocationPermission(context)
-        }
-
-        if (hasPermission) {
-            Box(modifier = Modifier.fillMaxSize()) {
-                val items = remember { mutableStateListOf<ClusterItem>() }
-                val view = MainPageViewModel(context)
-                val locations = view.getAllLocations()
-
-                for (location in locations) {
-                    val locationId = location.id
-                    val position =
-                        LatLng(location.latitude.toDouble(), location.longitude.toDouble())
-                    val shortLocationDescription = location.shortDescription ?: ""
-                    items.add(
-                        ClusterItem(
-                            locationId,
-                            position,
-                            location.name,
-                            shortLocationDescription,
-                            0f
-                        )
-                    )
-                }
-
-                GoogleMapsScreen(view, items)
-            }
-        } else {
-            // Show the LocationScreen if permissions are not granted
-            LocationScreen {
-                // Callback to update the state when permissions are granted
-                hasPermission = true
-            }
-        }
+    LaunchedEffect(Unit) {
+      // Check for permissions when the composable is initially launched
+      hasPermission = hasLocationPermission(context)
     }
+
+    if (hasPermission) {
+      Box(modifier = Modifier.fillMaxSize()) {
+        val items = remember { mutableStateListOf<ClusterItem>() }
+        val view = MainPageViewModel(context)
+        val locations = view.getAllLocations()
+
+        for (location in locations) {
+          val locationId = location.id
+          val position = LatLng(location.latitude.toDouble(), location.longitude.toDouble())
+          val shortLocationDescription = location.shortDescription ?: ""
+          items.add(
+              ClusterItem(
+                  locationId,
+                  position,
+                  location.name,
+                  shortLocationDescription,
+                  0f,
+              ),
+          )
+        }
+
+        GoogleMapsScreen(view, items)
+      }
+    } else {
+      // Show the LocationScreen if permissions are not granted
+      LocationScreen {
+        // Callback to update the state when permissions are granted
+        hasPermission = true
+      }
+    }
+  }
 }
-
-

@@ -10,15 +10,11 @@ data class ClusterItem(
     val itemSnippet: String,
     val itemZIndex: Float,
 ) : ClusterItem {
-    override fun getPosition(): LatLng =
-        itemPosition
+  override fun getPosition(): LatLng = itemPosition
 
-    override fun getTitle(): String =
-        itemTitle
+  override fun getTitle(): String = itemTitle
 
-    override fun getSnippet(): String =
-        itemSnippet
+  override fun getSnippet(): String = itemSnippet
 
-    override fun getZIndex(): Float =
-        itemZIndex
+  override fun getZIndex(): Float = itemZIndex
 }

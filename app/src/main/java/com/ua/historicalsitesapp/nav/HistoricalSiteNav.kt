@@ -18,79 +18,72 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.ua.historicalsitesapp.ui.screens.HomeScreen
 import com.ua.historicalsitesapp.ui.screens.UserProfilePage
 
-
 @Composable
 fun RowScope.AddItem(
     screen: BottomBarScreen,
-    navController: NavHostController
+    navController: NavHostController,
 ) {
-    val backStackEntry = navController.currentBackStackEntryAsState()
-    NavigationBarItem(
-        label = {
-            Text(text = screen.label)
-        },
-        icon = {
-            Icon(
-                imageVector = screen.icon,
-                contentDescription = screen.route + " icon"
-            )
-        },
-        selected = screen.route == backStackEntry.value?.destination?.route,
-        onClick = {
-            navController.navigate(screen.route)
-        }
-    )
+  val backStackEntry = navController.currentBackStackEntryAsState()
+  NavigationBarItem(
+      label = { Text(text = screen.label) },
+      icon = {
+        Icon(
+            imageVector = screen.icon,
+            contentDescription = screen.route + " icon",
+        )
+      },
+      selected = screen.route == backStackEntry.value?.destination?.route,
+      onClick = { navController.navigate(screen.route) },
+  )
 }
 
 @Composable
 fun AppBottomBar(navController: NavHostController) {
-    val screens = listOf(
-        BottomBarScreen.Map,
-        BottomBarScreen.Profile,
-    )
-    NavigationBar {
-        screens.forEach { screen ->
-            AddItem(
-                screen = screen,
-                navController = navController
-            )
-        }
+  val screens =
+      listOf(
+          BottomBarScreen.Map,
+          BottomBarScreen.Profile,
+      )
+  NavigationBar {
+    screens.forEach { screen ->
+      AddItem(
+          screen = screen,
+          navController = navController,
+      )
     }
+  }
 }
-
 
 @Composable
 fun BottomNavigationGraph(
     navController: NavHostController,
-    modifier: Modifier
+    modifier: Modifier,
 ) {
-    NavHost(
-        navController = navController,
-        startDestination = BottomBarScreen.Map.route
-    ) {
-        composable(route = BottomBarScreen.Map.route) {
-            HomeScreen(modifier)
-        }
-        composable(route = BottomBarScreen.Profile.route) {
-            UserProfilePage(modifier)
-        }
-    }
+  NavHost(
+      navController = navController,
+      startDestination = BottomBarScreen.Map.route,
+  ) {
+    composable(route = BottomBarScreen.Map.route) { HomeScreen(modifier) }
+    composable(route = BottomBarScreen.Profile.route) { UserProfilePage(modifier) }
+  }
 }
 
 sealed class BottomBarScreen(
     val route: String,
     val label: String,
-    val icon: ImageVector
+    val icon: ImageVector,
 ) {
-    data object Map : BottomBarScreen(
-        route = "Map",
-        label = "Map",
-        icon = Icons.Filled.Place
-    )
+  data object Map :
+      BottomBarScreen(
+          route = "Map",
+          label = "Map",
+          icon = Icons.Filled.Place,
+      )
 
-    data object Profile : BottomBarScreen(
-        route = "Profile",
-        label = "Profile",
-        icon = Icons.Rounded.AccountBox
-    )
+  data object Profile :
+      BottomBarScreen(
+          route = "Profile",
+          label = "Profile",
+          icon = Icons.Rounded.AccountBox,
+      )
 }

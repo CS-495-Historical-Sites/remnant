@@ -20,20 +20,20 @@ fun ClusterCircle(
     text: String,
     modifier: Modifier = Modifier,
 ) {
-    Surface(
-        modifier,
-        shape = CircleShape,
-        color = color,
-        contentColor = Color.White,
-        border = BorderStroke(1.dp, Color.White)
-    ) {
-        Box(contentAlignment = Alignment.Center) {
-            Text(
-                text,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Black,
-                textAlign = TextAlign.Center
-            )
-        }
+  Surface(
+      modifier,
+      shape = CircleShape,
+      color = color,
+      contentColor = Color.White,
+      border = BorderStroke(1.dp, Color.White),
+  ) {
+    Box(contentAlignment = Alignment.Center) {
+      Text(
+          text,
+          fontSize = 16.sp,
+          fontWeight = FontWeight.Black,
+          textAlign = TextAlign.Center,
+      )
     }
+  }
 }

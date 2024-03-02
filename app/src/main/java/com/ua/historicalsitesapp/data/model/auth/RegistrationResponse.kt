@@ -5,10 +5,10 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class RegistrationResponse(
     val email: String?,
-    val errorString: String?
+    val errorString: String?,
 )
 
 enum class RegistrationResult {
-    SUCCESS, FAILURE
+  SUCCESS,
+  FAILURE,
 }
-

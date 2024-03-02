@@ -14,38 +14,36 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 
 class LocationDataSource {
-    private fun getClient(): HttpClient {
-        return HttpClient(CIO) {
-            install(ContentNegotiation) {
-                json(Json {
-                    prettyPrint = true
-                    isLenient = true
-                })
-            }
-            install(HttpCache)
-        }
+  private fun getClient(): HttpClient {
+    return HttpClient(CIO) {
+      install(ContentNegotiation) {
+        json(
+            Json {
+              prettyPrint = true
+              isLenient = true
+            },
+        )
+      }
+      install(HttpCache)
     }
+  }
 
-    fun getAllLocations(): List<HsLocation> {
-        val client = getClient()
+  fun getAllLocations(): List<HsLocation> {
+    val client = getClient()
 
-        return runBlocking {
-            val response: List<HsLocation> =
-                client.get(ServerConfig.SERVER_URL + "/locations") {
-                }.body()
-            return@runBlocking response
-        }
+    return runBlocking {
+      val response: List<HsLocation> = client.get(ServerConfig.SERVER_URL + "/locations") {}.body()
+      return@runBlocking response
     }
+  }
 
-    fun getLocationInfo(locationId: Int): HsLocationComplete {
-        val client = getClient()
+  fun getLocationInfo(locationId: Int): HsLocationComplete {
+    val client = getClient()
 
-        return runBlocking {
-            val response: HsLocationComplete =
-                client.get(ServerConfig.SERVER_URL + "/locations/" + locationId) {
-                }.body()
-            return@runBlocking response
-        }
-
+    return runBlocking {
+      val response: HsLocationComplete =
+          client.get(ServerConfig.SERVER_URL + "/locations/" + locationId) {}.body()
+      return@runBlocking response
     }
+  }
 }

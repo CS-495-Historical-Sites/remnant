@@ -9,7 +9,7 @@ data class HsLocation(
     val name: String,
     val latitude: Float,
     val longitude: Float,
-    @SerialName("short_description") val shortDescription: String?
+    @SerialName("short_description") val shortDescription: String?,
 )
 
 @Serializable
@@ -20,6 +20,5 @@ data class HsLocationComplete(
     val longitude: Float,
     @SerialName("short_description") val shortDescription: String?,
     @SerialName("long_description") val longDescription: String?,
-    @SerialName("wikidata_image_name") val wikidataImageName: String
+    @SerialName("wikidata_image_name") val wikidataImageName: String,
 )
-

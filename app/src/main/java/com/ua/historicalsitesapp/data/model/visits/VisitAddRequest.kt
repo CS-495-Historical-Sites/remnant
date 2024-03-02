@@ -4,6 +4,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class VisitAddRequest(
-    val id: Int
+    val id: Int,
 )
-

@@ -29,87 +29,89 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.runBlocking
 
 class MainPageViewModel(context: Context) : ViewModel() {
+  private val locationRepository = LocationRepository(LocationDataSource())
 
-    private val locationRepository = LocationRepository(LocationDataSource())
+  private val loginRepository =
+      LoginRepositoryProvider.provideLoginRepository(LoginDataSource(), context)
 
-    private val loginRepository =
-        LoginRepositoryProvider.provideLoginRepository(LoginDataSource(), context)
+  private fun getUser(): LoggedInUser {
+    return loginRepository.user ?: throw Exception("MainPageViewModel could not retrieve user")
+  }
 
-    private fun getUser(): LoggedInUser {
-        return loginRepository.user ?: throw Exception("MainPageViewModel could not retrieve user")
-    }
+  fun getUserClient(): HttpClient {
+    val user = getUser()
+    var usertokens = GetBearerTokens(user)
+    val client =
+        HttpClient(CIO) {
+          install(ContentNegotiation) { json() }
 
-    fun getUserClient(): HttpClient {
-        val user = getUser()
-        var usertokens = GetBearerTokens(user)
-        val client = HttpClient(CIO) {
-            install(ContentNegotiation) {
-                json()
+          install(Auth) {
+            bearer {
+              loadTokens { usertokens }
+              refreshTokens {
+                val refreshTokenInfo: LoggedInUser =
+                    client
+                        .post(
+                            urlString = ServerConfig.SERVER_URL + "/refresh",
+                        ) {
+                          markAsRefreshTokenRequest()
+                        }
+                        .body()
+                usertokens = GetBearerTokens(refreshTokenInfo)
+                usertokens
+              }
             }
-
-            install(Auth) {
-                bearer {
-                    loadTokens {
-                        usertokens
-                    }
-                    refreshTokens {
-                        val refreshTokenInfo: LoggedInUser = client.post(
-                            urlString = ServerConfig.SERVER_URL + "/refresh"
-                        ) { markAsRefreshTokenRequest() }.body()
-                        usertokens = GetBearerTokens(refreshTokenInfo)
-                        usertokens
-                    }
-                }
-            }
+          }
         }
-        return client
-    }
+    return client
+  }
 
-    fun getAllLocations(): List<HsLocation> {
-        return locationRepository.getAllLocations()
-    }
+  fun getAllLocations(): List<HsLocation> {
+    return locationRepository.getAllLocations()
+  }
 
-    fun getLocationInfo(locationId: Int): HsLocationComplete {
-        return locationRepository.getLocationInfo(locationId)
-    }
+  fun getLocationInfo(locationId: Int): HsLocationComplete {
+    return locationRepository.getLocationInfo(locationId)
+  }
 
-    fun hasUserVisitedLocation(locationId: Int): Boolean {
-        val client = getUserClient()
-        return runBlocking {
-            val response = client.get(ServerConfig.SERVER_URL + " /user/visited_locations") {
-                contentType(ContentType.Application.Json)
-            }
-            if (response.status.value == 200) {
-                val visitedLocations =
-                    response.body<GetUserVisitedLocationsResponse>().visitedLocations
-                return@runBlocking visitedLocations.any { it.id == locationId }
-            }
-            return@runBlocking false;
-        }
+  fun hasUserVisitedLocation(locationId: Int): Boolean {
+    val client = getUserClient()
+    return runBlocking {
+      val response =
+          client.get(ServerConfig.SERVER_URL + " /user/visited_locations") {
+            contentType(ContentType.Application.Json)
+          }
+      if (response.status.value == 200) {
+        val visitedLocations = response.body<GetUserVisitedLocationsResponse>().visitedLocations
+        return@runBlocking visitedLocations.any { it.id == locationId }
+      }
+      return@runBlocking false
     }
+  }
 
-    fun markLocationAsVisited(locationId: Int): Boolean {
-        val client = getUserClient()
-        val visitInfo = VisitAddRequest(locationId)
-        return runBlocking {
-            val response = client.post(ServerConfig.SERVER_URL + "/user/visited_locations") {
-                contentType(ContentType.Application.Json)
-                setBody(visitInfo)
-            }
-            return@runBlocking response.status.value == 200
-        }
+  fun markLocationAsVisited(locationId: Int): Boolean {
+    val client = getUserClient()
+    val visitInfo = VisitAddRequest(locationId)
+    return runBlocking {
+      val response =
+          client.post(ServerConfig.SERVER_URL + "/user/visited_locations") {
+            contentType(ContentType.Application.Json)
+            setBody(visitInfo)
+          }
+      return@runBlocking response.status.value == 200
     }
+  }
 
-    fun removeLocationFromVisited(locationId: Int): Boolean {
-        val client = getUserClient()
-        val visitInfo = VisitAddRequest(locationId)
-        return runBlocking {
-            val response = client.delete(ServerConfig.SERVER_URL + "/user/visited_locations") {
-                contentType(ContentType.Application.Json)
-                setBody(visitInfo)
-            }
-            return@runBlocking response.status.value == 200
-        }
+  fun removeLocationFromVisited(locationId: Int): Boolean {
+    val client = getUserClient()
+    val visitInfo = VisitAddRequest(locationId)
+    return runBlocking {
+      val response =
+          client.delete(ServerConfig.SERVER_URL + "/user/visited_locations") {
+            contentType(ContentType.Application.Json)
+            setBody(visitInfo)
+          }
+      return@runBlocking response.status.value == 200
     }
-
+  }
 }

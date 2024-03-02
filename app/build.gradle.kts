@@ -3,6 +3,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     kotlin("plugin.serialization") version "1.9.21"
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
+    id("com.ncorti.ktfmt.gradle") version "0.17.0"
 }
 
 secrets {
@@ -17,7 +18,7 @@ secrets {
     // Configure which keys should be ignored by the plugin by providing regular expressions.
     // "sdk.dir" is ignored by default.
     ignoreList.add("keyToIgnore") // Ignore the key "keyToIgnore"
-    ignoreList.add("sdk.*")       // Ignore all keys matching the regexp "sdk.*"
+    ignoreList.add("sdk.*") // Ignore all keys matching the regexp "sdk.*"
 }
 
 android {
@@ -42,7 +43,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
             signingConfig = signingConfigs.getByName("debug")
         }

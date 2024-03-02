@@ -53,105 +53,97 @@ import com.ua.historicalsitesapp.ui.theme.Typography
 import com.ua.historicalsitesapp.util.Result
 import com.ua.historicalsitesapp.viewmodels.AuthViewModel
 
-
 class LoginActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            HistoricalSitesAppTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    LoginMenu()
-                }
-            }
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setContent {
+      HistoricalSitesAppTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background,
+        ) {
+          LoginMenu()
         }
+      }
     }
+  }
 }
-
 
 @Composable
 private fun EmailTextField(onEmailChange: (String) -> Unit) {
-
-
-    var text by remember { mutableStateOf("") }
-    OutlinedTextField(
-        value = text,
-        onValueChange = {
-            text = it
-            onEmailChange(it)
-        },
-        label = { Text("Your email") },
-        maxLines = 1,
-        singleLine = true,
-        shape = RoundedCornerShape(12.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = MaterialTheme.colorScheme.secondary
-        )
-    )
+  var text by remember { mutableStateOf("") }
+  OutlinedTextField(
+      value = text,
+      onValueChange = {
+        text = it
+        onEmailChange(it)
+      },
+      label = { Text("Your email") },
+      maxLines = 1,
+      singleLine = true,
+      shape = RoundedCornerShape(12.dp),
+      colors =
+          OutlinedTextFieldDefaults.colors(
+              focusedBorderColor = MaterialTheme.colorScheme.secondary,
+          ),
+  )
 }
 
 @Composable
 private fun PasswordTextField(onPasswordChange: (String) -> Unit) {
-    var text by remember { mutableStateOf("") }
-    var passwordHidden by rememberSaveable { mutableStateOf(true) }
+  var text by remember { mutableStateOf("") }
+  var passwordHidden by rememberSaveable { mutableStateOf(true) }
 
-    OutlinedTextField(
-        value = text,
-        onValueChange = {
-            text = it
-            onPasswordChange(it)
-
-        },
-        label = {
-            Text(
-                "Enter your password",
-
-                )
-        },
-
-        maxLines = 1,
-        singleLine = true,
-        visualTransformation =
-        if (passwordHidden) PasswordVisualTransformation() else VisualTransformation.None,
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-        trailingIcon = {
-            IconButton(onClick = { passwordHidden = !passwordHidden }) {
-                val visibilityIcon =
-                    if (passwordHidden) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                // Please provide localized description for accessibility services
-                val description = if (passwordHidden) "Show password" else "Hide password"
-                Icon(imageVector = visibilityIcon, contentDescription = description)
-            }
-        },
-        shape = RoundedCornerShape(12.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = MaterialTheme.colorScheme.secondary
+  OutlinedTextField(
+      value = text,
+      onValueChange = {
+        text = it
+        onPasswordChange(it)
+      },
+      label = {
+        Text(
+            "Enter your password",
         )
-    )
+      },
+      maxLines = 1,
+      singleLine = true,
+      visualTransformation =
+          if (passwordHidden) PasswordVisualTransformation() else VisualTransformation.None,
+      keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+      trailingIcon = {
+        IconButton(onClick = { passwordHidden = !passwordHidden }) {
+          val visibilityIcon =
+              if (passwordHidden) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+          // Please provide localized description for accessibility services
+          val description = if (passwordHidden) "Show password" else "Hide password"
+          Icon(imageVector = visibilityIcon, contentDescription = description)
+        }
+      },
+      shape = RoundedCornerShape(12.dp),
+      colors =
+          OutlinedTextFieldDefaults.colors(
+              focusedBorderColor = MaterialTheme.colorScheme.secondary,
+          ),
+  )
 }
 
 @Composable
 private fun LoginButton(
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
-    Button(
-        onClick = onClick,
-        colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-        shape = RoundedCornerShape(12.dp),
-        modifier = modifier
-            .fillMaxWidth()
-            .height(56.dp) // Adjust the height here
-    ) {
-        Text(
-            "Log in ",
-            style = Typography.labelLarge
-        )
-    }
+  Button(
+      onClick = onClick,
+      colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+      shape = RoundedCornerShape(12.dp),
+      modifier = modifier.fillMaxWidth().height(56.dp), // Adjust the height here
+  ) {
+    Text(
+        "Log in ",
+        style = Typography.labelLarge,
+    )
+  }
 }
-
 
 @Composable
 fun LoginCard(
@@ -159,94 +151,91 @@ fun LoginCard(
     onEmailChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
     onRegisterClick: () -> Unit,
-    onLoginClick: () -> Unit
+    onLoginClick: () -> Unit,
 ) {
+  Box(
+      modifier = Modifier.fillMaxSize(),
+  ) {
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        Box(
-            modifier = Modifier
-                .size(width = 300.dp, height = 800.dp)
+        modifier =
+            Modifier.size(width = 300.dp, height = 800.dp)
                 .clip(shape = RoundedCornerShape(20.dp))
-                .align(Alignment.TopCenter) // Align to the top of the parent
+                .align(Alignment.TopCenter), // Align to the top of the parent
+    ) {
+      Column(
+          modifier = modifier.fillMaxSize(),
+          horizontalAlignment = Alignment.Start, // Align to the start (left) of the parent
+          verticalArrangement = Arrangement.Center,
+      ) {
+        Text(
+            "Log in",
+            style =
+                TextStyle(
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 36.sp, // Adjust the font size as needed
+                    textAlign = TextAlign.Start, // Align the text to the start (left)
+                ),
+        )
+        Spacer(modifier = Modifier.height(20.dp))
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.Start,
         ) {
-            Column(
-                modifier = modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.Start, // Align to the start (left) of the parent
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    "Log in",
-                    style = TextStyle(
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 36.sp, // Adjust the font size as needed
-                        textAlign = TextAlign.Start // Align the text to the start (left)
-                    ),
-
-                    )
-                Spacer(modifier = Modifier.height(20.dp))
-                Column(
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.Start
-                ) {
-                    Text("Email", modifier = Modifier.padding(start = 8.dp))
-                    EmailTextField(onEmailChange = onEmailChange)
-                }
-                Spacer(modifier = Modifier.height(14.dp))
-                Column(
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.Start
-                ) {
-                    Text("Password", modifier = Modifier.padding(start = 8.dp))
-                    PasswordTextField(onPasswordChange = onPasswordChange)
-                }
-                Spacer(modifier = Modifier.height(20.dp))
-                LoginButton(onLoginClick, modifier = Modifier.fillMaxWidth(0.95f))
-                Spacer(modifier = Modifier.height(50.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text("Don't have an account? ", style = MaterialTheme.typography.labelLarge)
-                    Text(
-                        "Sign up",
-                        style = MaterialTheme.typography.labelLarge.copy(color = MaterialTheme.colorScheme.primary),
-                        modifier = Modifier.clickable { onRegisterClick() }
-                    )
-                }
-            }
+          Text("Email", modifier = Modifier.padding(start = 8.dp))
+          EmailTextField(onEmailChange = onEmailChange)
         }
-
+        Spacer(modifier = Modifier.height(14.dp))
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.Start,
+        ) {
+          Text("Password", modifier = Modifier.padding(start = 8.dp))
+          PasswordTextField(onPasswordChange = onPasswordChange)
+        }
+        Spacer(modifier = Modifier.height(20.dp))
+        LoginButton(onLoginClick, modifier = Modifier.fillMaxWidth(0.95f))
+        Spacer(modifier = Modifier.height(50.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+          Text("Don't have an account? ", style = MaterialTheme.typography.labelLarge)
+          Text(
+              "Sign up",
+              style =
+                  MaterialTheme.typography.labelLarge.copy(
+                      color = MaterialTheme.colorScheme.primary),
+              modifier = Modifier.clickable { onRegisterClick() },
+          )
+        }
+      }
     }
+  }
 }
-
 
 @Composable
 private fun LoginMenu(modifier: Modifier = Modifier) {
-    val context = LocalContext.current
-    val view = AuthViewModel(context)
+  val context = LocalContext.current
+  val view = AuthViewModel(context)
 
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+  var email by remember { mutableStateOf("") }
+  var password by remember { mutableStateOf("") }
 
-    LoginCard(
-        onEmailChange = { email = it },
-        onPasswordChange = { password = it },
-        onLoginClick = {
-            val loginResult = view.performLogin(email, password)
+  LoginCard(
+      onEmailChange = { email = it },
+      onPasswordChange = { password = it },
+      onLoginClick = {
+        val loginResult = view.performLogin(email, password)
 
-            if (loginResult is Result.Success) {
-                val intent = Intent(context, MainPageActivity::class.java)
-                context.startActivity(intent)
-            }
-        },
-        onRegisterClick = {
-            val intent = Intent(context, RegistrationActivity::class.java)
-            context.startActivity(intent)
+        if (loginResult is Result.Success) {
+          val intent = Intent(context, MainPageActivity::class.java)
+          context.startActivity(intent)
         }
-    )
-
+      },
+      onRegisterClick = {
+        val intent = Intent(context, RegistrationActivity::class.java)
+        context.startActivity(intent)
+      },
+  )
 }
-

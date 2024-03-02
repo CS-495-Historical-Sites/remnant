@@ -12,16 +12,15 @@ import com.ua.historicalsitesapp.viewmodels.MainPageViewModel
 fun LocationInfoCard(
     mainPageViewModel: MainPageViewModel,
     selectedLocation: ClusterItem,
-    onDismissRequest: () -> Unit
+    onDismissRequest: () -> Unit,
 ) {
-    val sheetState = rememberModalBottomSheetState()
-    ModalBottomSheet(
-        onDismissRequest = onDismissRequest,
-        sheetState = sheetState,
-    ) {
-        // Sheet content
-        val info = selectedLocation.let { mainPageViewModel.getLocationInfo(it.itemId) }
-        LocationInfoCardContent(location = info, sheetState)
-    }
-
+  val sheetState = rememberModalBottomSheetState()
+  ModalBottomSheet(
+      onDismissRequest = onDismissRequest,
+      sheetState = sheetState,
+  ) {
+    // Sheet content
+    val info = selectedLocation.let { mainPageViewModel.getLocationInfo(it.itemId) }
+    LocationInfoCardContent(location = info, sheetState)
+  }
 }
