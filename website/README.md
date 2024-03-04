@@ -1,6 +1,6 @@
 # React + TypeScript + Vite
 
-### Our commands
+
 
 ### Install dependencies
 
