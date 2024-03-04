@@ -4,7 +4,7 @@
 - Open with Android Studio IDE
 - Install an emulation device
 - Press "run"
-    - This version of the project will send requests to our server hosted in AWS, so you do not need to set up the backend seperately. If you would like, edit the file at `app/src/main/java/com/ua/historicalsitesapp/util/ServerConfig.kt` so that `SEVER_URL = TEST_SERVER_URL` 
+    - This version of the project will send requests to our server hosted in AWS, so you do not need to set up the backend seperately. To connect to the backend running locally, edit the file at `app/src/main/java/com/ua/historicalsitesapp/util/ServerConfig.kt` so that `SEVER_URL = TEST_SERVER_URL` 
 
 
 #### Setting up Google Maps
