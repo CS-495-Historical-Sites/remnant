@@ -109,7 +109,6 @@ is populated during testing set up and a single user is created.
 **Test Scenarios:**
 
 - Valid user requests their visited locations -> Status code of 200 and a list of the Locations are returned
-- Valid user requests their visited locations but has none -> Status code of 200 and an empty list is returned
 
 ### **7. Retrieving Locations**
 
