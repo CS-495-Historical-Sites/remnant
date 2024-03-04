@@ -1,8 +1,6 @@
 """Routes for user authentication."""
 
 from datetime import datetime
-import re
-
 
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import (
@@ -17,6 +15,7 @@ from sqlalchemy.exc import DatabaseError
 from src.appl import LOGGER
 from src.appl.models import RegistrationRequest, LoginRequest
 from src.appl.remnant_db import user_queries, token_queries
+from src.appl.validation import check_valid_password, check_valid_email, check_types
 
 auth_blueprint = Blueprint(
     "auth_blueprint",
@@ -43,7 +42,7 @@ def register():
 
     # making sure the json data types are correct before we move forward
     # these should always be string but just to be safe this will handle any weird requests
-    if not isinstance(email, str) or not isinstance(non_hash_password, str):
+    if not check_types([(email, non_hash_password, str)]):
         return jsonify({"message": "Invalid data submitted"}), 400
 
     # checking for valid credentials
@@ -77,7 +76,7 @@ def login():
     except KeyError:
         return jsonify({"message": "Incomplete request"}), 400
 
-    if not isinstance(email, str) or not isinstance(non_hash_password, str):
+    if not check_types([(email, non_hash_password, str)]):
         return jsonify({"message": "Invalid data submitted"}), 400
 
     if not check_valid_email(email) or not check_valid_password(non_hash_password):
@@ -125,25 +124,3 @@ def logout():
         return jsonify({"message": "Database error"}), 500
 
     return jsonify({"message": "Logged out successfully"}), 200
-
-
-# Regex to match pattern with 3 constraints: (1@2.3)
-# 1. Upper/lowercase letters, digits, or ._%+- followed by @
-# 2. Upper/lowercase letters, digits, or .- followed by .
-# 3. Upper/lowercase letters 2-7 characters for domains.
-def check_valid_email(email):
-    if email == "":
-        return False
-    regex = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b"
-    return bool(re.fullmatch(regex, email)) and len(email) < 40
-
-
-# only allows digits, upper or lowercase letters, and the special characters @!$%*?&
-def check_valid_password(password):
-    password_regex = re.compile(
-        r"^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]+$"
-    )
-
-    return bool(re.fullmatch(password_regex, password)) and (
-        (len(password)) >= 8 and (len(password) < 25)
-    )

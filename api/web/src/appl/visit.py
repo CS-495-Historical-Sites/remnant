@@ -4,6 +4,7 @@ from flask_jwt_extended import get_jwt_identity, jwt_required
 from src.appl import LOGGER
 from src.appl.models import Visit, Location
 from src.appl.remnant_db import location_queries, user_queries, visit_queries
+from src.appl.validation import check_types
 
 visit_blueprint = Blueprint(
     "visit_blueprint",
@@ -38,9 +39,12 @@ def delete_visited_location():
     data = request.get_json()
 
     try:
-        location_key = int(data.get("id"))
-    except ValueError:
-        return jsonify({"message": "Invalid location ID"}), 400
+        location_key = data["id"]
+    except KeyError:
+        return jsonify({"message": "Incomplete request"}), 400
+
+    if not check_types([(location_key, int)]):
+        return jsonify({"message": "Invalid data submitted"}), 400
 
     location_to_add = Location.query.filter_by(id=location_key).first()
     if not location_to_add:
@@ -68,9 +72,12 @@ def add_visited_location():
     data = request.get_json()
 
     try:
-        location_key = int(data.get("id"))
-    except ValueError:
-        return jsonify({"message": "Invalid location ID"}), 400
+        location_key = data["id"]
+    except KeyError:
+        return jsonify({"message": "Incomplete request"}), 400
+
+    if not check_types([(location_key, int)]):
+        return jsonify({"message": "Invalid data submitted"}), 400
 
     location_to_add = location_queries.get_location(location_id=location_key)
     if not location_to_add:
@@ -82,6 +89,6 @@ def add_visited_location():
     ).first()
     if check_duplicate:
         return jsonify({"message": "Visit Successfully Added"}), 200
-    LOGGER.critical(f"user id {user.id}, type: {type(user.id)}")
+
     visit_queries.create_visited_location(location_to_add.id, user.id)
     return jsonify({"message": "Visit Successfully Added"}), 200

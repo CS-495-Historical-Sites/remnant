@@ -44,7 +44,7 @@ def init_app(testing=False, db_uri=Config.SQLALCHEMY_DATABASE_URI):
     db.init_app(app)
 
     with app.app_context():
-        from src.appl import auth, routes, locations, visit
+        from src.appl import auth, routes, locations, visit, suggestions
         from src.appl.models import program_metadata, Location
         from src.appl.remnant_db import location_queries, token_queries
 
@@ -52,6 +52,7 @@ def init_app(testing=False, db_uri=Config.SQLALCHEMY_DATABASE_URI):
         app.register_blueprint(auth.auth_blueprint)
         app.register_blueprint(locations.location_blueprint)
         app.register_blueprint(visit.visit_blueprint)
+        app.register_blueprint(suggestions.suggestion_blueprint)
 
         program_metadata.create_all(db.engine)
 
@@ -100,4 +101,5 @@ def init_app(testing=False, db_uri=Config.SQLALCHEMY_DATABASE_URI):
             LOGGER.info(f"Elapsed time for app init: {elapsed_time} seconds")
 
             LOGGER.warning(f"Skipped {skipped} locations during app init")
+
         return app
