@@ -1,17 +1,21 @@
 # Home Page
 
-
 ## Project Description
 
 
 Our project's goal is to develop an mobile Android application that will enable users to see the historical sites around them.
-The app should provide a simple, easy to use UI, track the users "steps" through history, and contain proximity notifications.
+The app will provide a simple, easy to use UI, track the users "steps" through history, and contain proximity notifications.
 
----
+
+## Links
+- [Sprint 1 Presentation](https://docs.google.com/presentation/d/1N1un2fruCzJXbqARkHtwW_O_IlDZ9DslrHKXXw8md1M/edit#slide=id.p)
+- [Sprint 1 Demo Video](https://www.youtube.com/watch?v=YOHrRc_Cxek)
+- [Repositories](https://github.com/orgs/CS-495-Historical-Sites/repositories)
+
 
 ## Features
-- [ ] Display landmark’s details
-    * [ ] Name, location, historical significance, and photos
+- [x] Display landmark’s details
+    * [x] Name, location, historical significance, and photos
 - [ ] Proximity notifications
 - [ ] Track users’ exploration progress
 - [ ] User suggestions  
