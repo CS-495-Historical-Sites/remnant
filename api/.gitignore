@@ -3,6 +3,8 @@ __pycache__/
 hs_backend/app.db
 poetry.lock
 
+.vscode/
+
 # pytest
 .pytest_cache
 

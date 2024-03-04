@@ -1,5 +1,3 @@
-"""Routes for user authentication."""
-
 from datetime import datetime
 
 from flask import Blueprint, request, jsonify
@@ -17,15 +15,15 @@ from src.appl.models import RegistrationRequest, LoginRequest
 from src.appl.remnant_db import user_queries, token_queries
 from src.appl.validation import check_valid_password, check_valid_email, check_types
 
+
 auth_blueprint = Blueprint(
     "auth_blueprint",
     __name__,
 )
 
 
-@auth_blueprint.route("/api/register", methods=["POST", "OPTIONS"])
+@auth_blueprint.route("/api/user/register", methods=["POST", "OPTIONS"])
 def register():
-    LOGGER.debug("register() reached")
     if request.method == "OPTIONS":
         return "", 200
 
@@ -34,6 +32,7 @@ def register():
     try:
         email = data["email"]
         non_hash_password = data["password"]
+        request_admin = data.get("request_admin", False)
     except KeyError:
         return (
             jsonify({"message": "Incomplete request. Email and Password required"}),
@@ -50,7 +49,7 @@ def register():
     if not check_valid_email(email) or not check_valid_password(non_hash_password):
         return jsonify({"message": "Invalid credentials entered"}), 422
 
-    registration_info = RegistrationRequest(data["email"], data["password"])
+    registration_info = RegistrationRequest(email, non_hash_password, request_admin)
 
     LOGGER.debug(f"Attemping to register {registration_info.email}")
 
@@ -62,7 +61,7 @@ def register():
     return jsonify({"email": registration_info.email, "errorString": ""}), 200
 
 
-@auth_blueprint.route("/api/login", methods=["POST", "OPTIONS"])
+@auth_blueprint.route("/api/user/login", methods=["POST", "OPTIONS"])
 def login():
     LOGGER.debug("login() reached")
     if request.method == "OPTIONS":
@@ -82,7 +81,7 @@ def login():
     if not check_valid_email(email) or not check_valid_password(non_hash_password):
         return jsonify({"message": "Invalid credentials entered"}), 422
 
-    login_info = LoginRequest(data["email"], data["password"])
+    login_info = LoginRequest(email, non_hash_password)
 
     LOGGER.debug(f"Attemping to login {login_info.email}")
 
@@ -106,7 +105,7 @@ def refresh():
     return jsonify(access_token=access_token), 200
 
 
-@auth_blueprint.route("/api/logout", methods=["DELETE", "OPTIONS"])
+@auth_blueprint.route("/api/user/logout", methods=["DELETE", "OPTIONS"])
 @jwt_required(verify_type=False)
 def logout():
     try:
