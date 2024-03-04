@@ -14,5 +14,4 @@ jobs:
         working-directory: ./api
     steps:
       - uses: actions/checkout@v3
-      - name: cd into the api repo
       - uses: psf/black@stable
