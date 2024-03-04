@@ -1,0 +1,16 @@
+venv/
+__pycache__/
+hs_backend/app.db
+poetry.lock
+
+# pytest
+.pytest_cache
+
+# postgres
+pgdata
+
+# environment variables
+.env
+
+# ansible inventory file
+ansible/inventory.ini
