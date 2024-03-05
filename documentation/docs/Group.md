@@ -13,4 +13,4 @@
 
 ## Sponsor
 
-- Dr Travis Atkison
+- Dr. Travis Atkison

@@ -2,4 +2,4 @@
 
 ### Development Environment
 
-Please visit [MkDocs Material - Creating your site](https://squidfunk.github.io/mkdocs-material/creating-your-site/)
+Please visit [MkDocs Material - Getting Started](https://squidfunk.github.io/mkdocs-material/getting-started/)
