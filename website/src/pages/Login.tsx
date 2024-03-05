@@ -35,7 +35,7 @@ export const Login: React.FC<LoginProps> = ({ setToken }) => {
   async function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/login`, {
+    const response = await fetch(`http://localhost:8080/api/user/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -123,7 +123,7 @@ export const Login: React.FC<LoginProps> = ({ setToken }) => {
           </Button>
           <Typography id="subtitle-signin-text" variant="subtitle1">
             Don't have an account?{" "}
-            <Link id="subtitle-signin-text-signup" href="/signup">
+            <Link id="subtitle-signin-text-signup" href="/register">
               Register
             </Link>
           </Typography>

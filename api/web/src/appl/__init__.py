@@ -4,6 +4,7 @@ import json
 import time
 
 from flask import Flask
+from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 from sqlalchemy import create_engine, text
@@ -34,6 +35,7 @@ def check_postgres_database_elements(db_uri):
 def init_app(testing=False, db_uri=Config.SQLALCHEMY_DATABASE_URI):
     start_time = time.time()
     app = Flask(__name__)
+    CORS(app)
     jwt = JWTManager(app)
 
     app.config.from_object(Config)
