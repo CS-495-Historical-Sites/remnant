@@ -7,7 +7,7 @@ import { Typography} from "@mui/material";
 function Home() {
   return (
     <div>
-                <Typography variant="h1" className="title">
+          <Typography variant="h1" className="title">
             Remnant
           </Typography>
     </div>

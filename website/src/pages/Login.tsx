@@ -46,14 +46,15 @@ export const Login: React.FC<LoginProps> = ({ setToken }) => {
       body: JSON.stringify(userInformation),
     });
 
-    const result: LoginResponse = await response.json();
-
-    if (result.message === "login successful") {
+    if (response.status == 200) {
+      const result: LoginResponse = await response.json();
       setToken(result.access_token);
-      navigate("/profile");
-      return;
+      navigate("/admin");
+      return
     }
 
+    const result: LoginResponse = await response.json();
+   
     // handle error
     setErr(true);
     setErrMessage(result.message);

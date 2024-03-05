@@ -6,15 +6,26 @@ import './App.css'
 import Home from "./pages/Home";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
+import AdminView from "./pages/AdminView"
+
+import useToken from "./hooks/useToken";
 
 function App() {
+  const { token, setToken, removeToken } = useToken();
   return (
     <div className="App">
       <BrowserRouter>
         <Routes>
-          {<Route path="/" element={<Home />} />}
-          {<Route path="/register" element={<Register />} />}
-          {<Route path="/login" element={<Login />} />}
+          {<Route path="/" element={<Home />} />}AdminView
+
+          {token && <Route path="/register" element={<AdminView />} />}
+          {!token && <Route path="/register" element={<Register />} />}
+          
+          {token && <Route path="/login" element={<AdminView />} />}
+          {!token && <Route path="/login" element={<Login setToken={setToken} />} />}
+
+          {token && <Route path="/admin" element={<AdminView />} />}
+          {!token && <Route path="/admin" element={<Login setToken={setToken}/>} />}
         </Routes>
       </BrowserRouter>
     </div>
