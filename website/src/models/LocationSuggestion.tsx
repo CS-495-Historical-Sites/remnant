@@ -1,4 +1,4 @@
-export default interface UserSiteAdditionSuggestion {
+export default interface LocationSuggestion {
     id: number,
     user: number,
     suggestion_time: Date,

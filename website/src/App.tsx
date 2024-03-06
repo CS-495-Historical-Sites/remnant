@@ -7,7 +7,7 @@ import Home from "./pages/Home";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import AdminView from "./pages/AdminView"
-
+import SuggestionsView from "./pages/SuggestionView";
 import useToken from "./hooks/useToken";
 
 function App() {
@@ -26,6 +26,9 @@ function App() {
 
           {token && <Route path="/admin" element={<AdminView />} />}
           {!token && <Route path="/admin" element={<Login setToken={setToken}/>} />}
+
+          {token && <Route path="/admin/suggestions" element={<SuggestionsView />} />}
+          {!token && <Route path="/admin/suggestions" element={<Login setToken={setToken}/>} />}
         </Routes>
       </BrowserRouter>
     </div>
