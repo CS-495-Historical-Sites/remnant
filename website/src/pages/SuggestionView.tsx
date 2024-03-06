@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, List, ListItem, ListItemText, Paper } from '@mui/material';
+import { Button, Typography, List, ListItem, ListItemText, Paper } from '@mui/material';
 
 import LocationSuggestion from "../models/LocationSuggestion";
 
@@ -36,12 +36,12 @@ export const SuggestionsView: React.ComponentType<UserProps> = ({ setToken, toke
         Location Suggestions
       </Typography>
       <List>
-        {suggestions.map(s => (
-          <ListItem key={s.id} divider>
+        {suggestions.map((suggestion) => (
+          <ListItem key={suggestion.id} divider>
             <ListItemText
-              primary={s.name}
-              secondary={`Suggested by User ID: ${s.user} on ${new Date(s.suggestion_time).toLocaleDateString()} - ${s.short_description}`}
-            />
+              primary={suggestion.name}
+              secondary={`Suggested by User ID: ${suggestion.user} on ${new Date(suggestion.suggestion_time).toLocaleDateString()} - ${suggestion.short_description}`}
+              />
           </ListItem>
         ))}
       </List>

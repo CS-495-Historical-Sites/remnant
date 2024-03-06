@@ -134,7 +134,7 @@ class LocationSuggestion(db.Model):
     longitude = db.Column(db.Float, nullable=False)
     name = db.Column(db.String(120), index=True, unique=False, nullable=False)
     short_description = db.Column(db.Text, nullable=False)
-    wikidata_image_name = db.Column(db.Text, nullable=True)
+    wikipedia_link = db.Column(db.Text, nullable=True)
 
     def __init__(self, user: User, req: LocationSuggestionRequest):
         self.user_id = user.id
@@ -142,7 +142,7 @@ class LocationSuggestion(db.Model):
         self.longitude = req.longitude
         self.name = req.name
         self.short_description = req.short_description
-        self.wikidata_image_name = req.wikipedia_link
+        self.wikipedia_link = req.wikipedia_link
 
 
 class BlacklistToken(db.Model):

@@ -1,4 +1,5 @@
 import { Typography, Button, Box, Paper, Grid } from '@mui/material';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function AdminView() {
@@ -8,6 +9,15 @@ function AdminView() {
   const goToUserManagement = () => navigate('/admin/users');
   const goToSiteManagement = () => navigate('/admin/sites');
   const goToSuggestionsManagement = () => navigate('/admin/suggestions');
+
+
+
+  // Redirect to the /admin page if not already there
+  useEffect(() => {
+    if (window.location.pathname !== '/admin') {
+      navigate('/admin');
+    }
+  }, [navigate]);
 
   return (
     <Box sx={{ flexGrow: 1, p: 2 }}>
