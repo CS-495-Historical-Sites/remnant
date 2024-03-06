@@ -28,7 +28,18 @@ erDiagram
         int user_id FK
         datetime logout_time
     }
+    LocationSuggestion {
+        int id  PK
+        int user_id  FK
+        datetime suggestion_time
+        float latitude
+        float longitude
+        string name 
+        string short_description
+        string wikipedia_link
+    }
 
+    User ||--o{ LocationSuggestion : "suggests"
     User ||--o{ Visit : "visits"
     Location ||--o{ Visit : "visited by"
     User ||--o{BlacklistToken : "old token"
