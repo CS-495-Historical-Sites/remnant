@@ -1,4 +1,13 @@
+## Development Requirements
+
+- Poetry
+- Docker Compose
+- Ansible (for AWS EC2 configuration)
+
+
 ## Development commands
+
+These commands are for a UNIX environment, some have a Windows equivalent in the `Makefile`.
 
 #### Run
 
