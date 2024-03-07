@@ -110,7 +110,7 @@ fun QuestionnaireMenu() {
             currentQuestionIndex++
             if (currentQuestionIndex >= questions.size) {
                 // The questionnaire is completed, start Registration or Login
-                val intent = Intent(context, LoginActivity::class.java)
+                val intent = Intent(context, MainPageActivity::class.java)
                 context.startActivity(intent)
             }
         }
