@@ -17,9 +17,8 @@ import UserRegistrationInformation from "../models/UserRegistrationInformation";
 
 import { passwordValidationMessage } from "../validators/passwordValidationMessage";
 
-
 function allFieldsValid(
-  userRegistrationInformation: UserRegistrationInformation
+  userRegistrationInformation: UserRegistrationInformation,
 ): boolean {
   return (
     passwordValidationMessage(userRegistrationInformation.password) ===
@@ -60,7 +59,7 @@ export const Register: React.FC = () => {
 
     console.log(result);
 
-     if (response.status === 422) {
+    if (response.status === 422) {
       setErr(true);
       setErrMessage(result.message);
     } else if (response.status === 200) {
@@ -80,7 +79,6 @@ export const Register: React.FC = () => {
         <Typography variant="subtitle1" style={{ marginTop: "10px" }}>
           Your account is free
         </Typography>
-
 
         <div>
           <div className="signup-container">
@@ -123,11 +121,11 @@ export const Register: React.FC = () => {
                 error={
                   userRegistrationInformation.password !== "" &&
                   passwordValidationMessage(
-                    userRegistrationInformation.password
+                    userRegistrationInformation.password,
                   ) !== "Password is valid"
                 }
                 helperText={passwordValidationMessage(
-                  userRegistrationInformation.password
+                  userRegistrationInformation.password,
                 )}
                 required
                 key="password"

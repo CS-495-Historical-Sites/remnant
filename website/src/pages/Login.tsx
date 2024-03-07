@@ -9,8 +9,6 @@ import { Typography, TextField, Link, Box, Button } from "@mui/material";
 import UserLoginInformation from "../models/UserLoginInformation.tsx";
 import ErrorSubtitle from "../components/ErrorSubtitle.tsx";
 
-
-
 interface LoginProps {
   setToken: (token: string) => void;
 }
@@ -50,11 +48,11 @@ export const Login: React.FC<LoginProps> = ({ setToken }) => {
       const result: LoginResponse = await response.json();
       setToken(result.access_token);
       navigate("/admin");
-      return
+      return;
     }
 
     const result: LoginResponse = await response.json();
-   
+
     // handle error
     setErr(true);
     setErrMessage(result.message);

@@ -2,8 +2,6 @@ import React from "react";
 
 import { Typography } from "@mui/material";
 
-
-
 interface ErrorSubtitleProps {
   error: string;
 }

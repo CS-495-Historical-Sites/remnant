@@ -26,3 +26,7 @@ def create_admin(registration_info: RegistrationRequest) -> None:
 
 def get_user(email: str) -> User | None:
     return User.query.filter_by(email=email).first()
+
+
+def get_admin(email: str) -> User | None:
+    return User.query.filter_by(email=email, is_admin=True).first()

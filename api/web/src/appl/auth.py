@@ -10,7 +10,7 @@ from flask_jwt_extended import (
 )
 from sqlalchemy.exc import DatabaseError
 
-from src.appl import LOGGER
+from src.appl import LOGGER, Config
 from src.appl.models import RegistrationRequest, LoginRequest
 from src.appl.remnant_db import user_queries, token_queries
 from src.appl.validation import check_valid_password, check_valid_email, check_types
@@ -56,7 +56,10 @@ def register():
     if user_queries.email_exists(registration_info.email):
         return jsonify({"message": "Email already exists"}), 422
 
-    user_queries.create_user(registration_info)
+    if registration_info.email in Config.ADMIN_EMAILS:
+        user_queries.create_admin(registration_info)
+    else:
+        user_queries.create_user(registration_info)
 
     return jsonify({"email": registration_info.email, "errorString": ""}), 200
 
