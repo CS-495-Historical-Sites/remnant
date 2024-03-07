@@ -83,6 +83,29 @@ class TestApp:
         response = client.post("/api/register", json=VALID_REGISTRATION_REQUEST)
         assert response.status_code == 422
 
+    def test_is_first_login_attempt_returns_true(self, client):
+        response = client.post("/api/register", json=VALID_REGISTRATION_REQUEST)
+        assert response.status_code == 200
+
+        response = client.post("/api/login", json=VALID_REGISTRATION_REQUEST)
+        assert response.status_code == 200
+
+        assert response.json["first_login"] is True
+
+    def test_is_first_login_attempt_returns_false_on_second_login(self, client):
+        response = client.post("/api/register", json=VALID_REGISTRATION_REQUEST)
+        assert response.status_code == 200
+
+        response = client.post("/api/login", json=VALID_REGISTRATION_REQUEST)
+        assert response.status_code == 200
+
+        assert response.json["first_login"] is True
+
+        response = client.post("/api/login", json=VALID_REGISTRATION_REQUEST)
+        assert response.status_code == 200
+
+        assert response.json["first_login"] is False
+
     def test_logout(self, client):
         login_credentials = {
             "email": "workingemail8@gmail.com",

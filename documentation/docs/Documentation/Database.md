@@ -28,6 +28,12 @@ erDiagram
         int user_id FK
         datetime logout_time
     }
+    LoginAttempt {
+        int id PK
+        string email
+        datetime attempt_time
+        bool success
+    }
 
     User ||--o{ Visit : "visits"
     Location ||--o{ Visit : "visited by"
