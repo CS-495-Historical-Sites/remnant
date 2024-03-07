@@ -33,11 +33,12 @@ def register():
     data = request.get_json()
 
     try:
+        username = data["username"]
         email = data["email"]
         non_hash_password = data["password"]
     except KeyError:
         return (
-            jsonify({"message": "Incomplete request. Email and Password required"}),
+            jsonify({"message": "Incomplete request. Username, Email and Password required"}),
             400,
         )
 
@@ -51,9 +52,9 @@ def register():
     if not check_valid_email(email) or not check_valid_password(non_hash_password):
         return jsonify({"message": "Invalid credentials entered"}), 422
 
-    registration_info = RegistrationRequest(data["email"], data["password"])
+    registration_info = RegistrationRequest(data ["username"], data["email"], data["password"])
 
-    LOGGER.debug(f"Attemping to register {registration_info.email}")
+    LOGGER.debug(f"Attempting to register {registration_info.email}")
 
     if user_queries.email_exists(registration_info.email):
         return jsonify({"message": "Email already exists"}), 422
@@ -93,9 +94,14 @@ def login():
             jsonify({"message": "Invalid email or password", "accessToken": ""}),
             422,
         )
-
     access_token = create_access_token(identity=user.email)
     refresh_token = create_refresh_token(identity=user.email)
+    if user.is_first_login:
+        user.is_first_login = False
+        user_queries.update_user(user)
+
+        return jsonify({"message": "First login. Redirect to questionnaire.", "first_login": True, "accessToken": access_token, "refreshToken": refresh_token}), 200
+
     return jsonify(access_token=access_token, refresh_token=refresh_token), 200
 
 

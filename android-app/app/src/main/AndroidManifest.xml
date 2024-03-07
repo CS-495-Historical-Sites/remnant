@@ -34,6 +34,11 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="${MAPS_API_KEY}" />
 
+        <!-- Set the QuestionnaireActivity as the launcher activity -->
+        <activity
+            android:name=".ui.screens.QuestionnaireActivity"
+            android:exported="false"
+            android:theme="@style/Theme.HistoricalSitesApp"/>
         <activity
             android:name=".ui.screens.MainPageActivity"
             android:exported="false"
@@ -41,18 +46,18 @@
             android:theme="@style/Theme.HistoricalSitesApp" />
         <activity
             android:name=".ui.screens.LoginActivity"
-            android:exported="false"
-            android:label="@string/title_activity_main_page"
-            android:theme="@style/Theme.HistoricalSitesApp" />
-        <activity
-            android:name=".ui.screens.RegistrationActivity"
             android:exported="true"
-            android:theme="@style/Theme.HistoricalSitesApp">
+            android:label="@string/title_activity_main_page"
+            android:theme="@style/Theme.HistoricalSitesApp" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ui.screens.RegistrationActivity"
+            android:exported="false"
+            android:theme="@style/Theme.HistoricalSitesApp" />
     </application>
 
 </manifest>

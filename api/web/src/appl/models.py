@@ -11,6 +11,7 @@ from . import db
 
 @dataclass
 class RegistrationRequest:
+    username: str
     email: str
     password: str
 
@@ -116,7 +117,7 @@ class User(db.Model):
 
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(256), nullable=False)
-
+    is_first_login = db.Column(db.Boolean, default=True)
     def __init__(self, email: str, supplied_password: str):
         self.email = email
         self.password_hash = generate_password_hash(supplied_password)
