@@ -131,6 +131,7 @@ class LoginRepository(
     return LoggedInUser(
         accessToken = decryptedAccessToken,
         refreshToken = decryptedRefreshToken,
+        isFirstLogin = false
     )
   }
 

@@ -76,6 +76,27 @@ enum class PasswordValidationResult {
   InvalidLength,
 }
 
+@Composable
+private fun UsernameTextField(onUserNameChange: (String) -> Unit) {
+    var text by remember { mutableStateOf("") }
+
+    OutlinedTextField(
+        value = text,
+        onValueChange = {
+            text = it
+            onUserNameChange(it)
+        },
+        label = { Text("User Name") },
+        maxLines = 1,
+        singleLine = true,
+        keyboardOptions = KeyboardOptions.Default,
+        shape = RoundedCornerShape(12.dp),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = MaterialTheme.colorScheme.secondary
+        )
+    )
+}
+
 private fun isEmailValid(email: String): Boolean {
   return Regex("[\\w-]+@([\\w-]+\\.)+[\\w-]+").matches(email)
 }
@@ -219,26 +240,27 @@ private fun RegisterButton(
 @Composable
 fun RegistrationCard(
     modifier: Modifier = Modifier,
+    onUsernameChange: (String) -> Unit,
     onEmailChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
     onRegisterClick: () -> Unit,
     onLoginClick: () -> Unit,
 ) {
-  Box(
-      modifier = Modifier.fillMaxSize(),
-  ) {
     Box(
-        modifier =
+        modifier = Modifier.fillMaxSize(),
+    ) {
+        Box(
+            modifier =
             Modifier.size(width = 300.dp, height = 800.dp)
                 .clip(shape = RoundedCornerShape(20.dp))
                 .align(Alignment.TopCenter), // Align to the top of the parent
-    ) {
-      Column(
-          modifier = modifier.fillMaxSize(),
-          horizontalAlignment = Alignment.Start, // Align to the start (left) of the parent
-          verticalArrangement = Arrangement.Center,
-      ) {
-        Text(
+        ) {
+            Column(
+                modifier = modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.Start, // Align to the start (left) of the parent
+                verticalArrangement = Arrangement.Center,
+            ) {
+                Text(
             "Create account",
             style =
                 TextStyle(
@@ -248,7 +270,14 @@ fun RegistrationCard(
                 ),
         )
         Spacer(modifier = Modifier.height(20.dp))
-        Column(
+          Column( // First and Last name
+              verticalArrangement = Arrangement.Center,
+              horizontalAlignment = Alignment.Start
+          ) {
+              Text("User Name", modifier = Modifier.padding(start = 8.dp))
+              UsernameTextField(onUserNameChange = onUsernameChange)
+
+              Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.Start,
         ) {
@@ -283,6 +312,7 @@ fun RegistrationCard(
     }
   }
 }
+}
 
 @Composable
 private fun RegistrationMenu(modifier: Modifier = Modifier) {
@@ -293,11 +323,12 @@ private fun RegistrationMenu(modifier: Modifier = Modifier) {
     val intent = Intent(context, MainPageActivity::class.java)
     context.startActivity(intent)
   }
-
+    var username by remember { mutableStateOf("") }
   var email by remember { mutableStateOf("") }
   var password by remember { mutableStateOf("") }
 
   RegistrationCard(
+      onUsernameChange = { username = it},
       onEmailChange = { email = it },
       onPasswordChange = { password = it },
       onRegisterClick = {
@@ -309,7 +340,7 @@ private fun RegistrationMenu(modifier: Modifier = Modifier) {
           return@RegistrationCard
         }
 
-        val registrationResult = registrationView.performRegistration(email, password)
+        val registrationResult = registrationView.performRegistration(username, email, password)
         if (registrationResult == RegistrationResult.SUCCESS) {
           val intent = Intent(context, LoginActivity::class.java)
           context.startActivity(intent)

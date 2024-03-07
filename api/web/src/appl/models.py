@@ -11,6 +11,7 @@ from . import db
 
 @dataclass
 class RegistrationRequest:
+    username: str
     email: str
     password: str
 

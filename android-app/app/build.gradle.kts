@@ -101,8 +101,9 @@ dependencies {
     implementation("androidx.compose.foundation:foundation-layout-android:1.6.2")
     implementation("androidx.compose.material:material-icons-core-android:1.6.2")
     implementation("androidx.compose.runtime:runtime-android:1.6.2")
-    implementation("androidx.compose.runtime:runtime-saveable-android:1.6.2")
     implementation("androidx.compose.ui:ui-android:1.6.2")
+    implementation("androidx.compose.runtime:runtime-saveable-android:1.6.2")
+
     implementation("androidx.compose.ui:ui-graphics-android:1.6.2")
     implementation("androidx.compose.ui:ui-text-android:1.6.2")
     implementation("androidx.compose.ui:ui-unit-android:1.6.2")
@@ -119,6 +120,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:1.6.2")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.6.2")
     implementation("androidx.compose.material:material-icons-extended-android:1.6.2")
+    implementation("com.google.accompanist:accompanist-flowlayout:0.20.0")
     implementation("androidx.lifecycle:lifecycle-common:2.7.0")
     //noinspection KtxExtensionAvailable
     implementation("androidx.activity:activity:1.8.2")

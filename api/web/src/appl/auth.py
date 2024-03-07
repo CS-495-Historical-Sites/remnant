@@ -32,11 +32,14 @@ def register():
     data = request.get_json()
 
     try:
+        username = data["username"]
         email = data["email"]
         non_hash_password = data["password"]
     except KeyError:
         return (
-            jsonify({"message": "Incomplete request. Email and Password required"}),
+            jsonify(
+                {"message": "Incomplete request. Username, Email and Password required"}
+            ),
             400,
         )
 
@@ -50,9 +53,11 @@ def register():
     if not check_valid_email(email) or not check_valid_password(non_hash_password):
         return jsonify({"message": "Invalid credentials entered"}), 422
 
-    registration_info = RegistrationRequest(data["email"], data["password"])
+    registration_info = RegistrationRequest(
+        data["username"], data["email"], data["password"]
+    )
 
-    LOGGER.debug(f"Attemping to register {registration_info.email}")
+    LOGGER.debug(f"Attempting to register {registration_info.email}")
 
     if user_queries.email_exists(registration_info.email):
         return jsonify({"message": "Email already exists"}), 422
