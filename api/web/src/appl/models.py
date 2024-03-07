@@ -109,6 +109,19 @@ class Visit(db.Model):
         self.visit_time = visit_time
 
 
+class LoginAttempt(db.Model):
+    __tablename__ = "login_attempt"
+    metadata = program_metadata
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120), index=True, nullable=False)
+    attempt_time = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    success = db.Column(db.Boolean, nullable=False)
+
+    def __init__(self, email, success):
+        self.email = email
+        self.success = success
+
+
 class User(db.Model):
     __tablename__ = "user"
     metadata = program_metadata
@@ -139,4 +152,3 @@ class BlacklistToken(db.Model):
         self.logout_time = logout_time
         self.token_type = token_type
         self.user_id = user_id
-        self.logout_time = datetime.utcnow()
