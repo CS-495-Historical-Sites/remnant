@@ -7,6 +7,10 @@
     - This version of the project will send requests to our server hosted in AWS, so you do not need to set up the backend seperately. To connect to the backend running locally, edit the file at `app/src/main/java/com/ua/historicalsitesapp/util/ServerConfig.kt` so that `SERVER_URL = TEST_SERVER_URL` 
 
 
+#### How to format the project
+
+In the `./android-app` directory, run `./gradlew ktfmtFormat`
+
 #### Setting up Google Maps
 
 1. Create a file named `secrets.properties`.

@@ -78,23 +78,22 @@ enum class PasswordValidationResult {
 
 @Composable
 private fun UsernameTextField(onUserNameChange: (String) -> Unit) {
-    var text by remember { mutableStateOf("") }
+  var text by remember { mutableStateOf("") }
 
-    OutlinedTextField(
-        value = text,
-        onValueChange = {
-            text = it
-            onUserNameChange(it)
-        },
-        label = { Text("User Name") },
-        maxLines = 1,
-        singleLine = true,
-        keyboardOptions = KeyboardOptions.Default,
-        shape = RoundedCornerShape(12.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = MaterialTheme.colorScheme.secondary
-        )
-    )
+  OutlinedTextField(
+      value = text,
+      onValueChange = {
+        text = it
+        onUserNameChange(it)
+      },
+      label = { Text("User Name") },
+      maxLines = 1,
+      singleLine = true,
+      keyboardOptions = KeyboardOptions.Default,
+      shape = RoundedCornerShape(12.dp),
+      colors =
+          OutlinedTextFieldDefaults.colors(
+              focusedBorderColor = MaterialTheme.colorScheme.secondary))
 }
 
 private fun isEmailValid(email: String): Boolean {
@@ -246,21 +245,21 @@ fun RegistrationCard(
     onRegisterClick: () -> Unit,
     onLoginClick: () -> Unit,
 ) {
+  Box(
+      modifier = Modifier.fillMaxSize(),
+  ) {
     Box(
-        modifier = Modifier.fillMaxSize(),
-    ) {
-        Box(
-            modifier =
+        modifier =
             Modifier.size(width = 300.dp, height = 800.dp)
                 .clip(shape = RoundedCornerShape(20.dp))
                 .align(Alignment.TopCenter), // Align to the top of the parent
-        ) {
-            Column(
-                modifier = modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.Start, // Align to the start (left) of the parent
-                verticalArrangement = Arrangement.Center,
-            ) {
-                Text(
+    ) {
+      Column(
+          modifier = modifier.fillMaxSize(),
+          horizontalAlignment = Alignment.Start, // Align to the start (left) of the parent
+          verticalArrangement = Arrangement.Center,
+      ) {
+        Text(
             "Create account",
             style =
                 TextStyle(
@@ -270,48 +269,46 @@ fun RegistrationCard(
                 ),
         )
         Spacer(modifier = Modifier.height(20.dp))
-          Column( // First and Last name
-              verticalArrangement = Arrangement.Center,
-              horizontalAlignment = Alignment.Start
-          ) {
+        Column( // First and Last name
+            verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.Start) {
               Text("User Name", modifier = Modifier.padding(start = 8.dp))
               UsernameTextField(onUserNameChange = onUsernameChange)
 
               Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.Start,
-        ) {
-          Text("Email", modifier = Modifier.padding(start = 8.dp))
-          EmailTextField(onEmailChange = onEmailChange)
-        }
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.Start,
-        ) {
-          Text("Create a password", modifier = Modifier.padding(start = 8.dp))
-          PasswordTextField(onPasswordChange = onPasswordChange)
-        }
+                  verticalArrangement = Arrangement.Center,
+                  horizontalAlignment = Alignment.Start,
+              ) {
+                Text("Email", modifier = Modifier.padding(start = 8.dp))
+                EmailTextField(onEmailChange = onEmailChange)
+              }
+              Column(
+                  verticalArrangement = Arrangement.Center,
+                  horizontalAlignment = Alignment.Start,
+              ) {
+                Text("Create a password", modifier = Modifier.padding(start = 8.dp))
+                PasswordTextField(onPasswordChange = onPasswordChange)
+              }
 
-        RegisterButton(onRegisterClick, modifier = Modifier.fillMaxWidth(0.95f))
-        Spacer(modifier = Modifier.height(50.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-          Text("Already have an account? ", style = MaterialTheme.typography.labelLarge)
-          Text(
-              "Log in",
-              style =
-                  MaterialTheme.typography.labelLarge.copy(
-                      color = MaterialTheme.colorScheme.primary),
-              modifier = Modifier.clickable { onLoginClick() },
-          )
-        }
+              RegisterButton(onRegisterClick, modifier = Modifier.fillMaxWidth(0.95f))
+              Spacer(modifier = Modifier.height(50.dp))
+              Row(
+                  modifier = Modifier.fillMaxWidth(),
+                  horizontalArrangement = Arrangement.Center,
+                  verticalAlignment = Alignment.CenterVertically,
+              ) {
+                Text("Already have an account? ", style = MaterialTheme.typography.labelLarge)
+                Text(
+                    "Log in",
+                    style =
+                        MaterialTheme.typography.labelLarge.copy(
+                            color = MaterialTheme.colorScheme.primary),
+                    modifier = Modifier.clickable { onLoginClick() },
+                )
+              }
+            }
       }
     }
   }
-}
 }
 
 @Composable
@@ -323,12 +320,12 @@ private fun RegistrationMenu(modifier: Modifier = Modifier) {
     val intent = Intent(context, MainPageActivity::class.java)
     context.startActivity(intent)
   }
-    var username by remember { mutableStateOf("") }
+  var username by remember { mutableStateOf("") }
   var email by remember { mutableStateOf("") }
   var password by remember { mutableStateOf("") }
 
   RegistrationCard(
-      onUsernameChange = { username = it},
+      onUsernameChange = { username = it },
       onEmailChange = { email = it },
       onPasswordChange = { password = it },
       onRegisterClick = {
