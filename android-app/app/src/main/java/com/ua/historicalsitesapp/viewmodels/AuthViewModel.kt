@@ -21,7 +21,9 @@ class AuthViewModel(context: Context) : ViewModel() {
       password: String,
   ): RegistrationResult? {
     var result: RegistrationResult? = null
-    runBlocking { result = loginRepository.register(RegistrationDetails(username, email, password)) }
+    runBlocking {
+      result = loginRepository.register(RegistrationDetails(username, email, password))
+    }
 
     return result
   }

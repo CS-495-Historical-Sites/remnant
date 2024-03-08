@@ -11,28 +11,52 @@ class TestApp:
             # empty data
             ({}, 400),
             # no email key supplied
-            ({"password": "abc123!good"}, 400),
+            ({"username": "ausername", "password": "abc123!good"}, 400),
             # no password key supplied
-            ({"email": "agoodemail@gmail.com"}, 400),
+            ({"username": "ausername", "email": "agoodemail@gmail.com"}, 400),
+            # no username supplied
+            ({"email": "agoodemail@gmail.com", "password": "abc123!good"}, 400),
             # normal registration
-            ({"email": "agoodemail@gmail.com", "password": "AGoodPassword5!"}, 200),
+            (
+                {
+                    "username": "ausername",
+                    "email": "agoodemail@gmail.com",
+                    "password": "AGoodPassword5!",
+                },
+                200,
+            ),
             # no email
-            ({"email": "", "password": "AGoodPassword5!"}, 422),
-            # improper length
-            ({"email": "agoodemfsfsdfsail@gmail.com", "password": "sword5!"}, 422),
+            (
+                {"username": "ausername", "email": "", "password": "AGoodPassword5!"},
+                422,
+            ),
+            # improper password length
+            (
+                {
+                    "username": "ausername",
+                    "email": "agoodemfsfsdfsail@gmail.com",
+                    "password": "sword5!",
+                },
+                422,
+            ),
             # characters allowed in our password constraints
             (
                 {
+                    "username": "ausername",
                     "email": "asldkjfs333949959494@gmail.com",
                     "password": "AGoodPassword5_+_)(*&!",
                 },
                 200,
             ),
             # no password entered
-            ({"email": "hellow%@yahoo.gov", "password": ""}, 422),
+            (
+                {"username": "ausername", "email": "hellow%@yahoo.gov", "password": ""},
+                422,
+            ),
             # another success
             (
                 {
+                    "username": "ausername",
                     "email": "agoodemfsfsdfsail@gmail.com",
                     "password": "swordsdfdf52323*!",
                 },
@@ -69,7 +93,11 @@ class TestApp:
     def test_can_login(self, client, login_credentials, login_expected_status_code):
         register_response = client.post(
             "/api/register",
-            json={"email": "test@example.com", "password": "TestPassword123!"},
+            json={
+                "username": "agoodusername",
+                "email": "test@example.com",
+                "password": "TestPassword123!",
+            },
         )
         assert register_response.status_code == 200
 
@@ -107,12 +135,18 @@ class TestApp:
         assert response.json["first_login"] is False
 
     def test_logout(self, client):
+        registration_credentials = {
+            "username": "worker",
+            "email": "workingemail8@gmail.com",
+            "password": "Working65**",
+        }
+
         login_credentials = {
             "email": "workingemail8@gmail.com",
             "password": "Working65**",
         }
 
-        response = client.post("/api/register", json=login_credentials)
+        response = client.post("/api/register", json=registration_credentials)
         assert response.status_code == 200
 
         response = client.post("/api/login", json=login_credentials)

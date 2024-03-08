@@ -38,7 +38,7 @@
         <activity
             android:name=".ui.screens.QuestionnaireActivity"
             android:exported="false"
-            android:theme="@style/Theme.HistoricalSitesApp"/>
+            android:theme="@style/Theme.HistoricalSitesApp" />
         <activity
             android:name=".ui.screens.MainPageActivity"
             android:exported="false"
@@ -48,7 +48,7 @@
             android:name=".ui.screens.LoginActivity"
             android:exported="true"
             android:label="@string/title_activity_main_page"
-            android:theme="@style/Theme.HistoricalSitesApp" >
+            android:theme="@style/Theme.HistoricalSitesApp">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
