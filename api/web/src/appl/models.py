@@ -11,6 +11,7 @@ from src.appl import db
 
 @dataclass
 class RegistrationRequest:
+    username: str
     email: str
     password: str
     requesting_admin: bool = False
@@ -99,6 +100,19 @@ class Visit(db.Model):
         self.user_id = user_id
         self.location_id = location_id
         self.visit_time = visit_time
+
+
+class LoginAttempt(db.Model):
+    __tablename__ = "login_attempt"
+    metadata = program_metadata
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120), index=True, nullable=False)
+    attempt_time = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    success = db.Column(db.Boolean, nullable=False)
+
+    def __init__(self, email, success):
+        self.email = email
+        self.success = success
 
 
 class User(db.Model):

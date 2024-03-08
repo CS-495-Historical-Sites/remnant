@@ -1,5 +1,5 @@
 from src.appl import db
-from src.appl.models import User, RegistrationRequest
+from src.appl.models import LoginAttempt, RegistrationRequest, User
 
 
 def email_exists(email: str) -> bool:
@@ -30,3 +30,12 @@ def get_user(email: str) -> User | None:
 
 def get_admin(email: str) -> User | None:
     return User.query.filter_by(email=email, is_admin=True).first()
+
+
+def log_login_attempt(email: str, success: bool):
+    db.session.add(LoginAttempt(email=email, success=success))
+    db.session.commit()
+
+
+def successful_login_attempts(email: str):
+    return LoginAttempt.query.filter_by(email=email).count()

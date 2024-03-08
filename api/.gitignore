@@ -16,3 +16,5 @@ pgdata
 
 # ansible inventory file
 ansible/inventory.ini
+
+.vscode/

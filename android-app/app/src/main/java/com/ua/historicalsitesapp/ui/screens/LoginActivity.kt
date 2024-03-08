@@ -217,6 +217,13 @@ fun LoginCard(
 @Composable
 private fun LoginMenu(modifier: Modifier = Modifier) {
   val context = LocalContext.current
+  val registrationView = AuthViewModel(context)
+
+  if (registrationView.isLoggedIn()) {
+    val intent = Intent(context, MainPageActivity::class.java)
+    context.startActivity(intent)
+  }
+
   val view = AuthViewModel(context)
 
   var email by remember { mutableStateOf("") }
@@ -229,8 +236,13 @@ private fun LoginMenu(modifier: Modifier = Modifier) {
         val loginResult = view.performLogin(email, password)
 
         if (loginResult is Result.Success) {
-          val intent = Intent(context, MainPageActivity::class.java)
-          context.startActivity(intent)
+          if (loginResult.data.isFirstLogin) {
+            val intent = Intent(context, QuestionnaireActivity::class.java)
+            context.startActivity(intent)
+          } else {
+            val intent = Intent(context, MainPageActivity::class.java)
+            context.startActivity(intent)
+          }
         }
       },
       onRegisterClick = {

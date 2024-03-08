@@ -30,12 +30,14 @@ def register():
     data = request.get_json()
 
     try:
+        username = data["username"]
         email = data["email"]
         non_hash_password = data["password"]
-        request_admin = data.get("request_admin", False)
     except KeyError:
         return (
-            jsonify({"message": "Incomplete request. Email and Password required"}),
+            jsonify(
+                {"message": "Incomplete request. Username, Email and Password required"}
+            ),
             400,
         )
 
@@ -49,9 +51,9 @@ def register():
     if not check_valid_email(email) or not check_valid_password(non_hash_password):
         return jsonify({"message": "Invalid credentials entered"}), 422
 
-    registration_info = RegistrationRequest(email, non_hash_password, request_admin)
+    registration_info = RegistrationRequest(username, email, non_hash_password)
 
-    LOGGER.debug(f"Attemping to register {registration_info.email}")
+    LOGGER.debug(f"Attempting to register {registration_info.email}")
 
     if user_queries.email_exists(registration_info.email):
         return jsonify({"message": "Email already exists"}), 422
@@ -66,7 +68,6 @@ def register():
 
 @auth_blueprint.route("/api/user/login", methods=["POST", "OPTIONS"])
 def login():
-    LOGGER.debug("login() reached")
     if request.method == "OPTIONS":
         return "", 200
 
@@ -90,14 +91,25 @@ def login():
 
     user = user_queries.get_user(login_info.email)
     if not user or not user.password_matches_hash(login_info.password):
+        user_queries.log_login_attempt(email=login_info.email, success=False)
         return (
-            jsonify({"message": "Invalid email or password", "accessToken": ""}),
+            jsonify({"message": "Invalid email or password"}),
             422,
         )
 
+    user_queries.log_login_attempt(email=login_info.email, success=True)
+
     access_token = create_access_token(identity=user.email)
     refresh_token = create_refresh_token(identity=user.email)
-    return jsonify(access_token=access_token, refresh_token=refresh_token), 200
+    is_first_login = user_queries.successful_login_attempts(email=login_info.email) == 1
+    return (
+        jsonify(
+            access_token=access_token,
+            refresh_token=refresh_token,
+            first_login=is_first_login,
+        ),
+        200,
+    )
 
 
 @auth_blueprint.route("/api/refresh", methods=["POST"])

@@ -16,11 +16,14 @@ class AuthViewModel(context: Context) : ViewModel() {
       LoginRepositoryProvider.provideLoginRepository(LoginDataSource(), context)
 
   fun performRegistration(
+      username: String,
       email: String,
       password: String,
   ): RegistrationResult? {
     var result: RegistrationResult? = null
-    runBlocking { result = loginRepository.register(RegistrationDetails(email, password)) }
+    runBlocking {
+      result = loginRepository.register(RegistrationDetails(username, email, password))
+    }
 
     return result
   }

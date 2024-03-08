@@ -38,6 +38,12 @@ erDiagram
         string short_description
         string wikipedia_link
     }
+    LoginAttempt {
+        int id PK
+        string email
+        datetime attempt_time
+        bool success
+    }
 
     User ||--o{ LocationSuggestion : "suggests"
     User ||--o{ Visit : "visits"

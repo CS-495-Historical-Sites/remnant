@@ -8,5 +8,5 @@ object ServerConfig {
   private const val TEST_SERVER_URL = "http://10.0.2.2:8080/api"
 
   // use to set the server url
-  const val SERVER_URL = AWS_SERVER_URL
+  const val SERVER_URL = TEST_SERVER_URL
 }
