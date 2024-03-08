@@ -217,12 +217,6 @@ fun LoginCard(
 @Composable
 private fun LoginMenu(modifier: Modifier = Modifier) {
   val context = LocalContext.current
-  val registrationView = AuthViewModel(context)
-
-  if (registrationView.isLoggedIn()) {
-    val intent = Intent(context, MainPageActivity::class.java)
-    context.startActivity(intent)
-  }
 
   val view = AuthViewModel(context)
 
