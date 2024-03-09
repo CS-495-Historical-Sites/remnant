@@ -18,6 +18,7 @@ def create_user(registration_info: RegistrationRequest) -> None:
 
 def create_admin(registration_info: RegistrationRequest) -> None:
     user = User(
+        username=registration_info.username,
         email=registration_info.email,
         supplied_password=registration_info.password,
         is_admin=True,

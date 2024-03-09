@@ -29,6 +29,7 @@ function allFieldsValid(
 export const Register: React.FC = () => {
   const [userRegistrationInformation, setUserRegistrationInformation] =
     React.useState<UserRegistrationInformation>({
+      username: "",
       email: "",
       password: "",
     });
@@ -94,6 +95,18 @@ export const Register: React.FC = () => {
                 padding: "20px",
               }}
             >
+              <TextField
+                sx={{ m: 1 }}
+                label="Username"
+                onChange={(e) =>
+                  setUserRegistrationInformation({
+                    ...userRegistrationInformation,
+                    username: e.target.value,
+                  })
+                }
+                required
+                key="username"
+              />
               <TextField
                 sx={{ m: 1 }}
                 label="Email"

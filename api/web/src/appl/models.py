@@ -126,7 +126,9 @@ class User(db.Model):
 
     is_admin = db.Column(db.Boolean, default=False)
 
-    def __init__(self, username: str, email: str, supplied_password: str, is_admin=False):
+    def __init__(
+        self, username: str, email: str, supplied_password: str, is_admin=False
+    ):
         self.username = username
         self.email = email
         self.password_hash = generate_password_hash(supplied_password)

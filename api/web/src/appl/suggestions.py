@@ -50,11 +50,9 @@ def add_location_suggestion():
 @suggestion_blueprint.route("/api/location_suggestions", methods=["GET"])
 @jwt_required()
 def get_all_location_suggestions():
-    LOGGER.critical("location_suggestions hit")
     user_identity = get_jwt_identity()
     admin = user_queries.get_admin(user_identity)
     if admin is None:
-        LOGGER.critical("Admin is none")
         return jsonify({"message": "User not found"}), 400
 
     all_suggestions = suggestion_queries.get_all_suggestions()
