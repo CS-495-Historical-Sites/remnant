@@ -39,7 +39,7 @@ class LoginDataSource {
         }
     val response: HttpResponse =
         client.post(
-            ServerConfig.SERVER_URL + "/login",
+            ServerConfig.SERVER_URL + "/user/login",
         ) {
           contentType(ContentType.Application.Json)
           setBody(details)
@@ -65,7 +65,7 @@ class LoginDataSource {
         }
     try {
       val response: HttpResponse =
-          client.post(ServerConfig.SERVER_URL + "/register") {
+          client.post(ServerConfig.SERVER_URL + "/user/register") {
             contentType(ContentType.Application.Json)
             setBody(regDetails)
           }
@@ -93,7 +93,6 @@ class LoginDataSource {
   }
 
   suspend fun logout(tokenObject: LoggedInUser): LogoutResult {
-    // TODO: revoke authentication
     return sendLogoutRequest(tokenObject)
   }
 
@@ -118,7 +117,7 @@ class LoginDataSource {
           }
 
       val response: HttpResponse =
-          client.delete(ServerConfig.SERVER_URL + "/logout") {
+          client.delete(ServerConfig.SERVER_URL + "/user/logout") {
             contentType(ContentType.Application.Json)
             headers { append(HttpHeaders.Authorization, "Bearer ${tokenObject.accessToken}") }
           }
@@ -127,7 +126,7 @@ class LoginDataSource {
       }
 
       val refreshResponse: HttpResponse =
-          client.delete(ServerConfig.SERVER_URL + "/logout") {
+          client.delete(ServerConfig.SERVER_URL + "/user/logout") {
             contentType(ContentType.Application.Json)
             headers { append(HttpHeaders.Authorization, "Bearer ${tokenObject.refreshToken}") }
           }
