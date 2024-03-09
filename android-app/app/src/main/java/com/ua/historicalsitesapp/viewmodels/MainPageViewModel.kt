@@ -77,10 +77,7 @@ class MainPageViewModel(context: Context) : ViewModel() {
   fun hasUserVisitedLocation(locationId: Int): Boolean {
     val client = getUserClient()
     return runBlocking {
-      val response =
-          client.get(ServerConfig.SERVER_URL + " /user/visited_locations") {
-            contentType(ContentType.Application.Json)
-          }
+      val response = client.get(ServerConfig.SERVER_URL + " /user/visited_locations")
       if (response.status.value == 200) {
         val visitedLocations = response.body<GetUserVisitedLocationsResponse>().visitedLocations
         return@runBlocking visitedLocations.any { it.id == locationId }
