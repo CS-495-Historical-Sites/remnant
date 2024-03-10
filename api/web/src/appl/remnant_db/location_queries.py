@@ -1,3 +1,5 @@
+from math import cos, pi
+
 from src.appl import db
 from src.appl.models import Location
 
@@ -20,9 +22,14 @@ def get_all_locations() -> list[Location]:
     return Location.query.all()
 
 
-def get_locations_near(lat: float, long: float) -> list[Location]:
-    delta_lat = 3
-    delta_long = 3
+def get_locations_near(
+    lat: float, long: float, kilometer_radius: float
+) -> list[Location]:
+    # 1 degree of latitude in kilometers, ~111km
+    delta_lat = kilometer_radius / 111
+
+    # Adjust delta_long for the latitude
+    delta_long = kilometer_radius / (111 * abs(cos(lat * (pi / 180))))
 
     min_lat = lat - delta_lat
     max_lat = lat + delta_lat

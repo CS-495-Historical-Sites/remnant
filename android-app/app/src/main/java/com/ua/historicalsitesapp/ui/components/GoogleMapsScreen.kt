@@ -10,6 +10,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -107,10 +108,10 @@ private fun CustomRendererClustering(
 @Composable
 fun GoogleMapsScreen(
     view: MainPageViewModel,
-    items: List<ClusterItem>,
 ) {
   var showBottomSheet by remember { mutableStateOf(false) }
   var selectedLocation: ClusterItem? = null
+  val items = remember { mutableStateListOf<ClusterItem>() }
 
   val onLocationInfoBoxClick: (ClusterItem) -> Unit = { item ->
     showBottomSheet = true // Update the state value
@@ -122,11 +123,28 @@ fun GoogleMapsScreen(
   val cameraPositionState = rememberCameraPositionState { CameraPosition.NULL }
 
   fusedLocationClient.getCurrentLocation(PRIORITY_HIGH_ACCURACY, null).addOnSuccessListener {
-      location ->
-    if (location != null) {
-      val coordinates = LatLng(location.latitude, location.longitude)
+      usersLocation ->
+    if (usersLocation != null) {
+      val coordinates = LatLng(usersLocation.latitude, usersLocation.longitude)
       val cameraPosition = CameraPosition.fromLatLngZoom(coordinates, 15F)
       cameraPositionState.move(CameraUpdateFactory.newCameraPosition(cameraPosition))
+
+      val historicalLocations = view.getHistoricalLocationNearPoint(coordinates, 50.0f)
+
+      for (location in historicalLocations) {
+        val locationId = location.id
+        val position = LatLng(location.latitude.toDouble(), location.longitude.toDouble())
+        val shortLocationDescription = location.shortDescription ?: ""
+        items.add(
+            ClusterItem(
+                locationId,
+                position,
+                location.name,
+                shortLocationDescription,
+                0f,
+            ),
+        )
+      }
     }
   }
 

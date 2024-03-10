@@ -13,7 +13,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -21,8 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.rememberNavController
 import com.example.compose.HistoricalSitesAppTheme
-import com.google.android.gms.maps.model.LatLng
-import com.ua.historicalsitesapp.data.model.map.ClusterItem
 import com.ua.historicalsitesapp.nav.AppBottomBar
 import com.ua.historicalsitesapp.nav.BottomNavigationGraph
 import com.ua.historicalsitesapp.ui.components.GoogleMapsScreen
@@ -82,26 +79,9 @@ fun HomeScreen(modifier: Modifier) {
 
     if (hasPermission) {
       Box(modifier = Modifier.fillMaxSize()) {
-        val items = remember { mutableStateListOf<ClusterItem>() }
         val view = MainPageViewModel(context)
-        val locations = view.getAllLocations()
 
-        for (location in locations) {
-          val locationId = location.id
-          val position = LatLng(location.latitude.toDouble(), location.longitude.toDouble())
-          val shortLocationDescription = location.shortDescription ?: ""
-          items.add(
-              ClusterItem(
-                  locationId,
-                  position,
-                  location.name,
-                  shortLocationDescription,
-                  0f,
-              ),
-          )
-        }
-
-        GoogleMapsScreen(view, items)
+        GoogleMapsScreen(view)
       }
     } else {
       // Show the LocationScreen if permissions are not granted

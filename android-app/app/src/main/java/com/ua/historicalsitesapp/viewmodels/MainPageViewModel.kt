@@ -2,6 +2,7 @@ package com.ua.historicalsitesapp.viewmodels
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
+import com.google.android.gms.maps.model.LatLng
 import com.ua.historicalsitesapp.data.model.auth.GetBearerTokens
 import com.ua.historicalsitesapp.data.model.auth.LoggedInUser
 import com.ua.historicalsitesapp.data.model.map.HsLocation
@@ -70,6 +71,10 @@ class MainPageViewModel(context: Context) : ViewModel() {
     return locationRepository.getAllLocations()
   }
 
+  fun getHistoricalLocationNearPoint(point: LatLng, kilometerRadius: Float): List<HsLocation> {
+    return locationRepository.getLocationsNearPoint(point, kilometerRadius)
+  }
+
   fun getLocationInfo(locationId: Int): HsLocationComplete {
     return locationRepository.getLocationInfo(locationId)
   }
@@ -77,10 +82,7 @@ class MainPageViewModel(context: Context) : ViewModel() {
   fun hasUserVisitedLocation(locationId: Int): Boolean {
     val client = getUserClient()
     return runBlocking {
-      val response =
-          client.get(ServerConfig.SERVER_URL + " /user/visited_locations") {
-            contentType(ContentType.Application.Json)
-          }
+      val response = client.get(ServerConfig.SERVER_URL + "/user/visited_locations")
       if (response.status.value == 200) {
         val visitedLocations = response.body<GetUserVisitedLocationsResponse>().visitedLocations
         return@runBlocking visitedLocations.any { it.id == locationId }

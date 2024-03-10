@@ -61,7 +61,7 @@ def delete_visited_location():
 @jwt_required()
 def add_visited_location():
     user_identity = get_jwt_identity()
-    user = user_queries.get_user(user_identity)
+    user = user_queries.get_user(email=user_identity)
     if user is None:
         return jsonify({"message": "User not found"}), 400
 
@@ -82,6 +82,6 @@ def add_visited_location():
     ).first()
     if check_duplicate:
         return jsonify({"message": "Visit Successfully Added"}), 200
-    LOGGER.critical(f"user id {user.id}, type: {type(user.id)}")
+
     visit_queries.create_visited_location(location_to_add.id, user.id)
     return jsonify({"message": "Visit Successfully Added"}), 200
