@@ -32,7 +32,7 @@ def get_all_locations():
         near_locations = location_queries.get_locations_near(
             latitude, longitude, kilometer_radius
         )
-        return jsonify([l.short_repr() for l in near_locations]), 200
+        return jsonify([short_location_repr(l) for l in near_locations]), 200
 
     all_locations = location_queries.get_all_locations()
     return jsonify([short_location_repr(l) for l in all_locations]), 200
