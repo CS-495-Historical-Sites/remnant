@@ -13,15 +13,26 @@ location_blueprint = Blueprint(
 def get_all_locations():
     latitude = request.args.get("lat")
     longitude = request.args.get("long")
+    kilometer_radius = request.args.get("kilometer_radius")
 
-    if any([latitude, longitude]) and not all([latitude, longitude]):
-        return jsonify({"message": "Must give both lat and long or neither"}), 400
+    if any([latitude, longitude, kilometer_radius]) and not all(
+        [latitude, longitude, kilometer_radius]
+    ):
+        return (
+            jsonify(
+                {"message": "Must give all of (lat, long, kilometer_radius) or none"}
+            ),
+            400,
+        )
 
-    if latitude and longitude:
+    if latitude and longitude and kilometer_radius:
         latitude = float(latitude)
         longitude = float(longitude)
-        near_locations = location_queries.get_locations_near(latitude, longitude)
-        return jsonify([short_location_repr(l) for l in near_locations]), 200
+        kilometer_radius = float(kilometer_radius)
+        near_locations = location_queries.get_locations_near(
+            latitude, longitude, kilometer_radius
+        )
+        return jsonify([l.short_repr() for l in near_locations]), 200
 
     all_locations = location_queries.get_all_locations()
     return jsonify([short_location_repr(l) for l in all_locations]), 200
