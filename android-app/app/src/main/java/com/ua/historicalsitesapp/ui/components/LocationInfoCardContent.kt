@@ -1,5 +1,6 @@
 package com.ua.historicalsitesapp.ui.components
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,12 +17,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,6 +32,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -73,10 +77,7 @@ private fun RenderLocationInfo(location: HsLocationComplete) {
 
   ImageBox(imageLink)
   Spacer(modifier = Modifier.height(6.dp))
-  Text(
-      text = location.name,
-      style = Typography.headlineMedium,
-  )
+  TitleBox(locationName = location.name, {})
   if (location.shortDescription != null) {
     Text(
         text = location.shortDescription,
@@ -96,6 +97,14 @@ private fun RenderLocationInfo(location: HsLocationComplete) {
         modifier = Modifier.clickable(onClick = { isTextExpanded = !isTextExpanded }),
         style = Typography.bodyMedium,
     )
+  }
+}
+
+@Composable
+private fun TitleBox(locationName: String, onEditClick: () -> Unit) {
+  Row(verticalAlignment = Alignment.CenterVertically) {
+    Text(text = locationName, style = Typography.headlineMedium, modifier = Modifier.weight(1f))
+    IconButton(onClick = { onEditClick() }) { Icon(Icons.Filled.Edit, contentDescription = "Edit") }
   }
 }
 
@@ -125,55 +134,64 @@ private fun ImageBox(imageLink: String) {
 private fun LocationActionItems(location: HsLocationComplete) {
   val context = LocalContext.current
   val view = MainPageViewModel(context)
-
-  var hasVisitedLocation by remember { mutableStateOf(view.hasUserVisitedLocation(location.id)) }
-
-  Row(
-      horizontalArrangement = Arrangement.SpaceBetween,
-      modifier = Modifier.fillMaxWidth().padding(4.dp),
-  ) {
-    Button(
-        onClick = {
-          if (!hasVisitedLocation) {
-            val successfullyMarked = view.markLocationAsVisited(location.id)
-            if (successfullyMarked) {
-              hasVisitedLocation = true
-            }
-          } else {
-            val successfullyRemoved = view.removeLocationFromVisited(location.id)
-            if (successfullyRemoved) {
-              hasVisitedLocation = false
-            }
-          }
-        },
-        colors = ButtonDefaults.buttonColors(contentColor = Color.White),
+  Column {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.fillMaxWidth().padding(4.dp),
     ) {
-      val buttonText =
-          if (hasVisitedLocation) {
-            "Remove from visits"
-          } else {
-            "Add to visits"
-          }
-
-      Text(buttonText)
-      Spacer(modifier = Modifier.width(4.dp))
-      Icon(Icons.Default.Add, buttonText)
+      ToggleVisitedButton(view = view, location = location)
+      RouteMeButton(context = context, location = location)
     }
+  }
+}
 
-    Button(
-        onClick = {
-          val intent =
-              createGoogleMapsDirectionsIntent(
-                  location.latitude,
-                  location.longitude,
-                  location.name,
-              )
-          context.startActivity(intent)
-        },
-        colors = ButtonDefaults.buttonColors(contentColor = Color.White)) {
-          Text("Route Me")
-          Spacer(modifier = Modifier.width(4.dp))
-          Icon(Icons.Default.Map, "Route me")
+@Composable
+private fun RouteMeButton(context: Context, location: HsLocationComplete) {
+  Button(
+      onClick = {
+        val intent =
+            createGoogleMapsDirectionsIntent(
+                location.latitude,
+                location.longitude,
+                location.name,
+            )
+        context.startActivity(intent)
+      },
+      colors = ButtonDefaults.buttonColors(contentColor = Color.White)) {
+        Text("Route Me")
+        Spacer(modifier = Modifier.width(4.dp))
+        Icon(Icons.Default.Map, "Route me")
+      }
+}
+
+@Composable
+private fun ToggleVisitedButton(view: MainPageViewModel, location: HsLocationComplete) {
+  var hasVisitedLocation by remember { mutableStateOf(view.hasUserVisitedLocation(location.id)) }
+  Button(
+      onClick = {
+        if (!hasVisitedLocation) {
+          val successfullyMarked = view.markLocationAsVisited(location.id)
+          if (successfullyMarked) {
+            hasVisitedLocation = true
+          }
+        } else {
+          val successfullyRemoved = view.removeLocationFromVisited(location.id)
+          if (successfullyRemoved) {
+            hasVisitedLocation = false
+          }
         }
+      },
+      colors = ButtonDefaults.buttonColors(contentColor = Color.White),
+  ) {
+    val buttonText =
+        if (hasVisitedLocation) {
+          "Remove from visits"
+        } else {
+          "Add to visits"
+        }
+
+    Text(buttonText)
+    Spacer(modifier = Modifier.width(4.dp))
+    Icon(Icons.Default.Add, buttonText)
   }
 }

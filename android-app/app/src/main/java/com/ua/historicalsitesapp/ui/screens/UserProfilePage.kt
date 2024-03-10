@@ -57,6 +57,7 @@ fun UserProfilePage(modifier: Modifier = Modifier) {
         text = "This is the user page",
         modifier = Modifier.weight(1f),
     )
+
     LogoutButton(
         onClick = { showLogoutConfirmation.value = true },
     )
