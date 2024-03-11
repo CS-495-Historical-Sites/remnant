@@ -1,5 +1,6 @@
 from src.appl.models import (
     Location,
+    LocationEditSuggestion,
     ShortLocationDescription,
     LongLocationDescription,
     LocationSuggestion,
@@ -38,4 +39,15 @@ def add_suggestion_repr(s: LocationSuggestion) -> dict:
         "longitude": s.longitude,
         "short_description": s.short_description,
         "wikipedia_link": s.wikipedia_link,
+    }
+
+
+def edit_suggestion_repr(s: LocationEditSuggestion) -> dict:
+    return {
+        "id": s.id,
+        "user": s.user_id,
+        "suggestion_time": s.suggestion_time,
+        "name": s.name,
+        "short_description": s.short_description,
+        "long_description": s.long_description,
     }

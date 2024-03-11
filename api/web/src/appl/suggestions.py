@@ -1,10 +1,15 @@
 from flask import jsonify, Blueprint, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 
-from src.appl import LOGGER
-from src.appl.models import LocationSuggestion, LocationSuggestionRequest
+from src.appl import LOGGER, db
+from src.appl.models import (
+    LocationEditSuggestion,
+    LocationEditSuggestionRequest,
+    LocationSuggestion,
+    LocationSuggestionRequest,
+)
 from src.appl.remnant_db import user_queries, suggestion_queries
-from src.appl.responses import add_suggestion_repr
+from src.appl.responses import add_suggestion_repr, edit_suggestion_repr
 from src.appl.validation import check_types
 
 suggestion_blueprint = Blueprint(
@@ -13,7 +18,9 @@ suggestion_blueprint = Blueprint(
 )
 
 
-@suggestion_blueprint.route("/api/location_suggestions", methods=["POST"])
+@suggestion_blueprint.route(
+    "/api/suggestions/location_add_suggestions", methods=["POST"]
+)
 @jwt_required()
 def add_location_suggestion():
     user_identity = get_jwt_identity()
@@ -42,18 +49,79 @@ def add_location_suggestion():
 
     suggestion = LocationSuggestion(user, suggestion_req)
 
-    suggestion_queries.add_location_suggestion(suggestion)
+    db.session.add(suggestion)
+    db.session.commit()
 
     return jsonify({"message": "Suggestion Successfully Added"}), 200
 
 
-@suggestion_blueprint.route("/api/location_suggestions", methods=["GET"])
+@suggestion_blueprint.route(
+    "/api/suggestions/location_edit_suggestions/<location_id>", methods=["POST"]
+)
 @jwt_required()
-def get_all_location_suggestions():
+def add_location_edit_suggestion(location_id):
+    try:
+        location_key = int(location_id)
+    except ValueError:
+        return jsonify({"message": "Invalid location ID"}), 400
+
+    user_identity = get_jwt_identity()
+    user = user_queries.get_user(user_identity)
+    if user is None:
+        return jsonify({"message": "User not found"}), 400
+
+    data = request.get_json()
+
+    try:
+        name, short_desc, long_desc = (
+            data["name"],
+            data["short_description"],
+            data["long_description"],
+        )
+    except KeyError:
+        return jsonify({"message": "Incomplete request"}), 400
+
+    if not check_types([(name, short_desc, long_desc, str)]):
+        return jsonify({"message": "Invalid data submitted"}), 400
+
+    suggestion_req = LocationEditSuggestionRequest(
+        location_id=location_key,
+        name=name,
+        short_description=short_desc,
+        long_description=long_desc,
+    )
+
+    suggestion = LocationEditSuggestion(user, suggestion_req)
+
+    db.session.add(suggestion)
+    db.session.commit()
+
+    return jsonify({"message": "Suggestion Successfully Added"}), 200
+
+
+@suggestion_blueprint.route(
+    "/api/suggestions/location_edit_suggestions", methods=["GET"]
+)
+@jwt_required()
+def get_all_location_edit_suggestions():
     user_identity = get_jwt_identity()
     admin = user_queries.get_admin(user_identity)
     if admin is None:
         return jsonify({"message": "User not found"}), 400
 
-    all_suggestions = suggestion_queries.get_all_suggestions()
+    all_suggestions = suggestion_queries.get_all_location_edit_suggestions()
+    return jsonify([edit_suggestion_repr(s) for s in all_suggestions]), 200
+
+
+@suggestion_blueprint.route(
+    "/api/suggestions/location_add_suggestions", methods=["GET"]
+)
+@jwt_required()
+def get_all_location_add_suggestions():
+    user_identity = get_jwt_identity()
+    admin = user_queries.get_admin(user_identity)
+    if admin is None:
+        return jsonify({"message": "User not found"}), 400
+
+    all_suggestions = suggestion_queries.get_all_location_add_suggestions()
     return jsonify([add_suggestion_repr(s) for s in all_suggestions]), 200

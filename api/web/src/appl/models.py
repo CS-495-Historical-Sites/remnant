@@ -33,6 +33,14 @@ class LocationSuggestionRequest:
     wikipedia_link: str | None
 
 
+@dataclass
+class LocationEditSuggestionRequest:
+    location_id: int
+    name: str
+    short_description: str
+    long_description: str
+
+
 class ShortLocationDescription(TypedDict):
     id: str
     name: str
@@ -145,6 +153,7 @@ class LocationSuggestion(db.Model):
     # base info
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+
     suggestion_time = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
     # location suggestion info
@@ -161,6 +170,28 @@ class LocationSuggestion(db.Model):
         self.name = req.name
         self.short_description = req.short_description
         self.wikipedia_link = req.wikipedia_link
+
+
+class LocationEditSuggestion(db.Model):
+    __tablename__ = "user_suggested_location_edit"
+    metadata = program_metadata
+
+    # base info
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    location_id = db.Column(db.Integer, db.ForeignKey("location.id"), nullable=False)
+    suggestion_time = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+    name = db.Column(db.String(120), index=True, unique=False, nullable=False)
+    short_description = db.Column(db.Text, nullable=True)
+    long_description = db.Column(db.Text, nullable=True)
+
+    def __init__(self, user: User, req: LocationEditSuggestionRequest):
+        self.user_id = user.id
+        self.location_id = req.location_id
+        self.name = req.name
+        self.short_description = req.short_description
+        self.long_description = req.long_description
 
 
 class BlacklistToken(db.Model):

@@ -55,6 +55,7 @@ fun LocationInfoCardContent(
     location: HsLocationComplete,
     sheetState: SheetState,
 ) {
+  val view = MainPageViewModel(LocalContext.current)
   var showEditForm by remember { mutableStateOf(false) }
   Box(
       modifier = Modifier.fillMaxSize(),
@@ -63,9 +64,11 @@ fun LocationInfoCardContent(
       SuggestEditForm(
           location = location,
           onSubmitSuggestion = { title, shortDescription, longDescription ->
-            // Handle the submission of the suggestions here.
-            // This might involve calling a ViewModel function to update the data and then hiding
-            // the form.
+            view.sendLocationEditSuggestionRequest(
+                locationId = location.id,
+                name = title,
+                shortDesc = shortDescription,
+                longDesc = longDescription)
             showEditForm = false
           },
           onDismiss = { showEditForm = false })

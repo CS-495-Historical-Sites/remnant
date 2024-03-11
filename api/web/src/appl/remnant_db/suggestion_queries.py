@@ -1,11 +1,10 @@
 from src.appl import db
-from src.appl.models import LocationSuggestion
+from src.appl.models import LocationEditSuggestion, LocationSuggestion
 
 
-def add_location_suggestion(suggestion: LocationSuggestion) -> None:
-    db.session.add(suggestion)
-    db.session.commit()
-
-
-def get_all_suggestions() -> list[LocationSuggestion]:
+def get_all_location_add_suggestions() -> list[LocationSuggestion]:
     return LocationSuggestion.query.all()
+
+
+def get_all_location_edit_suggestions() -> list[LocationEditSuggestion]:
+    return LocationEditSuggestion.query.all()

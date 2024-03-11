@@ -7,6 +7,7 @@ import com.ua.historicalsitesapp.data.model.auth.GetBearerTokens
 import com.ua.historicalsitesapp.data.model.auth.LoggedInUser
 import com.ua.historicalsitesapp.data.model.map.HsLocation
 import com.ua.historicalsitesapp.data.model.map.HsLocationComplete
+import com.ua.historicalsitesapp.data.model.suggestions.LocationEditSuggestion
 import com.ua.historicalsitesapp.data.model.visits.GetUserVisitedLocationsResponse
 import com.ua.historicalsitesapp.data.model.visits.VisitAddRequest
 import com.ua.historicalsitesapp.data.repository.auth.LoginDataSource
@@ -39,7 +40,7 @@ class MainPageViewModel(context: Context) : ViewModel() {
     return loginRepository.user ?: throw Exception("MainPageViewModel could not retrieve user")
   }
 
-  fun getUserClient(): HttpClient {
+  private fun getUserClient(): HttpClient {
     val user = getUser()
     var usertokens = GetBearerTokens(user)
     val client =
@@ -113,6 +114,25 @@ class MainPageViewModel(context: Context) : ViewModel() {
             contentType(ContentType.Application.Json)
             setBody(visitInfo)
           }
+      return@runBlocking response.status.value == 200
+    }
+  }
+
+  fun sendLocationEditSuggestionRequest(
+      locationId: Int,
+      name: String,
+      shortDesc: String,
+      longDesc: String
+  ): Boolean {
+    val client = getUserClient()
+    val visitInfo = LocationEditSuggestion(name, shortDesc, longDesc)
+    return runBlocking {
+      val response =
+          client.post(
+              ServerConfig.SERVER_URL + "/suggestions/location_edit_suggestions/" + locationId) {
+                contentType(ContentType.Application.Json)
+                setBody(visitInfo)
+              }
       return@runBlocking response.status.value == 200
     }
   }

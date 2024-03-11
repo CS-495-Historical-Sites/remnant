@@ -1,6 +1,7 @@
 // third party
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 // material-ui
 import { Typography, TextField, Link, Box, Button } from "@mui/material";
@@ -19,16 +20,22 @@ interface LoginResponse {
 }
 
 export const Login: React.FC<LoginProps> = ({ setToken }) => {
+  const navigate = useNavigate();
   const [userInformation, setUserInformation] =
     React.useState<UserLoginInformation>({
       email: "",
       password: "",
     });
 
+  // Redirect to the /login page if not already there
+  useEffect(() => {
+    if (window.location.pathname !== "/login") {
+      navigate("/login");
+    }
+  }, [navigate]);
+
   const [err, setErr] = React.useState(false);
   const [errMessage, setErrMessage] = React.useState("");
-
-  const navigate = useNavigate();
 
   async function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
