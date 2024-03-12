@@ -23,7 +23,11 @@ def fill_with_locations(client):
 
 
 def register_user(client) -> dict[str, str]:
-    user_data = {"email": "testuser@example.com", "password": "Astrongpassword43*"}
+    user_data = {
+        "username": "ausername",
+        "email": "testuser@example.com",
+        "password": "Astrongpassword43*",
+    }
 
     register_response = client.post("/api/register", json=user_data)
     assert register_response.status_code == 200

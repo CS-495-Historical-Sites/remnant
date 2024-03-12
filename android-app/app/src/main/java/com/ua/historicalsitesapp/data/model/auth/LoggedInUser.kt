@@ -9,6 +9,7 @@ import kotlinx.serialization.Serializable
 data class LoggedInUser(
     @SerialName("access_token") val accessToken: String,
     @SerialName("refresh_token") val refreshToken: String,
+    @SerialName("first_login") val isFirstLogin: Boolean
 )
 
 fun GetBearerTokens(user: LoggedInUser): BearerTokens {

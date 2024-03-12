@@ -9,23 +9,28 @@ from src.appl.models import Location, User, RegistrationRequest
 
 @pytest.fixture
 def valid_user() -> User:
+    username = "DamonArnette34"
     user_email = "DamonArnette34@gmail.com"
     user_unhashed_password = "IloveSQL#667"
-    return User(user_email, user_unhashed_password)
+    return User(
+        username=username, email=user_email, supplied_password=user_unhashed_password
+    )
 
 
 class TestUser:
 
     def test_can_add_and_retrieve_user_from_db(self, app):
+        username = "DamonArnette34"
         user_email = "DamonArnette34@gmail.com"
         user_unhashed_password = "IloveSQL#667"
 
-        test_info = RegistrationRequest(user_email, user_unhashed_password)
+        test_info = RegistrationRequest(username, user_email, user_unhashed_password)
         user_queries.create_user(test_info)
 
         fetched_user: User | None = User.query.filter_by(email=user_email).first()
 
         assert fetched_user is not None
+        assert fetched_user.username == username
         assert fetched_user.email == user_email
         assert fetched_user.password_hash != user_unhashed_password
 
