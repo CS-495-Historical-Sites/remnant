@@ -5,7 +5,7 @@
 - Install an emulation device
 - Press "run"
     - This version of the project will send requests to our server hosted in AWS, so you do not need
-      to set up the backend seperately. To connect to the backend running locally, edit the file
+      to set up the backend separately. To connect to the backend running locally, edit the file
       at `app/src/main/java/com/ua/historicalsitesapp/util/ServerConfig.kt` so
       that `SERVER_URL = TEST_SERVER_URL`
 

@@ -20,6 +20,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.rememberNavController
 import com.example.compose.HistoricalSitesAppTheme
+import com.google.android.gms.location.GeofencingClient
+import com.google.android.gms.location.LocationServices
 import com.ua.historicalsitesapp.nav.AppBottomBar
 import com.ua.historicalsitesapp.nav.BottomNavigationGraph
 import com.ua.historicalsitesapp.ui.components.GoogleMapsScreen
@@ -28,7 +30,9 @@ import com.ua.historicalsitesapp.util.hasLocationPermission
 import com.ua.historicalsitesapp.viewmodels.MainPageViewModel
 
 class MainPageActivity : ComponentActivity() {
+  private lateinit var geofencingClient: GeofencingClient
   override fun onCreate(savedInstanceState: Bundle?) {
+    geofencingClient = LocationServices.getGeofencingClient(this)
     super.onCreate(savedInstanceState)
 
     onBackPressedDispatcher.addCallback(
