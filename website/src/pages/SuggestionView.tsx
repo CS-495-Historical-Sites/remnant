@@ -9,6 +9,11 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 
+import {
+  GetAddLocationSuggestions,
+  GetLocationEditSuggestions,
+} from "../remnantAPI/GetLocationSuggestions";
+
 import LocationSuggestion from "../models/LocationSuggestion";
 import LocationEditSuggestion from "../models/LocationSuggestion";
 
@@ -24,34 +29,24 @@ export const SuggestionsView: React.FC<UserProps> = ({ setToken, token }) => {
   const [editSuggestions, setEditSuggestions] = useState<
     LocationEditSuggestion[]
   >([]);
+
   const navigate = useNavigate(); // Initialize useNavigate
 
   useEffect(() => {
-    const fetchSuggestions = async (
-      endpoint: string,
-      setSuggestionsFunc: React.Dispatch<
-        React.SetStateAction<LocationSuggestion[]>
-      >,
-    ) => {
-      const response = await fetch(
-        `http://localhost:8080/api/suggestions/${endpoint}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-      if (response.status === 401) {
-        setToken("");
-        return;
-      }
-      const data: LocationSuggestion[] = await response.json();
-      setSuggestionsFunc(data);
+    const fetchLocationAddSuggestions = async () => {
+      const data = await GetAddLocationSuggestions(token, setToken);
+
+      setAddSuggestions(data);
     };
 
-    fetchSuggestions("location_add_suggestions", setAddSuggestions);
-    fetchSuggestions("location_edit_suggestions", setEditSuggestions);
+    const fetchLocationEditSuggestions = async () => {
+      const data = await GetLocationEditSuggestions(token, setToken);
+
+      setEditSuggestions(data);
+    };
+
+    fetchLocationAddSuggestions();
+    fetchLocationEditSuggestions();
   }, [token, setToken]);
 
   const handleSuggestionClick = (suggestionId: number) => {

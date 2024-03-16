@@ -1,14 +1,18 @@
+# pylint: disable=unused-argument
 from flask import jsonify, Blueprint, request
-from flask_jwt_extended import get_jwt_identity, jwt_required
+from flask_jwt_extended import jwt_required
 
-from src.appl import LOGGER, db
+from src.appl import db
 from src.appl.models import (
     LocationEditSuggestion,
     LocationEditSuggestionRequest,
     LocationSuggestion,
     LocationSuggestionRequest,
+    User,
 )
-from src.appl.remnant_db import user_queries, suggestion_queries
+
+from src.appl.auth import admin_required, user_required
+from src.appl.remnant_db import suggestion_queries
 from src.appl.responses import add_suggestion_repr, edit_suggestion_repr
 from src.appl.validation import check_types
 
@@ -22,14 +26,9 @@ suggestion_blueprint = Blueprint(
     "/api/suggestions/location_add_suggestions", methods=["POST"]
 )
 @jwt_required()
-def add_location_suggestion():
-    user_identity = get_jwt_identity()
-    user = user_queries.get_user(user_identity)
-    if user is None:
-        return jsonify({"message": "User not found"}), 400
-
+@user_required
+def add_location_suggestion(user: User):
     data = request.get_json()
-
     try:
         latitude, longitude = data["latitude"], data["longitude"]
         name, short_desc = data["name"], data["short_description"]
@@ -59,16 +58,12 @@ def add_location_suggestion():
     "/api/suggestions/location_edit_suggestions/<location_id>", methods=["POST"]
 )
 @jwt_required()
-def add_location_edit_suggestion(location_id):
+@user_required
+def add_location_edit_suggestion(user: User, location_id):
     try:
         location_key = int(location_id)
     except ValueError:
         return jsonify({"message": "Invalid location ID"}), 400
-
-    user_identity = get_jwt_identity()
-    user = user_queries.get_user(user_identity)
-    if user is None:
-        return jsonify({"message": "User not found"}), 400
 
     data = request.get_json()
 
@@ -103,12 +98,8 @@ def add_location_edit_suggestion(location_id):
     "/api/suggestions/location_edit_suggestions", methods=["GET"]
 )
 @jwt_required()
-def get_all_location_edit_suggestions():
-    user_identity = get_jwt_identity()
-    admin = user_queries.get_admin(user_identity)
-    if admin is None:
-        return jsonify({"message": "User not found"}), 400
-
+@admin_required
+def get_all_location_edit_suggestions(admin: User):
     all_suggestions = suggestion_queries.get_all_location_edit_suggestions()
     return jsonify([edit_suggestion_repr(s) for s in all_suggestions]), 200
 
@@ -117,12 +108,8 @@ def get_all_location_edit_suggestions():
     "/api/suggestions/location_edit_suggestions/<suggestion_id>", methods=["GET"]
 )
 @jwt_required()
-def get_location_edit_suggestion(suggestion_id):
-    user_identity = get_jwt_identity()
-    admin = user_queries.get_admin(user_identity)
-    if admin is None:
-        return jsonify({"message": "User not found"}), 400
-
+@admin_required
+def get_location_edit_suggestion(admin: User, suggestion_id: str):
     try:
         suggestion_key = int(suggestion_id)
     except ValueError:
@@ -138,11 +125,7 @@ def get_location_edit_suggestion(suggestion_id):
     "/api/suggestions/location_add_suggestions", methods=["GET"]
 )
 @jwt_required()
-def get_all_location_add_suggestions():
-    user_identity = get_jwt_identity()
-    admin = user_queries.get_admin(user_identity)
-    if admin is None:
-        return jsonify({"message": "User not found"}), 400
-
+@admin_required
+def get_all_location_add_suggestions(admin: User):
     all_suggestions = suggestion_queries.get_all_location_add_suggestions()
     return jsonify([add_suggestion_repr(s) for s in all_suggestions]), 200

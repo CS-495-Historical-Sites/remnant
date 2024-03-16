@@ -1,4 +1,5 @@
 from datetime import datetime
+from functools import wraps
 
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import (
@@ -14,6 +15,30 @@ from src.appl import LOGGER, Config
 from src.appl.models import RegistrationRequest, LoginRequest
 from src.appl.remnant_db import user_queries, token_queries
 from src.appl.validation import check_valid_password, check_valid_email, check_types
+
+
+def user_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        user_identity = get_jwt_identity()
+        user = user_queries.get_user(user_identity)
+        if user is None:
+            return jsonify({"message": "User not found"}), 400
+        return f(user, *args, **kwargs)
+
+    return decorated_function
+
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        user_identity = get_jwt_identity()
+        user = user_queries.get_admin(user_identity)
+        if user is None:
+            return jsonify({"message": "User not found"}), 400
+        return f(user, *args, **kwargs)
+
+    return decorated_function
 
 
 auth_blueprint = Blueprint(

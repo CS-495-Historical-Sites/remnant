@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 
 import LocationEditSuggestions from "../models/LocationSuggestion";
+import { GetLocationEditSuggestion } from "../remnantAPI/GetLocationSuggestions";
 
 interface UserProps {
   setToken: (token: string) => void;
@@ -27,27 +28,11 @@ export const EditSuggestionPage: React.FC<UserProps> = ({
   useEffect(() => {
     const fetchSuggestionDetails = async () => {
       try {
-        const getSuggestionDetails = async (suggestionId: string) => {
-          // Implement your logic to fetch suggestion details from the server
-          // For example:
-          const response = await fetch(
-            `http://localhost:8080/api/suggestions/location_edit_suggestions/${suggestionId}`,
-            {
-              method: "GET",
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            },
-          );
-          if (!response.ok) {
-            throw new Error("Failed to fetch suggestion details");
-          }
-          const data = await response.json();
-          return data;
-        };
-
-        const data = await getSuggestionDetails(suggestionId!);
-
+        const data = await GetLocationEditSuggestion(
+          suggestionId!,
+          token,
+          setToken,
+        );
         setSuggestion(data);
       } catch (error) {
         console.error("Failed to fetch suggestion details", error);
