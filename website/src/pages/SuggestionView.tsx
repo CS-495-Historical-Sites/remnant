@@ -7,6 +7,7 @@ import {
   Paper,
   Divider,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 import LocationSuggestion from "../models/LocationSuggestion";
 import LocationEditSuggestion from "../models/LocationSuggestion";
@@ -16,16 +17,14 @@ interface UserProps {
   token: string;
 }
 
-export const SuggestionsView: React.ComponentType<UserProps> = ({
-  setToken,
-  token,
-}) => {
+export const SuggestionsView: React.FC<UserProps> = ({ setToken, token }) => {
   const [addSuggestions, setAddSuggestions] = useState<LocationSuggestion[]>(
     [],
   );
   const [editSuggestions, setEditSuggestions] = useState<
     LocationEditSuggestion[]
   >([]);
+  const navigate = useNavigate(); // Initialize useNavigate
 
   useEffect(() => {
     const fetchSuggestions = async (
@@ -55,6 +54,11 @@ export const SuggestionsView: React.ComponentType<UserProps> = ({
     fetchSuggestions("location_edit_suggestions", setEditSuggestions);
   }, [token, setToken]);
 
+  const handleSuggestionClick = (suggestionId: number) => {
+    // Navigate to the edit suggestion page with the suggestionId
+    navigate(`/admin/edit-suggestion/${suggestionId}`);
+  };
+
   return (
     <Paper elevation={3} style={{ margin: "20px", padding: "20px" }}>
       <Typography variant="h4" gutterBottom>
@@ -66,7 +70,12 @@ export const SuggestionsView: React.ComponentType<UserProps> = ({
       </Typography>
       <List>
         {addSuggestions.map((suggestion) => (
-          <ListItem key={suggestion.id} divider>
+          <ListItem
+            key={suggestion.id}
+            divider
+            button
+            onClick={() => handleSuggestionClick(suggestion.id)}
+          >
             <ListItemText
               primary={suggestion.name}
               secondary={`Suggested by User ID: ${suggestion.user} on ${new Date(suggestion.suggestion_time).toLocaleDateString()} - ${suggestion.short_description}`}
@@ -80,7 +89,12 @@ export const SuggestionsView: React.ComponentType<UserProps> = ({
       </Typography>
       <List>
         {editSuggestions.map((suggestion) => (
-          <ListItem key={suggestion.id} divider>
+          <ListItem
+            key={suggestion.id}
+            divider
+            button
+            onClick={() => handleSuggestionClick(suggestion.id)}
+          >
             <ListItemText
               primary={suggestion.name}
               secondary={`Suggested by User ID: ${suggestion.user} on ${new Date(suggestion.suggestion_time).toLocaleDateString()} - ${suggestion.short_description}`}

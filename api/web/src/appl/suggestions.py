@@ -114,6 +114,27 @@ def get_all_location_edit_suggestions():
 
 
 @suggestion_blueprint.route(
+    "/api/suggestions/location_edit_suggestions/<suggestion_id>", methods=["GET"]
+)
+@jwt_required()
+def get_location_edit_suggestion(suggestion_id):
+    user_identity = get_jwt_identity()
+    admin = user_queries.get_admin(user_identity)
+    if admin is None:
+        return jsonify({"message": "User not found"}), 400
+
+    try:
+        suggestion_key = int(suggestion_id)
+    except ValueError:
+        return jsonify({"message": "Invalid suggestion ID"}), 400
+
+    suggestion = suggestion_queries.get_all_location_edit_suggestion_by_id(
+        suggestion_key
+    )
+    return jsonify(edit_suggestion_repr(suggestion)), 200
+
+
+@suggestion_blueprint.route(
     "/api/suggestions/location_add_suggestions", methods=["GET"]
 )
 @jwt_required()

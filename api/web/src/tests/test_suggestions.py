@@ -1,8 +1,6 @@
 # pylint: disable=unused-argument, line-too-long
 import pytest
 
-from src.appl.models import Visit
-from src.appl.remnant_db import visit_queries
 
 from src.tests import helpers
 
@@ -63,7 +61,7 @@ class TestSuggestions:
 
         # Make a POST request to the endpoint
         response = client.post(
-            "/api/location_suggestions",
+            "/api/suggestions/location_add_suggestions",
             json=test_data,
             headers=headers,
             content_type="application/json",

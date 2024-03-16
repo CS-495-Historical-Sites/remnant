@@ -7,6 +7,7 @@ import Register from "./pages/Register";
 import Login from "./pages/Login";
 import AdminView from "./pages/AdminView";
 import SuggestionsView from "./pages/SuggestionView";
+import EditSuggestionPage from "./pages/EditSuggestionPage";
 import useToken from "./hooks/useToken";
 
 function App() {
@@ -35,6 +36,18 @@ function App() {
           {!token && (
             <Route
               path="/admin/suggestions"
+              element={<Login setToken={setToken} />}
+            />
+          )}
+          {token && (
+            <Route
+              path="/admin/edit-suggestion/:suggestionId"
+              element={<EditSuggestionPage setToken={setToken} token={token} />}
+            />
+          )}
+          {!token && (
+            <Route
+              path="/admin/edit-suggestion/:suggestionId"
               element={<Login setToken={setToken} />}
             />
           )}
