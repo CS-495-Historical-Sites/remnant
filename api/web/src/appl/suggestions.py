@@ -6,8 +6,8 @@ from src.appl import db
 from src.appl.models import (
     LocationEditSuggestion,
     LocationEditSuggestionRequest,
-    LocationSuggestion,
-    LocationSuggestionRequest,
+    LocationAddSuggestion,
+    LocationAddSuggestionRequest,
     User,
 )
 
@@ -42,11 +42,11 @@ def add_location_suggestion(user: User):
     if not check_types([(name, short_desc, str), (wikipedia_link, (str, type(None)))]):
         return jsonify({"message": "Invalid data submitted"}), 400
 
-    suggestion_req = LocationSuggestionRequest(
+    suggestion_req = LocationAddSuggestionRequest(
         latitude, longitude, name, short_desc, wikipedia_link
     )
 
-    suggestion = LocationSuggestion(user, suggestion_req)
+    suggestion = LocationAddSuggestion(user, suggestion_req)
 
     db.session.add(suggestion)
     db.session.commit()

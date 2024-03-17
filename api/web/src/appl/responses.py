@@ -45,6 +45,7 @@ def add_suggestion_repr(s: LocationSuggestion) -> dict:
 def edit_suggestion_repr(s: LocationEditSuggestion) -> dict:
     return {
         "id": s.id,
+        "location_id": s.location_id,
         "user": s.user_id,
         "suggestion_time": s.suggestion_time,
         "name": s.name,

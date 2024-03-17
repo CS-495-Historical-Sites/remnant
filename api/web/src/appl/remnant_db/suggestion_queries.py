@@ -1,8 +1,8 @@
-from src.appl.models import LocationEditSuggestion, LocationSuggestion
+from src.appl.models import LocationEditSuggestion, LocationAddSuggestion
 
 
-def get_all_location_add_suggestions() -> list[LocationSuggestion]:
-    return LocationSuggestion.query.all()
+def get_all_location_add_suggestions() -> list[LocationAddSuggestion]:
+    return LocationAddSuggestion.query.all()
 
 
 def get_all_location_edit_suggestions() -> list[LocationEditSuggestion]:

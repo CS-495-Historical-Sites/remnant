@@ -28,7 +28,7 @@ erDiagram
         int user_id FK
         datetime logout_time
     }
-    LocationSuggestion {
+    LocationAddSuggestion {
         int id  PK
         int user_id  FK
         datetime suggestion_time
@@ -38,6 +38,15 @@ erDiagram
         string short_description
         string wikipedia_link
     }
+    LocationEditSuggestion {
+        int id PK
+        int user_id FK
+        int location_id FK
+        datetime suggestion_time
+        string name 
+        string short_description
+        string long_description
+    }
     LoginAttempt {
         int id PK
         string email
@@ -45,7 +54,9 @@ erDiagram
         bool success
     }
 
-    User ||--o{ LocationSuggestion : "suggests"
+    User ||--o{ LocationAddSuggestion : "suggests"
+    User ||--o{ LocationEditSuggestion : "suggests"
+    LocationEditSuggestion ||--o{ Location : "edits"
     User ||--o{ Visit : "visits"
     Location ||--o{ Visit : "visited by"
     User ||--o{BlacklistToken : "old token"

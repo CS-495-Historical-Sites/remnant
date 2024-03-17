@@ -6,46 +6,96 @@ import {
   Paper,
   CircularProgress,
   Box,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
 } from "@mui/material";
 
+import LocationDetails from "../models/Location";
 import LocationEditSuggestions from "../models/LocationSuggestion";
 import { GetLocationEditSuggestion } from "../remnantAPI/GetLocationSuggestions";
+import { GetLocationDetails } from "../remnantAPI/GetLocation";
 
 interface UserProps {
   setToken: (token: string) => void;
   token: string;
 }
 
-export const EditSuggestionPage: React.FC<UserProps> = ({
-  setToken,
-  token,
-}) => {
+const EditSuggestionPage: React.FC<UserProps> = ({ setToken, token }) => {
   const { suggestionId } = useParams<{ suggestionId: string }>();
   const [suggestion, setSuggestion] = useState<LocationEditSuggestions>();
+  const [currentDetails, setCurrentDetails] = useState<LocationDetails>();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchSuggestionDetails = async () => {
-      try {
-        const data = await GetLocationEditSuggestion(
-          suggestionId!,
-          token,
-          setToken,
-        );
-        setSuggestion(data);
-      } catch (error) {
-        console.error("Failed to fetch suggestion details", error);
-      } finally {
-        setIsLoading(false);
+    const fetchData = async () => {
+      if (suggestionId) {
+        try {
+          const suggestionData = await GetLocationEditSuggestion(
+            suggestionId,
+            token,
+            setToken,
+          );
+          setSuggestion(suggestionData);
+          const currentData = await GetLocationDetails(
+            suggestionData.location_id.toString(),
+            token,
+            setToken,
+          );
+          setCurrentDetails(currentData);
+        } catch (error) {
+          console.error("Failed to fetch data", error);
+        } finally {
+          setIsLoading(false);
+        }
       }
     };
+    fetchData();
+  }, [suggestionId, token]);
 
-    if (suggestionId) {
-      fetchSuggestionDetails();
-    }
-  }, [suggestionId]);
+  // Implement comparison logic here (as an example, this could be more elaborate)
+  const renderDifferences = () => {
+    if (!suggestion || !currentDetails) return null;
+    // Example comparison, extend according to your data structure
+    const diffs = [
+      {
+        label: "Name",
+        current: currentDetails.name,
+        suggested: suggestion.name,
+      },
+      {
+        label: "Short Description",
+        current: currentDetails.short_description,
+        suggested: suggestion.short_description,
+      },
+    ].filter((diff) => diff.current !== diff.suggested);
 
+    return diffs.length ? (
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Field</TableCell>
+            <TableCell>Current Value</TableCell>
+            <TableCell>Suggested Value</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {diffs.map((diff, index) => (
+            <TableRow key={index}>
+              <TableCell>{diff.label}</TableCell>
+              <TableCell>{diff.current}</TableCell>
+              <TableCell>{diff.suggested}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    ) : (
+      <Typography>No differences found.</Typography>
+    );
+  };
   const handleApprove = async () => {
     // try {
     //   await approveSuggestion(suggestionId!);
@@ -63,7 +113,6 @@ export const EditSuggestionPage: React.FC<UserProps> = ({
     //   console.error("Failed to deny suggestion", error);
     // }
   };
-
   if (isLoading) {
     return <CircularProgress />;
   }
@@ -73,20 +122,21 @@ export const EditSuggestionPage: React.FC<UserProps> = ({
       <Typography variant="h4" gutterBottom>
         Edit Suggestion Details
       </Typography>
-      {suggestion ? (
+      {suggestion && currentDetails ? (
         <Box>
-          <Typography variant="h5">{suggestion.name}</Typography>
-          <Typography variant="subtitle1">
+          <Typography variant="h5" gutterBottom>
+            Edit Suggestion for {currentDetails.name}
+          </Typography>
+
+          <Typography variant="body1">
             Suggested by User ID: {suggestion.user} on{" "}
             {new Date(suggestion.suggestion_time).toLocaleDateString()}
           </Typography>
-          <Typography variant="body1" paragraph>
-            Short Description: {suggestion.short_description}
-          </Typography>
-          <Typography variant="body2" paragraph>
-            Detailed Description: {suggestion.long_description}
-          </Typography>
-          <div>
+
+          {renderDifferences()}
+
+          {/* Approval and Denial Buttons */}
+          <div style={{ marginTop: "20px" }}>
             <Button
               variant="contained"
               color="primary"

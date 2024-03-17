@@ -143,7 +143,7 @@ fun SuggestEditForm(
       title = { Text("Suggest an Edit") },
       text = {
         Column {
-          TextField(value = title, onValueChange = { title = it }, label = { Text("Title") })
+          TextField(value = title, onValueChange = { title = it }, label = { Text("Name") })
           TextField(
               value = shortDescription,
               onValueChange = { shortDescription = it },

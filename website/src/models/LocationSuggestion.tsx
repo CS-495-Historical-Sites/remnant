@@ -11,6 +11,7 @@ export default interface LocationSuggestion {
 
 export default interface LocationEditSuggestion {
   id: number;
+  location_id: number;
   user: number;
   suggestion_time: Date;
   name: string;

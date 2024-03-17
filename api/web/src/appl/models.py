@@ -25,7 +25,7 @@ class LoginRequest:
 
 # The image comes in a seperate part of the request
 @dataclass
-class LocationSuggestionRequest:
+class LocationAddSuggestionRequest:
     latitude: str
     longitude: str
     name: str
@@ -146,7 +146,7 @@ class User(db.Model):
         return check_password_hash(self.password_hash, password)
 
 
-class LocationSuggestion(db.Model):
+class LocationAddSuggestion(db.Model):
     __tablename__ = "user_suggested_locations"
     metadata = program_metadata
 
@@ -163,7 +163,7 @@ class LocationSuggestion(db.Model):
     short_description = db.Column(db.Text, nullable=False)
     wikipedia_link = db.Column(db.Text, nullable=True)
 
-    def __init__(self, user: User, req: LocationSuggestionRequest):
+    def __init__(self, user: User, req: LocationAddSuggestionRequest):
         self.user_id = user.id
         self.latitude = req.latitude
         self.longitude = req.longitude
