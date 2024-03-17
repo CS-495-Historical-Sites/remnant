@@ -1,35 +1,60 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+import "./App.css";
+
+import Home from "./pages/Home";
+import Register from "./pages/Register";
+import Login from "./pages/Login";
+import AdminView from "./pages/AdminView";
+import SuggestionsView from "./pages/SuggestionView";
+import EditSuggestionPage from "./pages/EditSuggestionPage";
+import useToken from "./hooks/useToken";
 
 function App() {
-  const [count, setCount] = useState(0)
-
+  const { token, setToken, removeToken } = useToken();
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="App">
+      <BrowserRouter>
+        <Routes>
+          {<Route path="/" element={<Home />} />}AdminView
+          {token && <Route path="/register" element={<AdminView />} />}
+          {!token && <Route path="/register" element={<Register />} />}
+          {token && <Route path="/login" element={<AdminView />} />}
+          {!token && (
+            <Route path="/login" element={<Login setToken={setToken} />} />
+          )}
+          {token && <Route path="/admin" element={<AdminView />} />}
+          {!token && (
+            <Route path="/admin" element={<Login setToken={setToken} />} />
+          )}
+          {token && (
+            <Route
+              path="/admin/suggestions"
+              element={<SuggestionsView setToken={setToken} token={token} />}
+            />
+          )}
+          {!token && (
+            <Route
+              path="/admin/suggestions"
+              element={<Login setToken={setToken} />}
+            />
+          )}
+          {token && (
+            <Route
+              path="/admin/edit-suggestion/:suggestionId"
+              element={<EditSuggestionPage setToken={setToken} token={token} />}
+            />
+          )}
+          {!token && (
+            <Route
+              path="/admin/edit-suggestion/:suggestionId"
+              element={<Login setToken={setToken} />}
+            />
+          )}
+        </Routes>
+      </BrowserRouter>
+    </div>
+  );
 }
 
-export default App
+export default App;

@@ -29,10 +29,10 @@ def register_user(client) -> dict[str, str]:
         "password": "Astrongpassword43*",
     }
 
-    register_response = client.post("/api/register", json=user_data)
+    register_response = client.post("/api/user/register", json=user_data)
     assert register_response.status_code == 200
 
-    login_response = client.post("/api/login", json=user_data)
+    login_response = client.post("/api/user/login", json=user_data)
     assert login_response.status_code == 200
 
     j_token = login_response.json.get("access_token")

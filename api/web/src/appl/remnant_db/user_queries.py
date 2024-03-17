@@ -16,8 +16,23 @@ def create_user(registration_info: RegistrationRequest) -> None:
     db.session.commit()
 
 
+def create_admin(registration_info: RegistrationRequest) -> None:
+    user = User(
+        username=registration_info.username,
+        email=registration_info.email,
+        supplied_password=registration_info.password,
+        is_admin=True,
+    )
+    db.session.add(user)
+    db.session.commit()
+
+
 def get_user(email: str) -> User | None:
     return User.query.filter_by(email=email).first()
+
+
+def get_admin(email: str) -> User | None:
+    return User.query.filter_by(email=email, is_admin=True).first()
 
 
 def log_login_attempt(email: str, success: bool):
