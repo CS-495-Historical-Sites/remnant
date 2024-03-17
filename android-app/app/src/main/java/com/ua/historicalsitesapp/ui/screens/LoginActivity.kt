@@ -231,7 +231,6 @@ private fun LoginMenu(modifier: Modifier = Modifier) {
 
         if (loginResult is Result.Success) {
           if (loginResult.data.isFirstLogin) {
-
             val intent = Intent(context, QuestionnaireActivity::class.java)
             context.startActivity(intent)
           } else {

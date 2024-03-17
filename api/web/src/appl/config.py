@@ -13,6 +13,8 @@ class Config:
     POSTGRES_PORT = os.environ.get("POSTGRES_PORT")
     POSTGRES_DB = os.environ.get("POSTGRES_DB")
 
+    ADMIN_EMAILS = os.getenv("ADMIN_EMAILS").split(";")
+
     assert all(
         [
             SECRET_KEY,

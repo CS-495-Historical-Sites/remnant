@@ -1,6 +1,8 @@
 from flask import Blueprint, jsonify, request
+from flask_jwt_extended import jwt_required
 
 from src.appl.remnant_db import location_queries
+from src.appl.responses import short_location_repr, long_location_repr
 
 location_blueprint = Blueprint(
     "location_blueprint",
@@ -9,6 +11,7 @@ location_blueprint = Blueprint(
 
 
 @location_blueprint.route("/api/locations", methods=["GET"])
+@jwt_required()
 def get_all_locations():
     latitude = request.args.get("lat")
     longitude = request.args.get("long")
@@ -31,10 +34,10 @@ def get_all_locations():
         near_locations = location_queries.get_locations_near(
             latitude, longitude, kilometer_radius
         )
-        return jsonify([l.short_repr() for l in near_locations]), 200
+        return jsonify([short_location_repr(l) for l in near_locations]), 200
 
     all_locations = location_queries.get_all_locations()
-    return jsonify([l.short_repr() for l in all_locations]), 200
+    return jsonify([short_location_repr(l) for l in all_locations]), 200
 
 
 @location_blueprint.route("/api/locations/<location_id>", methods=["GET"])
@@ -48,4 +51,4 @@ def get_location_info(location_id):
     if not location:
         return jsonify({"message": "Location not found"}), 404
 
-    return jsonify(location.long_repr()), 200
+    return jsonify(long_location_repr(location)), 200

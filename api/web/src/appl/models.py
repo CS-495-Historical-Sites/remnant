@@ -6,7 +6,7 @@ from typing import TypedDict
 from sqlalchemy import MetaData, UniqueConstraint
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from . import db
+from src.appl import db
 
 
 @dataclass
@@ -14,12 +14,31 @@ class RegistrationRequest:
     username: str
     email: str
     password: str
+    requesting_admin: bool = False
 
 
 @dataclass
 class LoginRequest:
     email: str
     password: str
+
+
+# The image comes in a seperate part of the request
+@dataclass
+class LocationAddSuggestionRequest:
+    latitude: str
+    longitude: str
+    name: str
+    short_description: str
+    wikipedia_link: str | None
+
+
+@dataclass
+class LocationEditSuggestionRequest:
+    location_id: int
+    name: str
+    short_description: str
+    long_description: str
 
 
 class ShortLocationDescription(TypedDict):
@@ -37,6 +56,7 @@ class LongLocationDescription(TypedDict):
     longitude: float
     short_description: str
     long_description: str
+    wikidata_image_name: str
 
 
 program_metadata = MetaData()
@@ -71,26 +91,6 @@ class Location(db.Model):
         self.short_description = short_description
         self.long_description = long_description
         self.wikidata_image_name = wikidata_image_name
-
-    def short_repr(self) -> ShortLocationDescription:
-        return {
-            "id": self.id,
-            "name": self.name,
-            "latitude": self.latitude,
-            "longitude": self.longitude,
-            "short_description": self.short_description,
-        }
-
-    def long_repr(self) -> LongLocationDescription:
-        return {
-            "id": self.id,
-            "name": self.name,
-            "latitude": self.latitude,
-            "longitude": self.longitude,
-            "short_description": self.short_description,
-            "long_description": self.long_description,
-            "wikidata_image_name": self.wikidata_image_name,
-        }
 
 
 class Visit(db.Model):
@@ -132,13 +132,66 @@ class User(db.Model):
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(256), nullable=False)
 
-    def __init__(self, username: str, email: str, supplied_password: str):
+    is_admin = db.Column(db.Boolean, default=False)
+
+    def __init__(
+        self, username: str, email: str, supplied_password: str, is_admin=False
+    ):
         self.username = username
         self.email = email
         self.password_hash = generate_password_hash(supplied_password)
+        self.is_admin = is_admin
 
     def password_matches_hash(self, password: str) -> bool:
         return check_password_hash(self.password_hash, password)
+
+
+class LocationAddSuggestion(db.Model):
+    __tablename__ = "user_suggested_locations"
+    metadata = program_metadata
+
+    # base info
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+
+    suggestion_time = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+    # location suggestion info
+    latitude = db.Column(db.Float, nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
+    name = db.Column(db.String(120), index=True, unique=False, nullable=False)
+    short_description = db.Column(db.Text, nullable=False)
+    wikipedia_link = db.Column(db.Text, nullable=True)
+
+    def __init__(self, user: User, req: LocationAddSuggestionRequest):
+        self.user_id = user.id
+        self.latitude = req.latitude
+        self.longitude = req.longitude
+        self.name = req.name
+        self.short_description = req.short_description
+        self.wikipedia_link = req.wikipedia_link
+
+
+class LocationEditSuggestion(db.Model):
+    __tablename__ = "user_suggested_location_edit"
+    metadata = program_metadata
+
+    # base info
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    location_id = db.Column(db.Integer, db.ForeignKey("location.id"), nullable=False)
+    suggestion_time = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+    name = db.Column(db.String(120), index=True, unique=False, nullable=False)
+    short_description = db.Column(db.Text, nullable=True)
+    long_description = db.Column(db.Text, nullable=True)
+
+    def __init__(self, user: User, req: LocationEditSuggestionRequest):
+        self.user_id = user.id
+        self.location_id = req.location_id
+        self.name = req.name
+        self.short_description = req.short_description
+        self.long_description = req.long_description
 
 
 class BlacklistToken(db.Model):
@@ -147,7 +200,7 @@ class BlacklistToken(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     token_id = db.Column(db.String(36), nullable=False, index=True)
     token_type = db.Column(db.String(16), nullable=False)
-    logout_time = db.Column(db.DateTime, nullable=False)
+    logout_time = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 
     def __init__(self, token_id, logout_time, token_type, user_id):

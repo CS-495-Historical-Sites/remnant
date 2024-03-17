@@ -1,8 +1,5 @@
-"""Routes for user authentication."""
-
 from datetime import datetime
-import re
-
+from functools import wraps
 
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import (
@@ -14,9 +11,35 @@ from flask_jwt_extended import (
 )
 from sqlalchemy.exc import DatabaseError
 
-from src.appl import LOGGER
+from src.appl import LOGGER, Config
 from src.appl.models import RegistrationRequest, LoginRequest
 from src.appl.remnant_db import user_queries, token_queries
+from src.appl.validation import check_valid_password, check_valid_email, check_types
+
+
+def user_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        user_identity = get_jwt_identity()
+        user = user_queries.get_user(user_identity)
+        if user is None:
+            return jsonify({"message": "User not found"}), 400
+        return f(user, *args, **kwargs)
+
+    return decorated_function
+
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        user_identity = get_jwt_identity()
+        user = user_queries.get_admin(user_identity)
+        if user is None:
+            return jsonify({"message": "User not found"}), 400
+        return f(user, *args, **kwargs)
+
+    return decorated_function
+
 
 auth_blueprint = Blueprint(
     "auth_blueprint",
@@ -24,7 +47,7 @@ auth_blueprint = Blueprint(
 )
 
 
-@auth_blueprint.route("/api/register", methods=["POST", "OPTIONS"])
+@auth_blueprint.route("/api/user/register", methods=["POST", "OPTIONS"])
 def register():
     if request.method == "OPTIONS":
         return "", 200
@@ -45,7 +68,7 @@ def register():
 
     # making sure the json data types are correct before we move forward
     # these should always be string but just to be safe this will handle any weird requests
-    if not isinstance(email, str) or not isinstance(non_hash_password, str):
+    if not check_types([(email, non_hash_password, str)]):
         return jsonify({"message": "Invalid data submitted"}), 400
 
     # checking for valid credentials
@@ -62,12 +85,15 @@ def register():
     if user_queries.email_exists(registration_info.email):
         return jsonify({"message": "Email already exists"}), 422
 
-    user_queries.create_user(registration_info)
+    if registration_info.email in Config.ADMIN_EMAILS:
+        user_queries.create_admin(registration_info)
+    else:
+        user_queries.create_user(registration_info)
 
     return jsonify({"email": registration_info.email, "errorString": ""}), 200
 
 
-@auth_blueprint.route("/api/login", methods=["POST", "OPTIONS"])
+@auth_blueprint.route("/api/user/login", methods=["POST", "OPTIONS"])
 def login():
     if request.method == "OPTIONS":
         return "", 200
@@ -80,13 +106,13 @@ def login():
     except KeyError:
         return jsonify({"message": "Incomplete request"}), 400
 
-    if not isinstance(email, str) or not isinstance(non_hash_password, str):
+    if not check_types([(email, non_hash_password, str)]):
         return jsonify({"message": "Invalid data submitted"}), 400
 
     if not check_valid_email(email) or not check_valid_password(non_hash_password):
         return jsonify({"message": "Invalid credentials entered"}), 422
 
-    login_info = LoginRequest(data["email"], data["password"])
+    login_info = LoginRequest(email, non_hash_password)
 
     LOGGER.debug(f"Attemping to login {login_info.email}")
 
@@ -121,7 +147,7 @@ def refresh():
     return jsonify(access_token=access_token), 200
 
 
-@auth_blueprint.route("/api/logout", methods=["DELETE", "OPTIONS"])
+@auth_blueprint.route("/api/user/logout", methods=["DELETE", "OPTIONS"])
 @jwt_required(verify_type=False)
 def logout():
     try:
@@ -139,25 +165,3 @@ def logout():
         return jsonify({"message": "Database error"}), 500
 
     return jsonify({"message": "Logged out successfully"}), 200
-
-
-# Regex to match pattern with 3 constraints: (1@2.3)
-# 1. Upper/lowercase letters, digits, or ._%+- followed by @
-# 2. Upper/lowercase letters, digits, or .- followed by .
-# 3. Upper/lowercase letters 2-7 characters for domains.
-def check_valid_email(email):
-    if email == "":
-        return False
-    regex = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b"
-    return bool(re.fullmatch(regex, email)) and len(email) < 40
-
-
-# only allows digits, upper or lowercase letters, and the special characters @!$%*?&
-def check_valid_password(password):
-    password_regex = re.compile(
-        r"^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]+$"
-    )
-
-    return bool(re.fullmatch(password_regex, password)) and (
-        (len(password)) >= 8 and (len(password) < 25)
-    )

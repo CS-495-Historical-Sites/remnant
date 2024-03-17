@@ -4,6 +4,7 @@ import json
 import time
 
 from flask import Flask
+from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 from sqlalchemy import create_engine, text
@@ -19,7 +20,7 @@ LOGGER.setLevel(Config.LOG_LEVEL)
 db = SQLAlchemy()
 
 
-def check_postgres_database_elements(db_uri):
+def db_contains_locations(db_uri) -> bool:
     try:
         engine = create_engine(db_uri)
         with engine.connect() as connection:
@@ -31,9 +32,51 @@ def check_postgres_database_elements(db_uri):
         return False
 
 
-def init_app(testing=False, db_uri=Config.SQLALCHEMY_DATABASE_URI):
+def init_db_with_sources_file(app):
+    from src.appl.models import Location
+    from src.appl.remnant_db import location_queries
+
     start_time = time.time()
+    skipped = 0
+    with open("sources/wikidata.json", "r", encoding="utf-8") as f:
+        data = json.load(f)
+        for location in data:
+            name = location["name"]
+            short_desc = location["short_description"]
+            long_desc = location["long_description"]
+            coordinates = location["coordinates"]
+            image_name = location["wikidata_image_name"]
+            if not coordinates:
+                skipped += 1
+                continue
+
+            loc = Location(
+                name,
+                coordinates["latitude"],
+                coordinates["longtitude"],
+                image_name,
+                short_desc,
+                long_desc,
+            )
+
+            location_queries.create_location(
+                loc,
+                suspend_commit=True,
+            )
+
+        db.session.commit()
+
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    LOGGER.info(f"Elapsed time for app init: {elapsed_time} seconds")
+
+    LOGGER.warning(f"Skipped {skipped} locations during app init")
+
+
+def init_app(testing=False, db_uri=Config.SQLALCHEMY_DATABASE_URI):
+
     app = Flask(__name__)
+    CORS(app)
     jwt = JWTManager(app)
 
     app.config.from_object(Config)
@@ -44,14 +87,15 @@ def init_app(testing=False, db_uri=Config.SQLALCHEMY_DATABASE_URI):
     db.init_app(app)
 
     with app.app_context():
-        from src.appl import auth, routes, locations, visit
-        from src.appl.models import program_metadata, Location
-        from src.appl.remnant_db import location_queries, token_queries
+        from src.appl import auth, routes, locations, visit, suggestions
+        from src.appl.models import program_metadata
+        from src.appl.remnant_db import token_queries
 
         app.register_blueprint(routes.main_blueprint)
         app.register_blueprint(auth.auth_blueprint)
         app.register_blueprint(locations.location_blueprint)
         app.register_blueprint(visit.visit_blueprint)
+        app.register_blueprint(suggestions.suggestion_blueprint)
 
         program_metadata.create_all(db.engine)
 
@@ -62,42 +106,10 @@ def init_app(testing=False, db_uri=Config.SQLALCHEMY_DATABASE_URI):
             jti = jwt_payload["jti"]
             return token_queries.is_token_blacklisted(jti)
 
-        if check_postgres_database_elements(db_uri):
+        if db_contains_locations(db_uri):
             return app
 
         if not testing:
-            skipped = 0
-            with open("sources/wikidata.json", "r", encoding="utf-8") as f:
-                data = json.load(f)
-                for location in data:
-                    name = location["name"]
-                    short_desc = location["short_description"]
-                    long_desc = location["long_description"]
-                    coordinates = location["coordinates"]
-                    image_name = location["wikidata_image_name"]
-                    if not coordinates:
-                        skipped += 1
-                        continue
+            init_db_with_sources_file(app)
 
-                    loc = Location(
-                        name,
-                        coordinates["latitude"],
-                        coordinates["longtitude"],
-                        image_name,
-                        short_desc,
-                        long_desc,
-                    )
-
-                    location_queries.create_location(
-                        loc,
-                        suspend_commit=True,
-                    )
-
-                db.session.commit()
-
-            end_time = time.time()
-            elapsed_time = end_time - start_time
-            LOGGER.info(f"Elapsed time for app init: {elapsed_time} seconds")
-
-            LOGGER.warning(f"Skipped {skipped} locations during app init")
         return app

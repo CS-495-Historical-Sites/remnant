@@ -64,9 +64,11 @@ class TestApp:
             ),
         ],
     )
-    def test_can_register(self, client, registration_credentials, expected_status_code):
+    def test_user_can_register(
+        self, client, registration_credentials, expected_status_code
+    ):
 
-        response = client.post("/api/register", json=registration_credentials)
+        response = client.post("/api/user/register", json=registration_credentials)
         assert response.status_code == expected_status_code
 
     @pytest.mark.parametrize(
@@ -92,7 +94,7 @@ class TestApp:
     )
     def test_can_login(self, client, login_credentials, login_expected_status_code):
         register_response = client.post(
-            "/api/register",
+            "/api/user/register",
             json={
                 "username": "agoodusername",
                 "email": "test@example.com",
@@ -101,35 +103,35 @@ class TestApp:
         )
         assert register_response.status_code == 200
 
-        response = client.post("/api/login", json=login_credentials)
+        response = client.post("/api/user/login", json=login_credentials)
         assert response.status_code == login_expected_status_code
 
     def test_duplicate_registration_prevented(self, client):
-        response = client.post("/api/register", json=VALID_REGISTRATION_REQUEST)
+        response = client.post("/api/user/register", json=VALID_REGISTRATION_REQUEST)
         assert response.status_code == 200
 
-        response = client.post("/api/register", json=VALID_REGISTRATION_REQUEST)
+        response = client.post("/api/user/register", json=VALID_REGISTRATION_REQUEST)
         assert response.status_code == 422
 
     def test_is_first_login_attempt_returns_true(self, client):
-        response = client.post("/api/register", json=VALID_REGISTRATION_REQUEST)
+        response = client.post("/api/user/register", json=VALID_REGISTRATION_REQUEST)
         assert response.status_code == 200
 
-        response = client.post("/api/login", json=VALID_REGISTRATION_REQUEST)
+        response = client.post("/api/user/login", json=VALID_REGISTRATION_REQUEST)
         assert response.status_code == 200
 
         assert response.json["first_login"] is True
 
     def test_is_first_login_attempt_returns_false_on_second_login(self, client):
-        response = client.post("/api/register", json=VALID_REGISTRATION_REQUEST)
+        response = client.post("/api/user/register", json=VALID_REGISTRATION_REQUEST)
         assert response.status_code == 200
 
-        response = client.post("/api/login", json=VALID_REGISTRATION_REQUEST)
+        response = client.post("/api/user/login", json=VALID_REGISTRATION_REQUEST)
         assert response.status_code == 200
 
         assert response.json["first_login"] is True
 
-        response = client.post("/api/login", json=VALID_REGISTRATION_REQUEST)
+        response = client.post("/api/user/login", json=VALID_REGISTRATION_REQUEST)
         assert response.status_code == 200
 
         assert response.json["first_login"] is False
@@ -146,16 +148,16 @@ class TestApp:
             "password": "Working65**",
         }
 
-        response = client.post("/api/register", json=registration_credentials)
+        response = client.post("/api/user/register", json=registration_credentials)
         assert response.status_code == 200
 
-        response = client.post("/api/login", json=login_credentials)
+        response = client.post("/api/user/login", json=login_credentials)
         assert response.status_code == 200
 
         j_token = response.json.get("access_token")
         headers = {"Authorization": f"Bearer {j_token}"}
 
-        response = client.delete("/api/logout", headers=headers)
+        response = client.delete("/api/user/logout", headers=headers)
         assert response.status_code == 200
 
         response = client.post(
@@ -166,5 +168,5 @@ class TestApp:
 
         assert response.status_code == 401
 
-        response = client.delete("/api/logout", headers=headers)
+        response = client.delete("/api/user/logout", headers=headers)
         assert response.status_code == 401

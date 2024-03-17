@@ -7,10 +7,12 @@ from src.tests import helpers
 class TestVisitedLocations:
 
     def test_get_all_locations(self, client):
+        headers, _ = helpers.register_user(client)
         added_locations = helpers.fill_with_locations(client)
 
         get_all_locations = client.get(
             "/api/locations",
+            headers=headers,
         )
         assert get_all_locations.status_code == 200
         assert len(get_all_locations.json) == added_locations

@@ -60,7 +60,6 @@ class LoginRepository(
         true
       }
       else -> {
-        println("Logout Failed")
         false
       }
     }
