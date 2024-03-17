@@ -1,9 +1,10 @@
 from src.appl.models import (
     Location,
+    LocationAddSuggestion,
     LocationEditSuggestion,
     ShortLocationDescription,
     LongLocationDescription,
-    LocationSuggestion,
+    LocationAddSuggestion,
 )
 
 
@@ -29,7 +30,7 @@ def long_location_repr(l: Location) -> LongLocationDescription:
     }
 
 
-def add_suggestion_repr(s: LocationSuggestion) -> dict:
+def add_suggestion_repr(s: LocationAddSuggestion) -> dict:
     return {
         "id": s.id,
         "user": s.user_id,
