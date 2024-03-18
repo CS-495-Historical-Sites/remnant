@@ -8,6 +8,7 @@ on:
 
 jobs:
   mkdocs:
+    environment:  MKDocs workflow
     name: Build and deploy mkdocs site
     runs-on: ubuntu-latest
     defaults:
