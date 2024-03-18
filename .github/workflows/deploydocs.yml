@@ -20,6 +20,10 @@ jobs:
     - name: Build
       uses: jnanadarshan/mkdocs-build-action@v0.24
 
+    # run an ls command here for debugging purposes
+    - name: List files
+      run: ls -la
+
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
