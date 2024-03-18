@@ -45,3 +45,4 @@ jobs:
     - name: Sync output to S3
       run: |
         aws s3 sync ./site/ s3://documentation-site-mkdocs --delete
+        aws cloudfront create-invalidation --distribution-id E244HUT7MJERF4 --paths "/*"
