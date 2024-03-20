@@ -1,8 +1,10 @@
 package com.ua.historicalsitesapp.ui.screens
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
@@ -21,13 +23,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.app.ActivityCompat
 import androidx.navigation.compose.rememberNavController
 import com.example.compose.HistoricalSitesAppTheme
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingClient
 import com.google.android.gms.location.GeofencingRequest
 import com.google.android.gms.location.LocationServices
-import com.ua.historicalsitesapp.geofence.MyLocation
+import com.ua.historicalsitesapp.geofence.GeofenceBroadcastReceiver
 import com.ua.historicalsitesapp.nav.AppBottomBar
 import com.ua.historicalsitesapp.nav.BottomNavigationGraph
 import com.ua.historicalsitesapp.ui.components.GoogleMapsScreen
@@ -35,13 +38,36 @@ import com.ua.historicalsitesapp.ui.components.LocationScreen
 import com.ua.historicalsitesapp.util.hasLocationPermission
 import com.ua.historicalsitesapp.viewmodels.MainPageViewModel
 
-private lateinit var geofencingClient: GeofencingClient
-private var geofencePendingIntent: PendingIntent? = null
-private var geofenceList: ArrayList<Geofence>? = null
+lateinit var geofencingClient: GeofencingClient
+private var geofenceList : ArrayList<Geofence> = TODO()
 
 class MainPageActivity : ComponentActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
+    geofencingClient = LocationServices.getGeofencingClient(this)
+
+    geofenceList.add(Geofence.Builder()
+      .setRequestId("Place1")
+      .setCircularRegion(
+        37.431456,
+        -122.0871,
+        100f
+      )
+      .setNotificationResponsiveness(1000)
+      .setExpirationDuration(Geofence.NEVER_EXPIRE)
+      .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL)
+      .build()
+    )
+
+    geofencingClient.addGeofences(getGeofencingRequest(), geofencingPendingIntent).run {
+      addOnSuccessListener {
+
+      }
+      addOnFailureListener {
+
+      }
+    }
+
     super.onCreate(savedInstanceState)
 
     onBackPressedDispatcher.addCallback(
@@ -58,6 +84,19 @@ class MainPageActivity : ComponentActivity() {
       }
     }
   }
+
+  private fun getGeofencingRequest() : GeofencingRequest {
+    return GeofencingRequest.Builder().apply {
+      setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_DWELL)
+      addGeofences(geofenceList)
+    }.build()
+  }
+
+  private val geofencingPendingIntent : PendingIntent by lazy {
+    val intent = Intent(this, GeofenceBroadcastReceiver::class.java)
+    PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+  }
+
 }
 
 const val TAG = "INFO"
@@ -91,7 +130,6 @@ fun HomeScreen(modifier: Modifier) {
     }
 
     if (hasPermission) {
-      AddGeofences()
       Box(modifier = Modifier.fillMaxSize()) {
         val view = MainPageViewModel(context)
         GoogleMapsScreen(view)
@@ -105,55 +143,3 @@ fun HomeScreen(modifier: Modifier) {
     }
   }
 }
-
-@Composable
-fun AddGeofences() {
-  geofenceList = ArrayList()
-  val listPlaces = ArrayList<MyLocation>()
-  listPlaces.add(MyLocation("Place1", 37.431456, -122.0871))
-  for (location: MyLocation in listPlaces) {
-    geofenceList!!.add(Geofence.Builder()
-      .setRequestId(location.key)
-      .setCircularRegion(
-        location.lat,
-        location.long,
-        100f
-      )
-      .setNotificationResponsiveness(1000)
-      .setExpirationDuration(Geofence.NEVER_EXPIRE)
-      .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL)
-      .build()
-    )
-  }
-  CreateGeofencingClient()
-}
-
-@SuppressLint("MissingPermission")
-@Composable
-fun CreateGeofencingClient() {
-  geofencePendingIntent = null
-  geofencingClient = LocationServices.getGeofencingClient(LocalContext.current)
-  createGeofencePendingIntent().let { geofencePendingIntent ->
-    if (geofencePendingIntent != null) {
-      geofencingClient.addGeofences(createGeofencingRequest(), geofencePendingIntent)
-    }
-  }
-}
-
-private fun createGeofencingRequest(): GeofencingRequest {
-  val builder = GeofencingRequest.Builder()
-  builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_DWELL)
-  geofenceList?.let { builder.addGeofences(it) }
-  return builder.build()
-}
-
-@Composable
-private fun createGeofencePendingIntent(): PendingIntent? {
-  geofencePendingIntent?.let{
-    return it
-  }
-  val intent = Intent(LocalContext.current, MyGeofenceTransitionsIntentService::class.java)
-  geofencePendingIntent = PendingIntent.getService(LocalContext.current, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-  return geofencePendingIntent
-}
-
