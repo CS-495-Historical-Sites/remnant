@@ -131,6 +131,7 @@ class User(db.Model):
     username = db.Column(db.String(120), index=False, unique=False)
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(256), nullable=False)
+    #interested_eras = db.Column(db.String())
 
     is_admin = db.Column(db.Boolean, default=False)
 

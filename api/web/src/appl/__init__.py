@@ -87,7 +87,7 @@ def init_app(testing=False, db_uri=Config.SQLALCHEMY_DATABASE_URI):
     db.init_app(app)
 
     with app.app_context():
-        from src.appl import auth, routes, locations, visit, suggestions
+        from src.appl import auth, routes, locations, visit, suggestions, user
         from src.appl.models import program_metadata
         from src.appl.remnant_db import token_queries
 
@@ -96,6 +96,7 @@ def init_app(testing=False, db_uri=Config.SQLALCHEMY_DATABASE_URI):
         app.register_blueprint(locations.location_blueprint)
         app.register_blueprint(visit.visit_blueprint)
         app.register_blueprint(suggestions.suggestion_blueprint)
+        app.register_blueprint(user.user_blueprint)
 
         program_metadata.create_all(db.engine)
 
