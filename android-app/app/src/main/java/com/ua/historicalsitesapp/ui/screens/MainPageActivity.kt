@@ -1,7 +1,6 @@
 package com.ua.historicalsitesapp.ui.screens
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -29,7 +28,7 @@ import com.example.compose.HistoricalSitesAppTheme
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingClient
 import com.google.android.gms.location.GeofencingRequest
-import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.LocationServices.*
 import com.ua.historicalsitesapp.geofence.GeofenceBroadcastReceiver
 import com.ua.historicalsitesapp.nav.AppBottomBar
 import com.ua.historicalsitesapp.nav.BottomNavigationGraph
@@ -38,35 +37,44 @@ import com.ua.historicalsitesapp.ui.components.LocationScreen
 import com.ua.historicalsitesapp.util.hasLocationPermission
 import com.ua.historicalsitesapp.viewmodels.MainPageViewModel
 
-lateinit var geofencingClient: GeofencingClient
-private var geofenceList : ArrayList<Geofence> = TODO()
+
 
 class MainPageActivity : ComponentActivity() {
+  private lateinit var geofencingClient: GeofencingClient
+  private var geofenceList : ArrayList<Geofence> = ArrayList(100)
 
   override fun onCreate(savedInstanceState: Bundle?) {
-    geofencingClient = LocationServices.getGeofencingClient(this)
+    geofencingClient = getGeofencingClient(this)
 
-    geofenceList.add(Geofence.Builder()
-      .setRequestId("Place1")
-      .setCircularRegion(
-        37.431456,
-        -122.0871,
-        100f
-      )
-      .setNotificationResponsiveness(1000)
-      .setExpirationDuration(Geofence.NEVER_EXPIRE)
-      .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL)
-      .build()
-    )
+        geofenceList.add(Geofence.Builder()
+          .setRequestId("Place1")
+          .setCircularRegion(
+            37.431456,
+            -122.0871,
+            100f
+          )
+          .setNotificationResponsiveness(1000)
+          .setExpirationDuration(Geofence.NEVER_EXPIRE)
+          .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL)
+          .build()
+        )
 
-    geofencingClient.addGeofences(getGeofencingRequest(), geofencingPendingIntent).run {
-      addOnSuccessListener {
+    if (ActivityCompat.checkSelfPermission(
+        this,
+        Manifest.permission.ACCESS_FINE_LOCATION
+      ) != PackageManager.PERMISSION_GRANTED
+    ) {
+      geofencingClient.addGeofences(getGeofencingRequest(), geofencingPendingIntent).run {
+        addOnSuccessListener {
 
+        }
+        addOnFailureListener {
+
+        }
       }
-      addOnFailureListener {
-
-      }
+      return
     }
+
 
     super.onCreate(savedInstanceState)
 
@@ -81,6 +89,7 @@ class MainPageActivity : ComponentActivity() {
       HistoricalSitesAppTheme {
         // A surface container using the 'background' color from the theme
         MainScreen()
+
       }
     }
   }
