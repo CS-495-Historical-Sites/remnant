@@ -72,6 +72,8 @@ class LoginDataSource {
       if (response.status.value == 200) {
         val userDetails: RegistrationResponse = response.body()
         return RegistrationResult.SUCCESS
+      } else if (response.status.value == 422) {
+        return RegistrationResult.DUPLICATE
       }
     } catch (e: Exception) {
       println("Request failed with exception: $e")

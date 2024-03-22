@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,9 +28,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,6 +57,7 @@ import com.example.compose.HistoricalSitesAppTheme
 import com.ua.historicalsitesapp.ui.theme.Typography
 import com.ua.historicalsitesapp.util.Result
 import com.ua.historicalsitesapp.viewmodels.AuthViewModel
+import kotlinx.coroutines.delay
 
 class LoginActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,7 +76,7 @@ class LoginActivity : ComponentActivity() {
 }
 
 @Composable
-private fun EmailTextField(onEmailChange: (String) -> Unit) {
+private fun EmailTextField(onEmailChange: (String) -> Unit, updateError: Boolean) {
   var text by remember { mutableStateOf("") }
   OutlinedTextField(
       value = text,
@@ -78,6 +84,7 @@ private fun EmailTextField(onEmailChange: (String) -> Unit) {
         text = it
         onEmailChange(it)
       },
+      isError = updateError,
       label = { Text("Your email") },
       maxLines = 1,
       singleLine = true,
@@ -90,7 +97,7 @@ private fun EmailTextField(onEmailChange: (String) -> Unit) {
 }
 
 @Composable
-private fun PasswordTextField(onPasswordChange: (String) -> Unit) {
+private fun PasswordTextField(onPasswordChange: (String) -> Unit, updateError: Boolean) {
   var text by remember { mutableStateOf("") }
   var passwordHidden by rememberSaveable { mutableStateOf(true) }
 
@@ -100,6 +107,7 @@ private fun PasswordTextField(onPasswordChange: (String) -> Unit) {
         text = it
         onPasswordChange(it)
       },
+      isError = updateError,
       label = {
         Text(
             "Enter your password",
@@ -125,6 +133,13 @@ private fun PasswordTextField(onPasswordChange: (String) -> Unit) {
               focusedBorderColor = MaterialTheme.colorScheme.secondary,
           ),
   )
+  AnimatedVisibility(visible = updateError) {
+    Text(
+        text = "Invalid Email or Password",
+        color = MaterialTheme.colorScheme.error,
+        fontSize = 14.sp,
+        modifier = Modifier.padding(start = 8.dp))
+  }
 }
 
 @Composable
@@ -152,6 +167,8 @@ fun LoginCard(
     onPasswordChange: (String) -> Unit,
     onRegisterClick: () -> Unit,
     onLoginClick: () -> Unit,
+    isError: Boolean,
+    loginSuccess: Boolean
 ) {
   Box(
       modifier = Modifier.fillMaxSize(),
@@ -182,7 +199,7 @@ fun LoginCard(
             horizontalAlignment = Alignment.Start,
         ) {
           Text("Email", modifier = Modifier.padding(start = 8.dp))
-          EmailTextField(onEmailChange = onEmailChange)
+          EmailTextField(onEmailChange = onEmailChange, updateError = isError)
         }
         Spacer(modifier = Modifier.height(14.dp))
         Column(
@@ -190,7 +207,7 @@ fun LoginCard(
             horizontalAlignment = Alignment.Start,
         ) {
           Text("Password", modifier = Modifier.padding(start = 8.dp))
-          PasswordTextField(onPasswordChange = onPasswordChange)
+          PasswordTextField(onPasswordChange = onPasswordChange, updateError = isError)
         }
         Spacer(modifier = Modifier.height(20.dp))
         LoginButton(onLoginClick, modifier = Modifier.fillMaxWidth(0.95f))
@@ -219,7 +236,9 @@ private fun LoginMenu(modifier: Modifier = Modifier) {
   val context = LocalContext.current
 
   val view = AuthViewModel(context)
-
+  var firstLogin by remember { mutableStateOf(false) }
+  var isErrorLocal by remember { mutableStateOf(false) }
+  var showSuccessSnackbar by remember { mutableStateOf(false) }
   var email by remember { mutableStateOf("") }
   var password by remember { mutableStateOf("") }
 
@@ -230,18 +249,47 @@ private fun LoginMenu(modifier: Modifier = Modifier) {
         val loginResult = view.performLogin(email, password)
 
         if (loginResult is Result.Success) {
+          showSuccessSnackbar = true
           if (loginResult.data.isFirstLogin) {
-            val intent = Intent(context, QuestionnaireActivity::class.java)
-            context.startActivity(intent)
-          } else {
-            val intent = Intent(context, MainPageActivity::class.java)
-            context.startActivity(intent)
+            firstLogin = true
           }
+        } else {
+          isErrorLocal = true
         }
       },
+      loginSuccess = showSuccessSnackbar,
+      isError = isErrorLocal,
       onRegisterClick = {
         val intent = Intent(context, RegistrationActivity::class.java)
         context.startActivity(intent)
       },
   )
+  if (showSuccessSnackbar) {
+    ShowSnackbar("Successfully Logged In!")
+    LaunchedEffect(Unit) {
+      delay(1000)
+      showSuccessSnackbar = false
+      if (firstLogin) {
+        val intent = Intent(context, QuestionnaireActivity::class.java)
+        context.startActivity(intent)
+      } else {
+        val intent = Intent(context, MainPageActivity::class.java)
+        context.startActivity(intent)
+      }
+    }
+  }
+}
+
+@Composable
+fun ShowSnackbar(message: String) {
+  val snackbarHostState = SnackbarHostState()
+
+  LaunchedEffect(snackbarHostState) {
+    snackbarHostState.showSnackbar(message = message)
+    snackbarHostState.currentSnackbarData?.dismiss()
+  }
+
+  SnackbarHost(
+      hostState = snackbarHostState,
+      snackbar = { Snackbar(modifier = Modifier.padding(16.dp), action = {}) { Text(message) } })
 }

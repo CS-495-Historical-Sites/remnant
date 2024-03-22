@@ -11,4 +11,5 @@ data class RegistrationResponse(
 enum class RegistrationResult {
   SUCCESS,
   FAILURE,
+  DUPLICATE,
 }
