@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
@@ -42,39 +43,39 @@ import com.ua.historicalsitesapp.viewmodels.MainPageViewModel
 class MainPageActivity : ComponentActivity() {
   private lateinit var geofencingClient: GeofencingClient
   private var geofenceList : ArrayList<Geofence> = ArrayList(100)
-
   override fun onCreate(savedInstanceState: Bundle?) {
     geofencingClient = getGeofencingClient(this)
 
-        geofenceList.add(Geofence.Builder()
-          .setRequestId("Place1")
-          .setCircularRegion(
-            37.431456,
-            -122.0871,
-            100f
-          )
-          .setNotificationResponsiveness(1000)
-          .setExpirationDuration(Geofence.NEVER_EXPIRE)
-          .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL)
-          .build()
-        )
+    geofenceList.add(Geofence.Builder()
+      .setRequestId("Place1")
+      .setCircularRegion(
+        37.431456,
+        -122.0871,
+        10000f
+      )
+      .setNotificationResponsiveness(1000)
+      .setExpirationDuration(Geofence.NEVER_EXPIRE)
+      .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL or Geofence.GEOFENCE_TRANSITION_ENTER)
+      .setLoiteringDelay(5000)
+      .build()
+    )
+
 
     if (ActivityCompat.checkSelfPermission(
         this,
         Manifest.permission.ACCESS_FINE_LOCATION
       ) != PackageManager.PERMISSION_GRANTED
     ) {
-      geofencingClient.addGeofences(getGeofencingRequest(), geofencingPendingIntent).run {
-        addOnSuccessListener {
-
-        }
-        addOnFailureListener {
-
-        }
-      }
       return
     }
-
+    geofencingClient.addGeofences(getGeofencingRequest(), geofencingPendingIntent).run {
+      addOnSuccessListener {
+        Log.d("Geofence", "Successfully added geofences")
+      }
+      addOnFailureListener {
+        Log.d("Geofence", "Failed to add geofences")
+      }
+    }
 
     super.onCreate(savedInstanceState)
 
@@ -103,7 +104,7 @@ class MainPageActivity : ComponentActivity() {
 
   private val geofencingPendingIntent : PendingIntent by lazy {
     val intent = Intent(this, GeofenceBroadcastReceiver::class.java)
-    PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+    PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
   }
 
 }
@@ -131,6 +132,7 @@ fun HomeScreen(modifier: Modifier) {
     color = MaterialTheme.colorScheme.background,
   ) {
     val context = LocalContext.current
+
     var hasPermission by remember { mutableStateOf(hasLocationPermission(context)) }
 
     LaunchedEffect(Unit) {
@@ -152,3 +154,5 @@ fun HomeScreen(modifier: Modifier) {
     }
   }
 }
+
+
