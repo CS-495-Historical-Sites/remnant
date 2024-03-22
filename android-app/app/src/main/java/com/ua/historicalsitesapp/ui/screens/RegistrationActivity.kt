@@ -1,5 +1,6 @@
 package com.ua.historicalsitesapp.ui.screens
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -15,12 +16,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -28,9 +31,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,6 +60,7 @@ import com.example.compose.HistoricalSitesAppTheme
 import com.ua.historicalsitesapp.data.model.auth.RegistrationResult
 import com.ua.historicalsitesapp.ui.theme.Typography
 import com.ua.historicalsitesapp.viewmodels.AuthViewModel
+import kotlinx.coroutines.delay
 
 class RegistrationActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -323,7 +331,8 @@ private fun RegistrationMenu(modifier: Modifier = Modifier) {
   var username by remember { mutableStateOf("") }
   var email by remember { mutableStateOf("") }
   var password by remember { mutableStateOf("") }
-
+  var registerSuccess by remember { mutableStateOf(false) }
+  var duplicateError by remember { mutableStateOf(false) }
   RegistrationCard(
       onUsernameChange = { username = it },
       onEmailChange = { email = it },
@@ -339,8 +348,9 @@ private fun RegistrationMenu(modifier: Modifier = Modifier) {
 
         val registrationResult = registrationView.performRegistration(username, email, password)
         if (registrationResult == RegistrationResult.SUCCESS) {
-          val intent = Intent(context, LoginActivity::class.java)
-          context.startActivity(intent)
+          registerSuccess = true
+        } else if (registrationResult == RegistrationResult.DUPLICATE) {
+          duplicateError = true
         }
       },
       onLoginClick = {
@@ -348,4 +358,70 @@ private fun RegistrationMenu(modifier: Modifier = Modifier) {
         context.startActivity(intent)
       },
   )
+  if (duplicateError) {
+    AlertDialog(
+        onDismissRequest = { duplicateError = false },
+        title = {
+          Text(
+              text = "We already have an account associated with this email!",
+              textAlign = TextAlign.Center,
+              modifier = Modifier.padding(top = 16.dp, bottom = 8.dp))
+        },
+        text = {
+          Text(
+              text = "Would you like to log in?",
+              textAlign = TextAlign.Center,
+          )
+        },
+        confirmButton = {
+          Row(
+              modifier = Modifier.fillMaxWidth().padding(8.dp),
+              horizontalArrangement = Arrangement.SpaceEvenly) {
+                Button(
+                    onClick = { duplicateError = false },
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            contentColor = Color.White, containerColor = Color.Black),
+                    modifier = Modifier.width(115.dp)) {
+                      Text("Cancel")
+                    }
+                Button(
+                    onClick = {
+                      duplicateError = false
+                      val intent = Intent(context, LoginActivity::class.java)
+                      context.startActivity(intent)
+                    },
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            contentColor = Color.White, containerColor = Color.Black),
+                    modifier = Modifier.width(115.dp)) {
+                      Text("Log In")
+                    }
+              }
+        },
+    )
+  }
+  if (registerSuccess) {
+    registerSnackbar("Successfully Registered!")
+    LaunchedEffect(Unit) {
+      delay(1000)
+      registerSuccess = false
+      val intent = Intent(context, LoginActivity::class.java)
+      context.startActivity(intent)
+    }
+  }
+}
+
+@Composable
+fun registerSnackbar(message: String) {
+  val snackbarHostState = SnackbarHostState()
+
+  LaunchedEffect(snackbarHostState) {
+    snackbarHostState.showSnackbar(message = message)
+    snackbarHostState.currentSnackbarData?.dismiss()
+  }
+
+  SnackbarHost(
+      hostState = snackbarHostState,
+      snackbar = { Snackbar(modifier = Modifier.padding(16.dp), action = {}) { Text(message) } })
 }
