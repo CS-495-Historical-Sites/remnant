@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,9 +28,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,12 +57,7 @@ import com.example.compose.HistoricalSitesAppTheme
 import com.ua.historicalsitesapp.ui.theme.Typography
 import com.ua.historicalsitesapp.util.Result
 import com.ua.historicalsitesapp.viewmodels.AuthViewModel
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Snackbar
 import kotlinx.coroutines.delay
-import androidx.compose.runtime.LaunchedEffect
 
 class LoginActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -133,14 +133,13 @@ private fun PasswordTextField(onPasswordChange: (String) -> Unit, updateError: B
               focusedBorderColor = MaterialTheme.colorScheme.secondary,
           ),
   )
-    AnimatedVisibility(visible = updateError) {
-        Text(
-            text = "Invalid Email or Password",
-            color = MaterialTheme.colorScheme.error,
-            fontSize = 14.sp,
-            modifier = Modifier.padding(start = 8.dp)
-        )
-    }
+  AnimatedVisibility(visible = updateError) {
+    Text(
+        text = "Invalid Email or Password",
+        color = MaterialTheme.colorScheme.error,
+        fontSize = 14.sp,
+        modifier = Modifier.padding(start = 8.dp))
+  }
 }
 
 @Composable
@@ -237,8 +236,8 @@ private fun LoginMenu(modifier: Modifier = Modifier) {
   val context = LocalContext.current
 
   val view = AuthViewModel(context)
-  var firstLogin by remember { mutableStateOf( false ) }
-  var isErrorLocal by remember { mutableStateOf( false ) }
+  var firstLogin by remember { mutableStateOf(false) }
+  var isErrorLocal by remember { mutableStateOf(false) }
   var showSuccessSnackbar by remember { mutableStateOf(false) }
   var email by remember { mutableStateOf("") }
   var password by remember { mutableStateOf("") }
@@ -251,12 +250,11 @@ private fun LoginMenu(modifier: Modifier = Modifier) {
 
         if (loginResult is Result.Success) {
           showSuccessSnackbar = true
-          if(loginResult.data.isFirstLogin){
-              firstLogin = true
+          if (loginResult.data.isFirstLogin) {
+            firstLogin = true
           }
-        }
-        else{
-            isErrorLocal = true
+        } else {
+          isErrorLocal = true
         }
       },
       loginSuccess = showSuccessSnackbar,
@@ -266,45 +264,32 @@ private fun LoginMenu(modifier: Modifier = Modifier) {
         context.startActivity(intent)
       },
   )
-    if (showSuccessSnackbar) {
-        ShowSnackbar("Successfully Logged In!")
-        LaunchedEffect(Unit) {
-            delay(1000)
-            showSuccessSnackbar = false
-            if (firstLogin) {
-                val intent = Intent(context, QuestionnaireActivity::class.java)
-                context.startActivity(intent)
-            } else {
-                val intent = Intent(context, MainPageActivity::class.java)
-                context.startActivity(intent)
-            }
-        }
+  if (showSuccessSnackbar) {
+    ShowSnackbar("Successfully Logged In!")
+    LaunchedEffect(Unit) {
+      delay(1000)
+      showSuccessSnackbar = false
+      if (firstLogin) {
+        val intent = Intent(context, QuestionnaireActivity::class.java)
+        context.startActivity(intent)
+      } else {
+        val intent = Intent(context, MainPageActivity::class.java)
+        context.startActivity(intent)
+      }
     }
+  }
 }
 
-
-
 @Composable
-fun ShowSnackbar(
-    message: String
-) {
-    val snackbarHostState = SnackbarHostState()
+fun ShowSnackbar(message: String) {
+  val snackbarHostState = SnackbarHostState()
 
-    LaunchedEffect(snackbarHostState) {
-        snackbarHostState.showSnackbar(message = message)
-        snackbarHostState.currentSnackbarData?.dismiss()
-    }
+  LaunchedEffect(snackbarHostState) {
+    snackbarHostState.showSnackbar(message = message)
+    snackbarHostState.currentSnackbarData?.dismiss()
+  }
 
-    SnackbarHost(
-        hostState = snackbarHostState,
-        snackbar = {
-            Snackbar(
-                modifier = Modifier.padding(16.dp),
-                action = {
-                }
-            ) {
-                Text(message)
-            }
-        }
-    )
+  SnackbarHost(
+      hostState = snackbarHostState,
+      snackbar = { Snackbar(modifier = Modifier.padding(16.dp), action = {}) { Text(message) } })
 }
