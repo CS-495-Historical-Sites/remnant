@@ -14,7 +14,7 @@ from sqlalchemy.exc import DatabaseError
 from src.appl import LOGGER, Config
 from src.appl.models import RegistrationRequest, LoginRequest
 from src.appl.remnant_db import user_queries, token_queries
-from src.appl.validation import check_valid_password, check_valid_email, check_types
+from src.appl.validation import check_valid_password, check_valid_email, check_valid_username, check_types
 
 
 def user_required(f):
@@ -73,7 +73,7 @@ def register():
 
     # checking for valid credentials
     # no point in checking the database if the credentials are not valid
-    if not check_valid_email(email) or not check_valid_password(non_hash_password):
+    if not check_valid_email(email) or not check_valid_password(non_hash_password) or not check_valid_username(username):
         return jsonify({"message": "Invalid credentials entered"}), 422
 
     registration_info = RegistrationRequest(
