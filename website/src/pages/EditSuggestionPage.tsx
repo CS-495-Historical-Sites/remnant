@@ -15,6 +15,7 @@ import {
 
 import LocationDetails from "../models/Location";
 import LocationEditSuggestions from "../models/LocationSuggestion";
+import { UpdateLocationEditSuggestion } from "../remnantAPI/UpdateLocationSuggestions";
 import { GetLocationEditSuggestion } from "../remnantAPI/GetLocationSuggestions";
 import { GetLocationDetails } from "../remnantAPI/GetLocation";
 
@@ -97,21 +98,21 @@ const EditSuggestionPage: React.FC<UserProps> = ({ setToken, token }) => {
     );
   };
   const handleApprove = async () => {
-    // try {
-    //   await approveSuggestion(suggestionId!);
-    //   navigate('/suggestions'); // Redirect to suggestions list or dashboard after approval
-    // } catch (error) {
-    //   console.error("Failed to approve suggestion", error);
-    // }
+    try {
+      await UpdateLocationEditSuggestion(suggestionId!, token, "approved");
+      navigate('/admin/suggestions');
+    } catch (error) {
+      console.error("Failed to approve suggestion", error);
+    }
   };
 
   const handleDeny = async () => {
-    // try {
-    //   await denySuggestion(suggestionId!);
-    //   navigate('/suggestions'); // Redirect to suggestions list or dashboard after denial
-    // } catch (error) {
-    //   console.error("Failed to deny suggestion", error);
-    // }
+    try {
+      await UpdateLocationEditSuggestion(suggestionId!, token, "denied");
+      navigate('/admin/suggestions'); 
+    } catch (error) {
+      console.error("Failed to deny suggestion", error);
+    }
   };
   if (isLoading) {
     return <CircularProgress />;

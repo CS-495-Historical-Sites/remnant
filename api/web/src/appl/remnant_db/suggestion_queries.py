@@ -1,4 +1,8 @@
-from src.appl.models import LocationEditSuggestion, LocationAddSuggestion
+from src.appl.models import (
+    LocationEditSuggestion,
+    LocationAddSuggestion,
+    SuggestionApproval,
+)
 
 
 def get_all_location_add_suggestions() -> list[LocationAddSuggestion]:

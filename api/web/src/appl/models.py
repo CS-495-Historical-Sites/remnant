@@ -3,7 +3,8 @@ from datetime import datetime
 from typing import TypedDict
 
 
-from sqlalchemy import MetaData, UniqueConstraint
+from sqlalchemy import Connection, MetaData, UniqueConstraint, event
+from sqlalchemy.orm import Session
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from src.appl import db
@@ -74,6 +75,7 @@ class Location(db.Model):
     short_description = db.Column(db.Text, nullable=True)
     long_description = db.Column(db.Text, nullable=True)
     wikidata_image_name = db.Column(db.Text, nullable=False)
+    version = db.Column(db.Integer, default=1, nullable=False)
 
     # pylint: disable=too-many-arguments
     def __init__(
@@ -91,6 +93,24 @@ class Location(db.Model):
         self.short_description = short_description
         self.long_description = long_description
         self.wikidata_image_name = wikidata_image_name
+
+    def apply_edit_suggestion(self, edit: LocationEditSuggestionRequest):
+        history = LocationHistory(
+            location_id=self.id,
+            name=self.name,
+            latitude=self.latitude,
+            longitude=self.longitude,
+            short_description=self.short_description,
+            long_description=self.long_description,
+            wikidata_image_name=self.wikidata_image_name,
+            version=self.version,
+        )
+        db.session.add(history)
+
+        self.name = edit.name
+        self.short_description = edit.short_description
+        self.long_description = edit.long_description
+        self.version += 1
 
 
 class Visit(db.Model):
@@ -144,6 +164,26 @@ class User(db.Model):
 
     def password_matches_hash(self, password: str) -> bool:
         return check_password_hash(self.password_hash, password)
+
+
+class SuggestionApproval(db.Model):
+    __tablename__ = "suggestion_approval"
+    metadata = program_metadata
+
+    id = db.Column(db.Integer, primary_key=True)
+    suggestion_type = db.Column(db.String(50), nullable=False)
+    suggestion_id = db.Column(db.Integer, nullable=False)
+    admin_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    status = db.Column(db.String(50), nullable=False)
+    comments = db.Column(db.Text, nullable=True)
+    decision_time = db.Column(db.DateTime, default=datetime.utcnow, nullable=True)
+
+    def __init__(self, suggestion_type, suggestion_id, admin_id, status, comments=None):
+        self.suggestion_type = suggestion_type
+        self.suggestion_id = suggestion_id
+        self.admin_id = admin_id
+        self.status = status
+        self.comments = comments
 
 
 class LocationAddSuggestion(db.Model):
@@ -208,3 +248,23 @@ class BlacklistToken(db.Model):
         self.logout_time = logout_time
         self.token_type = token_type
         self.user_id = user_id
+
+
+class LocationHistory(db.Model):
+    __tablename__ = "location_history"
+    metadata = program_metadata
+    id = db.Column(db.Integer, primary_key=True)
+    location_id = db.Column(db.Integer, db.ForeignKey("location.id"), nullable=False)
+    name = db.Column(db.String(120), nullable=False)
+    latitude = db.Column(db.Float, nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
+    short_description = db.Column(db.Text, nullable=True)
+    long_description = db.Column(db.Text, nullable=True)
+    wikidata_image_name = db.Column(db.Text, nullable=True)
+    version = db.Column(db.Integer, nullable=False)
+    modified_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+    # Foreign key relationship
+    location = db.relationship(
+        "Location", backref=db.backref("history", lazy="dynamic")
+    )
