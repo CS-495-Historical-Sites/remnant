@@ -32,10 +32,17 @@ import androidx.compose.material.icons.filled.ChatBubble
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.background
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import coil.compose.AsyncImage
 import androidx.compose.ui.layout.ContentScale
-
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.runtime.*
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.toSize
 
 class FeedPageActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,6 +60,18 @@ class FeedPageActivity : ComponentActivity() {
         }
     }
 }
+
+@Composable
+fun Menu(){
+    var expanded by remember { mutableStateOf( false ) }
+    val radius = listOf("5", "10", "25", "50")
+
+    var mSelectedText by remember { mutableStateOf("") }
+
+    var mTextFieldSize by remember { mutableStateOf(Size.Zero)}
+
+
+}
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeAppBar(){
@@ -65,17 +84,9 @@ fun HomeAppBar(){
                 fontSize = 20.sp,
             )
         },
-        // Define the actions to include in the app bar
         actions = {
-            // Create an icon button with a heart icon
-            IconButton(onClick = {  }) {
-                Text(
-                    text = "+",
-                    fontFamily = FontFamily.Serif,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 30.sp,
-                )
-            }
+
+
         }
 
     )
