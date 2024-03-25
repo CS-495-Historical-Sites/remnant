@@ -9,6 +9,7 @@ from src.appl.models import (
     LocationAddSuggestion,
     LocationAddSuggestionRequest,
     SuggestionApproval,
+    Location,
     User,
 )
 
@@ -144,7 +145,7 @@ def handle_approval_result_for_location_edit(admin: User, suggestion_id: str):
     except ValueError:
         return jsonify({"message": "Invalid suggestion ID"}), 400
 
-    suggestion = suggestion_queries.get_all_location_edit_suggestion_by_id(
+    suggestion = suggestion_queries.get_location_edit_suggestion_by_id(
         suggestion_id
     )
 
@@ -164,5 +165,54 @@ def handle_approval_result_for_location_edit(admin: User, suggestion_id: str):
         location = location_queries.get_location(suggestion.location_id)
         location.apply_edit_suggestion(suggestion)
         db.session.commit()
+
+
+    return jsonify({"message": "Suggestion status updated"}), 200
+
+
+@suggestion_blueprint.route(
+    "/api/suggestions/locations/add/<suggestion_id>/approval", methods=["PATCH"]
+)
+@jwt_required()
+@admin_required
+def handle_approval_result_for_location_add(admin: User, suggestion_id: str):
+    LOGGER.info("Handling approval result for location add")
+    data = request.get_json()
+
+    try:
+        status = data["status"]
+        suggestion_id = int(suggestion_id)
+    except KeyError:
+        return jsonify({"message": "Incomplete request"}), 400
+    except ValueError:
+        return jsonify({"message": "Invalid suggestion ID"}), 400
+
+    suggestion = suggestion_queries.get_location_add_suggestion_by_id(
+        suggestion_id
+    )
+
+    if suggestion is None:
+        return jsonify({"message": "Suggestion not found"}), 404
+
+    approval = SuggestionApproval(
+        suggestion_type="location_add",
+        suggestion_id=suggestion_id,
+        admin_id=admin.id,
+        status=status,
+    )
+    db.session.add(approval)
+    db.session.commit()
+
+    if status == "approved":
+        location = Location(
+            name=suggestion.name,
+            latitude=suggestion.latitude,
+            longitude=suggestion.longitude,
+            short_description=suggestion.short_description,
+            wikidata_image_name="",
+            long_description="",
+        )
+        location_queries.create_location(location)
+
 
     return jsonify({"message": "Suggestion status updated"}), 200
