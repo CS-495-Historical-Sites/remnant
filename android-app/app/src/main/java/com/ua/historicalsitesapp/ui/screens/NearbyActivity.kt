@@ -1,5 +1,6 @@
 package com.ua.historicalsitesapp.ui.screens
 import android.os.Bundle
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,6 +17,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.compose.HistoricalSitesAppTheme
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.foundation.layout.Arrangement
@@ -38,6 +41,8 @@ import coil.compose.AsyncImage
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.rounded.Directions
+import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.runtime.*
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -61,17 +66,17 @@ class FeedPageActivity : ComponentActivity() {
     }
 }
 
-@Composable
-fun Menu(){
-    var expanded by remember { mutableStateOf( false ) }
-    val radius = listOf("5", "10", "25", "50")
-
-    var mSelectedText by remember { mutableStateOf("") }
-
-    var mTextFieldSize by remember { mutableStateOf(Size.Zero)}
-
-
-}
+//@Composable
+//fun Menu(){
+//    var expanded by remember { mutableStateOf( false ) }
+//    val radius = listOf("5", "10", "25", "50")
+//
+//    var mSelectedText by remember { mutableStateOf("") }
+//
+//    var mTextFieldSize by remember { mutableStateOf(Size.Zero)}
+//
+//
+//}
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeAppBar(){
@@ -96,6 +101,7 @@ fun HomeAppBar(){
 
 @Composable
 fun HomeMainContent(){
+    val cornerRadius = 8.dp
     Surface(modifier = Modifier.padding(top=6.dp, bottom = 6.dp)) {
 
 
@@ -108,15 +114,18 @@ fun HomeMainContent(){
             ) {
                 Column(
                     Modifier
-                        .weight(1f)
+                        .weight(2f)
                         .padding(end = 16.dp)
                 ) {
                     AsyncImage(
                         model = "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8UHJvZmlsZSUyMHBpY3R1cmV8ZW58MHx8MHx8fDA%3D",
                         contentDescription = null,
                         modifier = Modifier
-                            .size(30.dp)
-                            .clip(CircleShape)
+                            .fillMaxWidth()
+                            .aspectRatio(1f)
+                            .width(76.dp)
+                            .height(100.dp)
+                            .clip(RoundedCornerShape(cornerRadius))
                             .clickable(onClick = {}),
                         contentScale = ContentScale.Crop
                     )
@@ -128,103 +137,86 @@ fun HomeMainContent(){
                         .padding(end = 16.dp)
                 ) {
                     Text(
-                        text = "jacklyn_hill56",
+                        text = "Name of Location",
                         fontWeight = FontWeight.Normal,
-                        fontSize = 11.sp
+                        fontSize = 18.sp
+                    )
+                    Text(
+                        text = "Miles away",
+                        fontWeight = FontWeight.Normal,
+                        fontStyle = FontStyle.Italic,
+                        fontSize = 10.sp
                     )
                     Text(
                         text = "Tuscaloosa, Alabama",
                         fontWeight = FontWeight.Normal,
-                        fontSize = 10.sp
+                        fontSize = 14.sp
                     )
                 }
 
             }
 
-            Row(
-                modifier = Modifier
-                    .horizontalScroll(rememberScrollState())
-                    .fillMaxWidth(),
 
-                ) {
-                val image = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8UGVvcGxlfGVufDB8fDB8fHww"
-
-                val screenWidth = LocalConfiguration.current.screenWidthDp
-                Box(
-                    modifier = Modifier
-                        .width(screenWidth.dp)
-                        .aspectRatio(1f)
-                ) {
-                    AsyncImage(
-                        model = image,
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxWidth(),
-                        contentScale = ContentScale.FillWidth
-                    )
-
-
-                }
-            }
+            Divider(modifier = Modifier.padding(horizontal = 6.dp), color = Color.Gray)
 
             // Content (Reactions)
-            Row(
+            Box(
                 modifier = Modifier.fillMaxWidth()
-//
-
             ) {
+//
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 38.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    .height(40.dp),
+
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    IconButton(onClick = { }) {
-                        Icon(
-                            Icons.Rounded.Favorite,
-                            contentDescription = null,
-                            modifier = Modifier.size(33.dp)
-                        )
-                    }
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clickable(onClick = { /* Click action for the first button */ })
+                            .height(40.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                            Icon(
+                                imageVector = Icons.Rounded.Favorite,
+                                contentDescription = null
+                            )
+                        }
 
-                    IconButton(onClick = { }) {
-                        Icon(
-                            Icons.Filled.ChatBubble,
-                            contentDescription = "Comment Icon",
-                            modifier = Modifier.size(33.dp)
-                        )
-                    }
-
-                    IconButton(onClick = { }) {
-                        Icon(
-                            Icons.Rounded.Share,
-                            contentDescription = null,
-                            modifier = Modifier.size(33.dp)
-                        )
-                    }
-                }
-            }
-
-            Column(modifier = Modifier.padding(
-                start = 10.dp,
-                end = 10.dp,
-                top = 1.dp,
-                bottom =4.dp
-            )) {
-
-                Row{
-                    Text(
-                        text = "15 Users have liked this",
-                        fontWeight = FontWeight.Normal,
-                        fontSize = 15.sp
+                    Divider(
+                        color = Color.Gray,
+                        modifier = Modifier
+                            .width(1.dp)
+                            .fillMaxHeight()
+                            .padding(vertical = 4.dp)
                     )
-                }
 
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clickable(onClick = {})
+                            .height(40.dp),
+                        contentAlignment = Alignment.Center
+
+                    ) {
+                            Icon(
+                                imageVector = Icons.Rounded.Directions,
+                                contentDescription = null
+                            )
+                    }
+                }
             }
+            Divider(modifier = Modifier.padding(horizontal = 6.dp), color = Color.Gray)
+
+
 
 
 
         }
     }
+
 }
 
 
@@ -265,7 +257,6 @@ fun FeedPage() {
                 HomeMainContent()
 
 
-
             }
 
 
@@ -273,3 +264,4 @@ fun FeedPage() {
 
     }
 }
+
