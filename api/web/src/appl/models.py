@@ -14,6 +14,7 @@ class RegistrationRequest:
     username: str
     email: str
     password: str
+    interested_eras: str
     requesting_admin: bool = False
 
 
@@ -131,16 +132,17 @@ class User(db.Model):
     username = db.Column(db.String(120), index=False, unique=False)
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(256), nullable=False)
-    #interested_eras = db.Column(db.String())
+    interested_eras = db.Column(db.String(120), index=False)
 
     is_admin = db.Column(db.Boolean, default=False)
 
     def __init__(
-        self, username: str, email: str, supplied_password: str, is_admin=False
+        self, username: str, email: str, supplied_password: str, interested_eras: str, is_admin=False
     ):
         self.username = username
         self.email = email
         self.password_hash = generate_password_hash(supplied_password)
+        self.interested_eras = interested_eras
         self.is_admin = is_admin
 
     def password_matches_hash(self, password: str) -> bool:

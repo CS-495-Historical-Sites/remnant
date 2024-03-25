@@ -11,6 +11,7 @@ def create_user(registration_info: RegistrationRequest) -> None:
         username=registration_info.username,
         email=registration_info.email,
         supplied_password=registration_info.password,
+        interested_eras=registration_info.interested_eras
     )
     db.session.add(user)
     db.session.commit()
@@ -21,6 +22,7 @@ def create_admin(registration_info: RegistrationRequest) -> None:
         username=registration_info.username,
         email=registration_info.email,
         supplied_password=registration_info.password,
+        interested_eras=registration_info.interested_eras,
         is_admin=True,
     )
     db.session.add(user)
