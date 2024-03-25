@@ -6,7 +6,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
@@ -18,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY
@@ -28,6 +37,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.clustering.algo.NonHierarchicalViewBasedAlgorithm
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.MapsComposeExperimentalApi
 import com.google.maps.android.compose.clustering.Clustering
 import com.google.maps.android.compose.clustering.rememberClusterManager
@@ -104,6 +114,7 @@ private fun CustomRendererClustering(
   }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("MissingPermission")
 @Composable
 fun GoogleMapsScreen(
@@ -148,27 +159,45 @@ fun GoogleMapsScreen(
     }
   }
 
-  Scaffold { contentPadding ->
-    Box(modifier = Modifier.padding(contentPadding)) {
-      GoogleMap(
-          modifier = Modifier.fillMaxSize(),
-          googleMapOptionsFactory = { GoogleMapOptions().mapId("ed053e0f6a3454e8") },
-          properties = MapProperties(isMyLocationEnabled = true),
-          cameraPositionState = cameraPositionState,
-      ) {
-        CustomRendererClustering(
-            items = items,
-            onLocationInfoBoxClick,
-        )
-      }
-    }
-
-    if (showBottomSheet && selectedLocation != null) {
-      LocationInfoCard(
-          mainPageViewModel = view,
-          selectedLocation = selectedLocation!!,
-          onDismissRequest = { showBottomSheet = false },
-      )
-    }
-  }
+  Scaffold(
+      topBar = {
+        CenterAlignedTopAppBar(
+            title = { Text("Centered TopAppBar", maxLines = 1, overflow = TextOverflow.Ellipsis) },
+            navigationIcon = {
+              IconButton(onClick = { /* doSomething() */}) {
+                Icon(imageVector = Icons.Filled.Menu, contentDescription = "Localized description")
+              }
+            },
+            actions = {
+              IconButton(onClick = { /* doSomething() */}) {
+                Icon(
+                    imageVector = Icons.Filled.Favorite,
+                    contentDescription = "Localized description")
+              }
+            })
+      },
+      content = { contentPadding ->
+        Box(modifier = Modifier.padding(contentPadding)) {
+          GoogleMap(
+              modifier = Modifier.fillMaxSize(),
+              googleMapOptionsFactory = { GoogleMapOptions().mapId("ed053e0f6a3454e8") },
+              properties = MapProperties(isMyLocationEnabled = true),
+              uiSettings =
+                  MapUiSettings(myLocationButtonEnabled = false, mapToolbarEnabled = false),
+              cameraPositionState = cameraPositionState,
+          ) {
+            CustomRendererClustering(
+                items = items,
+                onLocationInfoBoxClick,
+            )
+          }
+        }
+        if (showBottomSheet && selectedLocation != null) {
+          LocationInfoCard(
+              mainPageViewModel = view,
+              selectedLocation = selectedLocation!!,
+              onDismissRequest = { showBottomSheet = false },
+          )
+        }
+      })
 }

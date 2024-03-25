@@ -1,6 +1,5 @@
 package com.ua.historicalsitesapp.ui.screens
 
-import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity

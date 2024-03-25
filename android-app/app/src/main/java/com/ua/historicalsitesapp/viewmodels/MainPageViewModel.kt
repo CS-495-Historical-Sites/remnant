@@ -98,11 +98,10 @@ class MainPageViewModel(context: Context) : ViewModel() {
     val visitInfo = LocationEditSuggestion(name, shortDesc, longDesc)
     return runBlocking {
       val response =
-          client.post(
-              ServerConfig.SERVER_URL + "/suggestions/locations/edit/" + locationId) {
-                contentType(ContentType.Application.Json)
-                setBody(visitInfo)
-              }
+          client.post(ServerConfig.SERVER_URL + "/suggestions/locations/edit/" + locationId) {
+            contentType(ContentType.Application.Json)
+            setBody(visitInfo)
+          }
       return@runBlocking response.status.value == 200
     }
   }
