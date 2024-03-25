@@ -49,7 +49,7 @@ class TestLocation:
         loc_name = "Tuscaloosa"
         lat = 68.004
         long = 87.0003
-        image = "pictureoftuscaloosa.png"
+        image = "link_pictureoftuscaloosa.png"
         short = " i love tuscaloosa"
         long_description = "lsdfkaslkjflasjlfkdjsaldfjlsajfdjsaldfjlsajdfljsaldfjlasjdflkasjdlfjaslfjalsjflsajdfjasldfjalsjdflaskjdflasjdflasjldfjasldjfklasjdfljas"
         location = Location(loc_name, lat, long, image, short, long_description)
@@ -64,4 +64,4 @@ class TestLocation:
         assert fetched_location.longitude == long
         assert fetched_location.short_description == short
         assert fetched_location.long_description == long_description
-        assert fetched_location.wikidata_image_name == image
+        assert fetched_location.image_link == image

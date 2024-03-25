@@ -23,7 +23,7 @@ class TestVisitedLocations:
                 "city1",
                 45.0283,
                 143.2030,
-                "image_name",
+                "image_link",
                 "description1",
                 "longdecription0",
             ),
@@ -44,7 +44,7 @@ class TestVisitedLocations:
             "longitude": 143.203,
             "name": "city1",
             "short_description": "description1",
-            "wikidata_image_name": "image_name",
+            "image_link": "image_link",
         }
 
     def test_get_specific_location_404(self, client):
@@ -53,7 +53,7 @@ class TestVisitedLocations:
                 "city1",
                 45.0283,
                 143.2030,
-                "image_name",
+                "image_link",
                 "description1",
                 "longdecription0",
             ),

@@ -73,7 +73,7 @@ class Location(db.Model):
     longitude = db.Column(db.Float, nullable=False)
     short_description = db.Column(db.Text, nullable=True)
     long_description = db.Column(db.Text, nullable=True)
-    wikidata_image_name = db.Column(db.Text, nullable=False)
+    image_link = db.Column(db.Text, nullable=False)
 
     # pylint: disable=too-many-arguments
     def __init__(
@@ -81,7 +81,7 @@ class Location(db.Model):
         name,
         latitude,
         longitude,
-        wikidata_image_name,
+        image_link,
         short_description=None,
         long_description=None,
     ):
@@ -90,7 +90,7 @@ class Location(db.Model):
         self.longitude = longitude
         self.short_description = short_description
         self.long_description = long_description
-        self.wikidata_image_name = wikidata_image_name
+        self.image_link = image_link
 
 
 class Visit(db.Model):

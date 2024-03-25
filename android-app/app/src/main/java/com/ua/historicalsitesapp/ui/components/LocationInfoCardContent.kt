@@ -44,7 +44,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.ua.historicalsitesapp.data.model.map.HsLocationComplete
-import com.ua.historicalsitesapp.data.wikidata.constructWikidataImageLink
 import com.ua.historicalsitesapp.ui.foreignintents.createGoogleMapsDirectionsIntent
 import com.ua.historicalsitesapp.ui.theme.Typography
 import com.ua.historicalsitesapp.viewmodels.MainPageViewModel
@@ -91,8 +90,7 @@ fun LocationInfoCardContent(
 
 @Composable
 private fun RenderLocationInfo(location: HsLocationComplete, onEditClick: () -> Unit) {
-  val imageLink = constructWikidataImageLink(location.wikidataImageName, 1000)
-
+  val imageLink = location.imageLink + "&width=1000"
   ImageBox(imageLink)
   Spacer(modifier = Modifier.height(6.dp))
   TitleBox(locationName = location.name, onEditClick = onEditClick)
