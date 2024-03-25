@@ -126,21 +126,3 @@ fun LogoutButton(
       content = { Text("Logout") },
   )
 }
-
-@Composable
-fun SuggestLocationButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-  Button(
-      onClick = onClick,
-      modifier = Modifier.width(200.dp),
-      shape = RoundedCornerShape(50.dp),
-      colors =
-          ButtonDefaults.buttonColors(
-              contentColor = Color.White,
-              containerColor = Color.Black,
-          ),
-      content = { Text("Suggest Location") },
-  )
-}
