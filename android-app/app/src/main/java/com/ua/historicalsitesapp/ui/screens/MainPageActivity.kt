@@ -47,11 +47,11 @@ class MainPageActivity : ComponentActivity() {
     geofencingClient = getGeofencingClient(this)
 
     geofenceList.add(Geofence.Builder()
-      .setRequestId("Place1")
+      .setRequestId("Rengstorff House")
       .setCircularRegion(
         37.431456,
         -122.0871,
-        10000f
+        100f
       )
       .setNotificationResponsiveness(1000)
       .setExpirationDuration(Geofence.NEVER_EXPIRE)
@@ -66,7 +66,7 @@ class MainPageActivity : ComponentActivity() {
         Manifest.permission.ACCESS_FINE_LOCATION
       ) != PackageManager.PERMISSION_GRANTED
     ) {
-      return
+      println("No Permission")
     }
     geofencingClient.addGeofences(getGeofencingRequest(), geofencingPendingIntent).run {
       addOnSuccessListener {
@@ -104,7 +104,7 @@ class MainPageActivity : ComponentActivity() {
 
   private val geofencingPendingIntent : PendingIntent by lazy {
     val intent = Intent(this, GeofenceBroadcastReceiver::class.java)
-    PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+    PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
   }
 
 }

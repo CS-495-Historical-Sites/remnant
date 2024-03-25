@@ -10,7 +10,7 @@ class NotificationHelper: Application() {
     override fun onCreate() {
         super.onCreate()
         val channel = NotificationChannel(
-            "channel_id",
+            "Notification_Helper",
             "Channel Name",
             NotificationManager.IMPORTANCE_HIGH
         )

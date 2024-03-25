@@ -1,9 +1,5 @@
 package com.ua.historicalsitesapp.ui.screens
 
-import android.app.NotificationManager
-import android.app.PendingIntent
-import android.content.Context
-import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
@@ -63,10 +59,8 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.example.compose.HistoricalSitesAppTheme
-import com.ua.historicalsitesapp.R
 import com.ua.historicalsitesapp.data.model.auth.RegistrationResult
 import com.ua.historicalsitesapp.ui.theme.Typography
 import com.ua.historicalsitesapp.viewmodels.AuthViewModel
@@ -111,9 +105,6 @@ class RegistrationActivity : ComponentActivity() {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                                 permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
                             }
-                            if (hasNotificationPermission){
-                                showNotification()
-                            }
                         }) {
                             Text(text = "Enable Notifications")
                         }
@@ -123,23 +114,6 @@ class RegistrationActivity : ComponentActivity() {
                 }
             }
         }
-    }
-    private fun showNotification() {
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val intent = Intent(applicationContext, RegistrationActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
-        val pendingIntent =
-            PendingIntent.getActivity(applicationContext, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-        val notification = NotificationCompat.Builder(applicationContext, "channel_id")
-            .setContentText("IDK what to put here")
-            .setContentTitle("Test Notification")
-            .setSmallIcon(R.mipmap.ic_launcher_round)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setContentIntent(pendingIntent)
-            .setAutoCancel(true)
-            .build()
-        notificationManager.notify(1, notification)
     }
 }
 
