@@ -6,6 +6,8 @@ erDiagram
         int id  PK
         string email UK
         string password_hash 
+        string interested_eras
+        bool is_admin
     }
     Location {
         int id  PK
@@ -14,6 +16,8 @@ erDiagram
         float longitude
         string short_description
         string long_description
+        string image_link
+        int version
     }
     Visit {
         int id  PK
@@ -37,6 +41,7 @@ erDiagram
         string name 
         string short_description
         string wikipedia_link
+        string image_link
     }
     LocationEditSuggestion {
         int id PK
@@ -53,11 +58,40 @@ erDiagram
         datetime attempt_time
         bool success
     }
+    SuggestionApproval {
+        int id PK
+        string suggestion_type
+        int suggestion_id FK
+        int admin_id FK
+        string status
+        string comments
+        datetime decision_time
+    }
+
+    LocationHistory {
+        int id PK
+        int location_id FK
+        string name 
+        float latitude
+        float longitude
+        string short_description
+        string long_description
+        string image_link
+        int version
+        datetime modified_at
+    }
 
     User ||--o{ LocationAddSuggestion : "suggests"
     User ||--o{ LocationEditSuggestion : "suggests"
-    LocationEditSuggestion ||--o{ Location : "edits"
+    LocationEditSuggestion ||--o{ Location : "edits existing"
+    LocationAddSuggestion ||--o{ Location : "creates new"
     User ||--o{ Visit : "visits"
     Location ||--o{ Visit : "visited by"
     User ||--o{BlacklistToken : "old token"
+    Admin ||--o{SuggestionApproval : "decides"
+
+    SuggestionApproval ||--o{ LocationAddSuggestion : "decides"
+    SuggestionApproval ||--o{ LocationEditSuggestion : "decides"
+
+    Location ||--o{ LocationHistory : "has"
 ```
