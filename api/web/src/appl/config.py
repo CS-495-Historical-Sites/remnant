@@ -1,6 +1,8 @@
 import logging
 import os
 
+import boto3
+
 
 class Config:
     SECRET_KEY = os.environ.get("FLASK_SECRET_KEY")
@@ -12,8 +14,18 @@ class Config:
     POSTGRES_HOST = os.environ.get("POSTGRES_HOST", "postgres")
     POSTGRES_PORT = os.environ.get("POSTGRES_PORT")
     POSTGRES_DB = os.environ.get("POSTGRES_DB")
+    IMAGES_DIR = os.environ.get("FLASK_IMAGES_DIR", "/path/to/default/images/directory")
 
     ADMIN_EMAILS = os.getenv("ADMIN_EMAILS").split(";")
+
+    AWS_ACCESS_KEY = os.getenv("AWS_ACCESS_KEY")
+    AWS_SECRET_KEY = os.getenv("AWS_SECRET_KEY")
+
+    S3_CLIENT = boto3.client(
+        "s3",
+        aws_access_key_id=AWS_ACCESS_KEY,
+        aws_secret_access_key=AWS_SECRET_KEY,
+    )
 
     assert all(
         [

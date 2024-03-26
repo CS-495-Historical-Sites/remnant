@@ -26,7 +26,7 @@ def long_location_repr(l: Location) -> LongLocationDescription:
         "longitude": l.longitude,
         "short_description": l.short_description,
         "long_description": l.long_description,
-        "wikidata_image_name": l.wikidata_image_name,
+        "image_link": l.image_link,
     }
 
 
@@ -40,6 +40,7 @@ def add_suggestion_repr(s: LocationAddSuggestion) -> dict:
         "longitude": s.longitude,
         "short_description": s.short_description,
         "wikipedia_link": s.wikipedia_link,
+        "image_url": s.image_url,
     }
 
 

@@ -45,7 +45,9 @@ def init_db_with_sources_file(app):
             short_desc = location["short_description"]
             long_desc = location["long_description"]
             coordinates = location["coordinates"]
+
             image_name = location["wikidata_image_name"]
+            image_name = f"https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/{image_name}"
             if not coordinates:
                 skipped += 1
                 continue
@@ -81,7 +83,7 @@ def init_app(testing=False, db_uri=Config.SQLALCHEMY_DATABASE_URI):
 
     app.config.from_object(Config)
     app.config["SQLALCHEMY_DATABASE_URI"] = db_uri
-    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
+    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=24)
     app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=30)
 
     db.init_app(app)

@@ -21,6 +21,6 @@ fun LocationInfoCard(
   ) {
     // Sheet content
     val info = selectedLocation.let { mainPageViewModel.getLocationInfo(it.itemId) }
-    LocationInfoCardContent(location = info, sheetState)
+    LocationInfoCardContent(location = info)
   }
 }

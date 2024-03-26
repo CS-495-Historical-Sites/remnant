@@ -6,7 +6,7 @@ export const GetAddLocationSuggestions = async (
   setToken: (token: string) => void,
 ): Promise<LocationSuggestion[]> => {
   const response = await fetch(
-    `http://localhost:8080/api/suggestions/location_add_suggestions`,
+    `http://localhost:8080/api/suggestions/locations/add`,
     {
       method: "GET",
       headers: {
@@ -26,7 +26,7 @@ export const GetLocationEditSuggestions = async (
   setToken: (token: string) => void,
 ): Promise<LocationEditSuggestion[]> => {
   const response = await fetch(
-    `http://localhost:8080/api/suggestions/location_edit_suggestions`,
+    `http://localhost:8080/api/suggestions/locations/edit`,
     {
       method: "GET",
       headers: {
@@ -47,7 +47,28 @@ export const GetLocationEditSuggestion = async (
   setToken: (token: string) => void,
 ): Promise<LocationEditSuggestion> => {
   const response = await fetch(
-    `http://localhost:8080/api/suggestions/location_edit_suggestions/${suggestionId}`,
+    `http://localhost:8080/api/suggestions/locations/edit/${suggestionId}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+  if (response.status === 401) {
+    setToken("");
+    throw new Error("Unauthorized access");
+  }
+  return response.json();
+};
+
+export const GetLocationAddSuggestion = async (
+  suggestionId: string,
+  token: string,
+  setToken: (token: string) => void,
+): Promise<LocationSuggestion> => {
+  const response = await fetch(
+    `http://localhost:8080/api/suggestions/locations/add/${suggestionId}`,
     {
       method: "GET",
       headers: {

@@ -1,5 +1,7 @@
 # pylint: disable=unused-argument, line-too-long
+import base64
 import pytest
+from sqlalchemy.engine import base
 
 
 from src.tests import helpers
@@ -61,7 +63,7 @@ class TestSuggestions:
 
         # Make a POST request to the endpoint
         response = client.post(
-            "/api/suggestions/location_add_suggestions",
+            "/api/suggestions/locations/add",
             json=test_data,
             headers=headers,
             content_type="application/json",
