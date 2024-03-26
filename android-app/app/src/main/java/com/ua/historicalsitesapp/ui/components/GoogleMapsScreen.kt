@@ -5,19 +5,12 @@ import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddBox
 import androidx.compose.material.icons.filled.AddLocation
-import androidx.compose.material.icons.filled.AddLocationAlt
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -64,7 +57,6 @@ import com.google.maps.android.compose.clustering.rememberClusterRenderer
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.ua.historicalsitesapp.data.model.map.ClusterItem
 import com.ua.historicalsitesapp.ui.screens.TAG
-import com.ua.historicalsitesapp.ui.theme.Typography
 import com.ua.historicalsitesapp.viewmodels.MainPageViewModel
 import kotlinx.coroutines.launch
 
@@ -142,7 +134,8 @@ fun GoogleMapsScreen(
     view: MainPageViewModel,
 ) {
   var showBottomSheet by remember { mutableStateOf(false) }
-  var showLocationSuggestionForm by remember { mutableStateOf(false) }
+  var isPlacingLocation by remember { mutableStateOf(false) }
+  var showAddLocationDialog by remember { mutableStateOf(false) }
   var selectedLocation: ClusterItem? = null
   val items = remember { mutableStateListOf<ClusterItem>() }
 
@@ -204,16 +197,24 @@ fun GoogleMapsScreen(
                     actionIconContentColor = MaterialTheme.colorScheme.onSecondary))
       },
       floatingActionButton = {
-          if (showLocationSuggestionForm) {
-              ExtendedFloatingActionButton(
-                  onClick = {  },
-                  icon = { Icon(Icons.Filled.AddLocation, "Add Location") },
-                  text = { Text(text = "Place Location") },
-              )
-          }
+        if (isPlacingLocation) {
+          ExtendedFloatingActionButton(
+              onClick = { showAddLocationDialog = true },
+              icon = { Icon(Icons.Filled.AddLocation, "Add Location") },
+              text = { Text(text = "Place Location") },
+          )
+        }
       },
-      floatingActionButtonPosition = FabPosition.Center
-  ) { contentPadding ->
+      floatingActionButtonPosition = FabPosition.Center,
+      bottomBar = {
+        if (showBottomSheet && selectedLocation != null) {
+          LocationInfoCard(
+              mainPageViewModel = view,
+              selectedLocation = selectedLocation!!,
+              onDismissRequest = { showBottomSheet = false },
+          )
+        }
+      }) { contentPadding ->
         ModalNavigationDrawer(
             drawerState = drawerState,
             drawerContent = {
@@ -223,7 +224,7 @@ fun GoogleMapsScreen(
                     label = { Text(text = "Suggest Location") },
                     selected = false,
                     onClick = {
-                      showLocationSuggestionForm = true
+                      isPlacingLocation = true
                       scope.launch { drawerState.apply { if (isClosed) open() else close() } }
                     },
                     modifier =
@@ -233,6 +234,14 @@ fun GoogleMapsScreen(
             },
             gesturesEnabled = false) {
               Box(modifier = Modifier.padding(contentPadding)) {
+                if (showAddLocationDialog) {
+                  SuggestLocationForm(
+                      onSubmitSuggestion = { s: String, s1: String -> },
+                      onDismiss = {
+                        showAddLocationDialog = false
+                        isPlacingLocation = false
+                      })
+                }
                 GoogleMap(
                     modifier = Modifier.fillMaxSize(),
                     googleMapOptionsFactory = { GoogleMapOptions().mapId("ed053e0f6a3454e8") },
@@ -241,7 +250,7 @@ fun GoogleMapsScreen(
                         MapUiSettings(myLocationButtonEnabled = false, mapToolbarEnabled = false),
                     cameraPositionState = cameraPositionState,
                 ) {
-                  if (showLocationSuggestionForm) {
+                  if (isPlacingLocation) {
                     LocationSuggestionMarker(state = cameraPositionState.position)
                   }
                   CustomRendererClustering(
@@ -249,15 +258,6 @@ fun GoogleMapsScreen(
                       onLocationInfoBoxClick,
                   )
                 }
-
-
-              }
-              if (showBottomSheet && selectedLocation != null) {
-                LocationInfoCard(
-                    mainPageViewModel = view,
-                    selectedLocation = selectedLocation!!,
-                    onDismissRequest = { showBottomSheet = false },
-                )
               }
             }
       }

@@ -11,11 +11,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import com.ua.historicalsitesapp.data.model.map.HsLocationComplete
 
 @Composable
-fun SuggestLocationForm(onSubmitSuggestion: (String, String) -> Unit, onDismiss: () -> Unit) {
-  var title by remember { mutableStateOf("") }
-  var shortDescription by remember { mutableStateOf("") }
+fun SuggestEditForm(
+    location: HsLocationComplete,
+    onSubmitSuggestion: (String, String, String) -> Unit,
+    onDismiss: () -> Unit
+) {
+  var title by remember { mutableStateOf(location.name) }
+  var shortDescription by remember { mutableStateOf(location.shortDescription ?: "") }
+  var longDescription by remember { mutableStateOf(location.longDescription ?: "") }
 
   AlertDialog(
       onDismissRequest = { onDismiss() },
@@ -27,12 +33,16 @@ fun SuggestLocationForm(onSubmitSuggestion: (String, String) -> Unit, onDismiss:
               value = shortDescription,
               onValueChange = { shortDescription = it },
               label = { Text("Short Description") })
+          TextField(
+              value = longDescription,
+              onValueChange = { longDescription = it },
+              label = { Text("Long Description") })
         }
       },
       confirmButton = {
         Button(
             onClick = {
-              onSubmitSuggestion(title, shortDescription)
+              onSubmitSuggestion(title, shortDescription, longDescription)
               onDismiss()
             }) {
               Text("Submit")
