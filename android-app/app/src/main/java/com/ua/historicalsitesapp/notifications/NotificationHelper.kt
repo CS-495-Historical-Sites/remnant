@@ -5,7 +5,8 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 
-
+//Class does not work for seemingly no reason, will revisit. Until then all notifications will have to initialize
+//personal notification channels
 class NotificationHelper: Application() {
     override fun onCreate() {
         super.onCreate()

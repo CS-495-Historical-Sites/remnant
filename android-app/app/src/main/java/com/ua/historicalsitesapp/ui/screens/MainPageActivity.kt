@@ -29,7 +29,7 @@ import com.example.compose.HistoricalSitesAppTheme
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingClient
 import com.google.android.gms.location.GeofencingRequest
-import com.google.android.gms.location.LocationServices.*
+import com.google.android.gms.location.LocationServices.getGeofencingClient
 import com.ua.historicalsitesapp.geofence.GeofenceBroadcastReceiver
 import com.ua.historicalsitesapp.nav.AppBottomBar
 import com.ua.historicalsitesapp.nav.BottomNavigationGraph
@@ -37,7 +37,6 @@ import com.ua.historicalsitesapp.ui.components.GoogleMapsScreen
 import com.ua.historicalsitesapp.ui.components.LocationScreen
 import com.ua.historicalsitesapp.util.hasLocationPermission
 import com.ua.historicalsitesapp.viewmodels.MainPageViewModel
-
 
 
 class MainPageActivity : ComponentActivity() {
@@ -55,8 +54,36 @@ class MainPageActivity : ComponentActivity() {
       )
       .setNotificationResponsiveness(1000)
       .setExpirationDuration(Geofence.NEVER_EXPIRE)
-      .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL or Geofence.GEOFENCE_TRANSITION_ENTER)
-      .setLoiteringDelay(5000)
+      .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL)
+      .setLoiteringDelay(2500)
+      .build()
+    )
+
+    geofenceList.add(Geofence.Builder()
+      .setRequestId("South Engineering Research Center")
+      .setCircularRegion(
+        33.21485322073362,
+        -87.54404634485985,
+        100000f
+      )
+      .setNotificationResponsiveness(1000)
+      .setExpirationDuration(Geofence.NEVER_EXPIRE)
+      .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL)
+      .setLoiteringDelay(2500)
+      .build()
+    )
+
+    geofenceList.add(Geofence.Builder()
+      .setRequestId("Gorgas-Manly Historic District")
+      .setCircularRegion(
+        33.21225687888854,
+        -87.54574686536566,
+        100000f
+      )
+      .setNotificationResponsiveness(1000)
+      .setExpirationDuration(Geofence.NEVER_EXPIRE)
+      .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL)
+      .setLoiteringDelay(2500)
       .build()
     )
 

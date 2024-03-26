@@ -14,10 +14,12 @@ import com.google.android.gms.location.GeofenceStatusCodes
 import com.google.android.gms.location.GeofencingEvent
 import com.ua.historicalsitesapp.R
 import com.ua.historicalsitesapp.ui.screens.MainPageActivity
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 
 class GeofenceBroadcastReceiver : BroadcastReceiver() {
-    override fun onReceive(context: Context?, intent: Intent?) {
-        val geofencingEvent = intent?.let { GeofencingEvent.fromIntent(it) }
+    override fun onReceive(context: Context, intent: Intent) {
+        val geofencingEvent = GeofencingEvent.fromIntent(intent)
         if (geofencingEvent != null) {
             if (geofencingEvent.hasError()) {
                 val errorMessage = GeofenceStatusCodes.getStatusCodeString(geofencingEvent.errorCode )
@@ -27,19 +29,24 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
         }
 
         val triggeringGeofences : MutableList<Geofence>? = geofencingEvent?.triggeringGeofences
-
-        if (context != null) {
-            if (triggeringGeofences != null) {
-                for (geofence in triggeringGeofences) {
-                    val geofenceId = geofence.requestId
-                    showNotification(context, geofenceId)
+        notificationHelp(context)
+        var notifID = 0
+        if (triggeringGeofences != null) {
+            for (geofence in triggeringGeofences) {
+                val geofenceId = geofence.requestId
+                println(geofenceId)
+                notifID += 1
+                showNotification(context, geofenceId, notifID)
+                runBlocking {
+                    delay(3000)
                 }
             }
-
         }
+
+
     }
 
-    private fun showNotification(context: Context, geofenceId: String) {
+    private fun notificationHelp(context: Context) {
         val channel = NotificationChannel(
             "Notification_Helper",
             "Channel Name",
@@ -47,6 +54,10 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
         )
         val notificationMan = context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         notificationMan.createNotificationChannel(channel)
+    }
+
+
+    private fun showNotification(context: Context, geofenceId: String, notifID: Int) {
         val notificationManager = context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         val intent = Intent(context, MainPageActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -60,8 +71,9 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
+            .setGroup("GeofenceNotificationGroup")
             .build()
-        notificationManager.notify(1, notification)
+        notificationManager.notify(notifID, notification)
     }
 
 
