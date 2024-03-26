@@ -227,7 +227,7 @@ def handle_approval_result_for_location_add(admin: User, suggestion_id: str):
             latitude=suggestion.latitude,
             longitude=suggestion.longitude,
             short_description=suggestion.short_description,
-            wikidata_image_name="",
+            image_link=suggestion.image_url,
             long_description="",
         )
         location_queries.create_location(location)

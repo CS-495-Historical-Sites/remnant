@@ -17,7 +17,6 @@ import LocationDetails from "../models/Location";
 import LocationSuggestion from "../models/LocationSuggestion";
 import { UpdateLocationSuggestion } from "../remnantAPI/UpdateLocationSuggestions";
 import { GetLocationAddSuggestion } from "../remnantAPI/GetLocationSuggestions";
-import { GetLocationDetails } from "../remnantAPI/GetLocation";
 
 interface UserProps {
   setToken: (token: string) => void;
@@ -89,6 +88,12 @@ const AddSuggestionPage: React.FC<UserProps> = ({ setToken, token }) => {
 
           <Typography variant="body1">
             Description: {suggestion.short_description}
+          </Typography>
+          <Typography variant="body1">
+            {/* show lat and long */}
+            Latitude: {suggestion.latitude.toFixed(4)}
+            <br />
+            Longitude: {suggestion.longitude.toFixed(4)}
           </Typography>
 
           <img

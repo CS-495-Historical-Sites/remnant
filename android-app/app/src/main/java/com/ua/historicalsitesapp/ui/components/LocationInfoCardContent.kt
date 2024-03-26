@@ -83,7 +83,11 @@ fun LocationInfoCardContent(
 
 @Composable
 private fun RenderLocationInfo(location: HsLocationComplete, onEditClick: () -> Unit) {
-  val imageLink = location.imageLink + "&width=1000"
+  var imageLink = location.imageLink
+  if (!location.imageLink.startsWith("https://remnantphotos.s3.")) {
+    imageLink = location.imageLink + "&width=1000"
+  }
+
   ImageBox(imageLink)
   Spacer(modifier = Modifier.height(6.dp))
   TitleBox(locationName = location.name, onEditClick = onEditClick)
