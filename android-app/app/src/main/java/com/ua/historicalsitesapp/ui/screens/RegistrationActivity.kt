@@ -67,54 +67,45 @@ import com.ua.historicalsitesapp.viewmodels.AuthViewModel
 import kotlinx.coroutines.delay
 
 class RegistrationActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            HistoricalSitesAppTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    val context = LocalContext.current
-                    var hasNotificationPermission by remember {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            mutableStateOf(
-                                ContextCompat.checkSelfPermission(
-                                    context,
-                                    android.Manifest.permission.POST_NOTIFICATIONS
-                                ) == PackageManager.PERMISSION_GRANTED
-                            )
-                        } else mutableStateOf(true)
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setContent {
+      HistoricalSitesAppTheme {
+        Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+          val context = LocalContext.current
+          var hasNotificationPermission by remember {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+              mutableStateOf(
+                  ContextCompat.checkSelfPermission(
+                      context, android.Manifest.permission.POST_NOTIFICATIONS) ==
+                      PackageManager.PERMISSION_GRANTED)
+            } else mutableStateOf(true)
+          }
+
+          val permissionLauncher =
+              rememberLauncherForActivityResult(
+                  contract = ActivityResultContracts.RequestPermission(),
+                  onResult = { isGranted -> hasNotificationPermission = isGranted })
+
+          Column(
+              modifier = Modifier.fillMaxSize().padding(16.dp),
+              verticalArrangement = Arrangement.Top,
+              horizontalAlignment = Alignment.CenterHorizontally) {
+                Button(
+                    onClick = {
+                      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                      }
+                    }) {
+                      Text(text = "Enable Notifications")
                     }
+              }
 
-                    val permissionLauncher = rememberLauncherForActivityResult(
-                        contract = ActivityResultContracts.RequestPermission(),
-                        onResult = {isGranted ->
-                            hasNotificationPermission = isGranted
-                        }
-                    )
-
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.Top,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Button(onClick = {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
-                            }
-                        }) {
-                            Text(text = "Enable Notifications")
-                        }
-                    }
-
-                    RegistrationMenu()
-                }
-            }
+          RegistrationMenu()
         }
+      }
     }
+  }
 }
 
 enum class PasswordValidationResult {

@@ -38,102 +38,83 @@ import com.ua.historicalsitesapp.ui.components.LocationScreen
 import com.ua.historicalsitesapp.util.hasLocationPermission
 import com.ua.historicalsitesapp.viewmodels.MainPageViewModel
 
-
 class MainPageActivity : ComponentActivity() {
   private lateinit var geofencingClient: GeofencingClient
-  private var geofenceList : ArrayList<Geofence> = ArrayList(100)
+  private var geofenceList: ArrayList<Geofence> = ArrayList(100)
+
   override fun onCreate(savedInstanceState: Bundle?) {
     geofencingClient = getGeofencingClient(this)
 
-    geofenceList.add(Geofence.Builder()
-      .setRequestId("Rengstorff House")
-      .setCircularRegion(
-        37.431456,
-        -122.0871,
-        100f
-      )
-      .setNotificationResponsiveness(1000)
-      .setExpirationDuration(Geofence.NEVER_EXPIRE)
-      .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL)
-      .setLoiteringDelay(2500)
-      .build()
-    )
+    geofenceList.add(
+        Geofence.Builder()
+            .setRequestId("Rengstorff House")
+            .setCircularRegion(37.431456, -122.0871, 100f)
+            .setNotificationResponsiveness(1000)
+            .setExpirationDuration(Geofence.NEVER_EXPIRE)
+            .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL)
+            .setLoiteringDelay(2500)
+            .build())
 
-    geofenceList.add(Geofence.Builder()
-      .setRequestId("South Engineering Research Center")
-      .setCircularRegion(
-        33.21485322073362,
-        -87.54404634485985,
-        100000f
-      )
-      .setNotificationResponsiveness(1000)
-      .setExpirationDuration(Geofence.NEVER_EXPIRE)
-      .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL)
-      .setLoiteringDelay(2500)
-      .build()
-    )
+    geofenceList.add(
+        Geofence.Builder()
+            .setRequestId("South Engineering Research Center")
+            .setCircularRegion(33.21485322073362, -87.54404634485985, 100000f)
+            .setNotificationResponsiveness(1000)
+            .setExpirationDuration(Geofence.NEVER_EXPIRE)
+            .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL)
+            .setLoiteringDelay(2500)
+            .build())
 
-    geofenceList.add(Geofence.Builder()
-      .setRequestId("Gorgas-Manly Historic District")
-      .setCircularRegion(
-        33.21225687888854,
-        -87.54574686536566,
-        100000f
-      )
-      .setNotificationResponsiveness(1000)
-      .setExpirationDuration(Geofence.NEVER_EXPIRE)
-      .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL)
-      .setLoiteringDelay(2500)
-      .build()
-    )
+    geofenceList.add(
+        Geofence.Builder()
+            .setRequestId("Gorgas-Manly Historic District")
+            .setCircularRegion(33.21225687888854, -87.54574686536566, 100000f)
+            .setNotificationResponsiveness(1000)
+            .setExpirationDuration(Geofence.NEVER_EXPIRE)
+            .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL)
+            .setLoiteringDelay(2500)
+            .build())
 
-
-    if (ActivityCompat.checkSelfPermission(
-        this,
-        Manifest.permission.ACCESS_FINE_LOCATION
-      ) != PackageManager.PERMISSION_GRANTED
-    ) {
+    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
+        PackageManager.PERMISSION_GRANTED) {
       println("No Permission")
     }
     geofencingClient.addGeofences(getGeofencingRequest(), geofencingPendingIntent).run {
-      addOnSuccessListener {
-        Log.d("Geofence", "Successfully added geofences")
-      }
-      addOnFailureListener {
-        Log.d("Geofence", "Failed to add geofences")
-      }
+      addOnSuccessListener { Log.d("Geofence", "Successfully added geofences") }
+      addOnFailureListener { Log.d("Geofence", "Failed to add geofences") }
     }
 
     super.onCreate(savedInstanceState)
 
     onBackPressedDispatcher.addCallback(
-      this,
-      object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {}
-      },
+        this,
+        object : OnBackPressedCallback(true) {
+          override fun handleOnBackPressed() {}
+        },
     )
 
     setContent {
       HistoricalSitesAppTheme {
         // A surface container using the 'background' color from the theme
         MainScreen()
-
       }
     }
   }
 
-  private fun getGeofencingRequest() : GeofencingRequest {
-    return GeofencingRequest.Builder().apply {
-      setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_DWELL)
-      addGeofences(geofenceList)
-    }.build()
+  private fun getGeofencingRequest(): GeofencingRequest {
+    return GeofencingRequest.Builder()
+        .apply {
+          setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_DWELL)
+          addGeofences(geofenceList)
+        }
+        .build()
   }
 
-  private val geofencingPendingIntent : PendingIntent by lazy {
+  private val geofencingPendingIntent: PendingIntent by lazy {
     val intent = Intent(this, GeofenceBroadcastReceiver::class.java)
-    PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+    PendingIntent.getBroadcast(
+        this, 0, intent, PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
   }
-
 }
 
 const val TAG = "INFO"
@@ -142,12 +123,12 @@ const val TAG = "INFO"
 fun MainScreen() {
   val navController = rememberNavController()
   Scaffold(
-    bottomBar = { AppBottomBar(navController = navController) },
+      bottomBar = { AppBottomBar(navController = navController) },
   ) // content:
   { paddingValues ->
     BottomNavigationGraph(
-      navController = navController,
-      modifier = Modifier.padding(paddingValues),
+        navController = navController,
+        modifier = Modifier.padding(paddingValues),
     )
   }
 }
@@ -155,8 +136,8 @@ fun MainScreen() {
 @Composable
 fun HomeScreen(modifier: Modifier) {
   Surface(
-    modifier = modifier.fillMaxSize(),
-    color = MaterialTheme.colorScheme.background,
+      modifier = modifier.fillMaxSize(),
+      color = MaterialTheme.colorScheme.background,
   ) {
     val context = LocalContext.current
 
@@ -181,5 +162,3 @@ fun HomeScreen(modifier: Modifier) {
     }
   }
 }
-
-
