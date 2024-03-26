@@ -1,6 +1,11 @@
 package com.ua.historicalsitesapp.ui.screens
 
+import android.Manifest
+import android.app.PendingIntent
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
@@ -18,8 +23,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.app.ActivityCompat
 import androidx.navigation.compose.rememberNavController
 import com.example.compose.HistoricalSitesAppTheme
+import com.google.android.gms.location.Geofence
+import com.google.android.gms.location.GeofencingClient
+import com.google.android.gms.location.GeofencingRequest
+import com.google.android.gms.location.LocationServices.getGeofencingClient
+import com.ua.historicalsitesapp.geofence.GeofenceBroadcastReceiver
 import com.ua.historicalsitesapp.nav.AppBottomBar
 import com.ua.historicalsitesapp.nav.BottomNavigationGraph
 import com.ua.historicalsitesapp.ui.components.GoogleMapsScreen
@@ -28,7 +39,51 @@ import com.ua.historicalsitesapp.util.hasLocationPermission
 import com.ua.historicalsitesapp.viewmodels.MainPageViewModel
 
 class MainPageActivity : ComponentActivity() {
+  private lateinit var geofencingClient: GeofencingClient
+  private var geofenceList: ArrayList<Geofence> = ArrayList(100)
+
   override fun onCreate(savedInstanceState: Bundle?) {
+    geofencingClient = getGeofencingClient(this)
+
+    geofenceList.add(
+        Geofence.Builder()
+            .setRequestId("Rengstorff House")
+            .setCircularRegion(37.431456, -122.0871, 100f)
+            .setNotificationResponsiveness(1000)
+            .setExpirationDuration(Geofence.NEVER_EXPIRE)
+            .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL)
+            .setLoiteringDelay(2500)
+            .build())
+
+    geofenceList.add(
+        Geofence.Builder()
+            .setRequestId("South Engineering Research Center")
+            .setCircularRegion(33.21485322073362, -87.54404634485985, 100000f)
+            .setNotificationResponsiveness(1000)
+            .setExpirationDuration(Geofence.NEVER_EXPIRE)
+            .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL)
+            .setLoiteringDelay(2500)
+            .build())
+
+    geofenceList.add(
+        Geofence.Builder()
+            .setRequestId("Gorgas-Manly Historic District")
+            .setCircularRegion(33.21225687888854, -87.54574686536566, 100000f)
+            .setNotificationResponsiveness(1000)
+            .setExpirationDuration(Geofence.NEVER_EXPIRE)
+            .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL)
+            .setLoiteringDelay(2500)
+            .build())
+
+    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
+        PackageManager.PERMISSION_GRANTED) {
+      println("No Permission")
+    }
+    geofencingClient.addGeofences(getGeofencingRequest(), geofencingPendingIntent).run {
+      addOnSuccessListener { Log.d("Geofence", "Successfully added geofences") }
+      addOnFailureListener { Log.d("Geofence", "Failed to add geofences") }
+    }
+
     super.onCreate(savedInstanceState)
 
     onBackPressedDispatcher.addCallback(
@@ -44,6 +99,21 @@ class MainPageActivity : ComponentActivity() {
         MainScreen()
       }
     }
+  }
+
+  private fun getGeofencingRequest(): GeofencingRequest {
+    return GeofencingRequest.Builder()
+        .apply {
+          setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_DWELL)
+          addGeofences(geofenceList)
+        }
+        .build()
+  }
+
+  private val geofencingPendingIntent: PendingIntent by lazy {
+    val intent = Intent(this, GeofenceBroadcastReceiver::class.java)
+    PendingIntent.getBroadcast(
+        this, 0, intent, PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
   }
 }
 
@@ -70,6 +140,7 @@ fun HomeScreen(modifier: Modifier) {
       color = MaterialTheme.colorScheme.background,
   ) {
     val context = LocalContext.current
+
     var hasPermission by remember { mutableStateOf(hasLocationPermission(context)) }
 
     LaunchedEffect(Unit) {
@@ -80,7 +151,6 @@ fun HomeScreen(modifier: Modifier) {
     if (hasPermission) {
       Box(modifier = Modifier.fillMaxSize()) {
         val view = MainPageViewModel(context)
-
         GoogleMapsScreen(view)
       }
     } else {
