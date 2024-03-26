@@ -31,7 +31,7 @@ class UserProfileViewModel(context: Context) : ViewModel() {
 
   fun submitRegistrationQuestionnaire(answers: Map<String, Set<String>>): Boolean {
     val client = getUserClient()
-    val allAnswers = QuestionnaireAnswersAddRequest(answers)
+    val allAnswers = UserProfileUpdateRequest(answers["Preferred Historical Period:"])
     return runBlocking {
       val response =
           client.post(ServerConfig.SERVER_URL + "api/user/privateinfo") {
