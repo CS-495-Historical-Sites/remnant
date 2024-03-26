@@ -83,7 +83,7 @@ def init_app(testing=False, db_uri=Config.SQLALCHEMY_DATABASE_URI):
 
     app.config.from_object(Config)
     app.config["SQLALCHEMY_DATABASE_URI"] = db_uri
-    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
+    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=24)
     app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=30)
 
     db.init_app(app)

@@ -18,7 +18,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.HistoricalSitesApp"
         tools:targetApi="31">
-
+        <activity
+            android:name=".ui.screens.SuggestLocation"
+            android:exported="false"
+            android:label="@string/title_activity_suggest_location"
+            android:theme="@style/Theme.HistoricalSitesApp" />
         <!--
              TODO: Before you run your application, you need a Google Maps API key.
 
@@ -32,9 +36,7 @@
         -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="${MAPS_API_KEY}" />
-
-        <!-- Set the QuestionnaireActivity as the launcher activity -->
+            android:value="${MAPS_API_KEY}" /> <!-- Set the QuestionnaireActivity as the launcher activity -->
         <activity
             android:name=".ui.screens.QuestionnaireActivity"
             android:exported="false"
@@ -49,13 +51,6 @@
             android:exported="false"
             android:label="@string/title_activity_main_page"
             android:theme="@style/Theme.HistoricalSitesApp">
-
-        </activity>
-        <activity
-            android:name=".ui.screens.SuggestLocation"
-            android:exported="false"
-            android:theme="@style/Theme.HistoricalSitesApp">
-
         </activity>
         <activity
             android:name=".ui.screens.RegistrationActivity"
@@ -63,6 +58,7 @@
             android:theme="@style/Theme.HistoricalSitesApp">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

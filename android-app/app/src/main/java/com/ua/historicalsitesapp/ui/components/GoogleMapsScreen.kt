@@ -5,14 +5,24 @@ import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddBox
+import androidx.compose.material.icons.filled.AddLocation
+import androidx.compose.material.icons.filled.AddLocationAlt
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FabPosition
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -54,6 +64,7 @@ import com.google.maps.android.compose.clustering.rememberClusterRenderer
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.ua.historicalsitesapp.data.model.map.ClusterItem
 import com.ua.historicalsitesapp.ui.screens.TAG
+import com.ua.historicalsitesapp.ui.theme.Typography
 import com.ua.historicalsitesapp.viewmodels.MainPageViewModel
 import kotlinx.coroutines.launch
 
@@ -131,6 +142,7 @@ fun GoogleMapsScreen(
     view: MainPageViewModel,
 ) {
   var showBottomSheet by remember { mutableStateOf(false) }
+  var showLocationSuggestionForm by remember { mutableStateOf(false) }
   var selectedLocation: ClusterItem? = null
   val items = remember { mutableStateListOf<ClusterItem>() }
 
@@ -170,6 +182,7 @@ fun GoogleMapsScreen(
   }
   val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
   val scope = rememberCoroutineScope()
+
   Scaffold(
       topBar = {
         CenterAlignedTopAppBar(
@@ -190,7 +203,17 @@ fun GoogleMapsScreen(
                     navigationIconContentColor = Color.DarkGray,
                     actionIconContentColor = MaterialTheme.colorScheme.onSecondary))
       },
-      content = { contentPadding ->
+      floatingActionButton = {
+          if (showLocationSuggestionForm) {
+              ExtendedFloatingActionButton(
+                  onClick = {  },
+                  icon = { Icon(Icons.Filled.AddLocation, "Add Location") },
+                  text = { Text(text = "Place Location") },
+              )
+          }
+      },
+      floatingActionButtonPosition = FabPosition.Center
+  ) { contentPadding ->
         ModalNavigationDrawer(
             drawerState = drawerState,
             drawerContent = {
@@ -199,7 +222,10 @@ fun GoogleMapsScreen(
                     icon = { Icon(imageVector = Icons.Default.AddBox, contentDescription = "Add") },
                     label = { Text(text = "Suggest Location") },
                     selected = false,
-                    onClick = { /*TODO*/},
+                    onClick = {
+                      showLocationSuggestionForm = true
+                      scope.launch { drawerState.apply { if (isClosed) open() else close() } }
+                    },
                     modifier =
                         Modifier.padding(contentPadding).padding(PaddingValues(vertical = 8.dp)))
                 HorizontalDivider()
@@ -215,11 +241,16 @@ fun GoogleMapsScreen(
                         MapUiSettings(myLocationButtonEnabled = false, mapToolbarEnabled = false),
                     cameraPositionState = cameraPositionState,
                 ) {
+                  if (showLocationSuggestionForm) {
+                    LocationSuggestionMarker(state = cameraPositionState.position)
+                  }
                   CustomRendererClustering(
                       items = items,
                       onLocationInfoBoxClick,
                   )
                 }
+
+
               }
               if (showBottomSheet && selectedLocation != null) {
                 LocationInfoCard(
@@ -229,5 +260,5 @@ fun GoogleMapsScreen(
                 )
               }
             }
-      })
+      }
 }
