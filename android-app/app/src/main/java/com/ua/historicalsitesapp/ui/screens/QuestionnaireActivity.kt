@@ -46,7 +46,7 @@ class QuestionnaireActivity : ComponentActivity() {
           val context = LocalContext.current
           val userProfilePageModel = UserProfileViewModel(context)
           QuestionnaireMenu(
-              onQuestionnaireCompleted = userProfilePageModel::submitRegistrationQuestionare)
+              onQuestionnaireCompleted = userProfilePageModel::submitRegistrationQuestionnaire)
         }
       }
     }
