@@ -102,7 +102,7 @@ class Location(db.Model):
             longitude=self.longitude,
             short_description=self.short_description,
             long_description=self.long_description,
-            wikidata_image_name=self.wikidata_image_name,
+            image_link=self.image_link,
             version=self.version,
         )
         db.session.add(history)
@@ -262,7 +262,7 @@ class LocationHistory(db.Model):
     longitude = db.Column(db.Float, nullable=False)
     short_description = db.Column(db.Text, nullable=True)
     long_description = db.Column(db.Text, nullable=True)
-    wikidata_image_name = db.Column(db.Text, nullable=True)
+    image_link = db.Column(db.Text, nullable=True)
     version = db.Column(db.Integer, nullable=False)
     modified_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
