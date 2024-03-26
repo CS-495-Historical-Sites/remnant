@@ -100,7 +100,7 @@ const EditSuggestionPage: React.FC<UserProps> = ({ setToken, token }) => {
   const handleApprove = async () => {
     try {
       await UpdateLocationEditSuggestion(suggestionId!, token, "approved");
-      navigate('/admin/suggestions');
+      navigate("/admin/suggestions");
     } catch (error) {
       console.error("Failed to approve suggestion", error);
     }
@@ -109,7 +109,7 @@ const EditSuggestionPage: React.FC<UserProps> = ({ setToken, token }) => {
   const handleDeny = async () => {
     try {
       await UpdateLocationEditSuggestion(suggestionId!, token, "denied");
-      navigate('/admin/suggestions'); 
+      navigate("/admin/suggestions");
     } catch (error) {
       console.error("Failed to deny suggestion", error);
     }
