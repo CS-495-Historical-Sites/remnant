@@ -21,12 +21,9 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -45,7 +42,6 @@ import com.ua.historicalsitesapp.data.model.map.HsLocationComplete
 import com.ua.historicalsitesapp.ui.foreignintents.createGoogleMapsDirectionsIntent
 import com.ua.historicalsitesapp.ui.theme.Typography
 import com.ua.historicalsitesapp.viewmodels.MainPageViewModel
-
 
 @Composable
 fun LocationInfoCardContent(
@@ -74,7 +70,7 @@ fun LocationInfoCardContent(
         modifier = Modifier.padding(horizontal = 32.dp).then(Modifier.verticalScroll(scrollState)),
     ) {
       RenderLocationInfo(location) { showEditForm = true }
-        Spacer(modifier = Modifier.height(16.dp))
+      Spacer(modifier = Modifier.height(16.dp))
       HorizontalDivider(
           thickness = 3.dp,
       )

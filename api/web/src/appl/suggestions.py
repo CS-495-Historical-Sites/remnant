@@ -1,5 +1,5 @@
 # pylint: disable=unused-argument
-from re import L
+import base64
 from flask import jsonify, Blueprint, request
 from flask_jwt_extended import jwt_required
 
@@ -36,6 +36,8 @@ def add_location_suggestion(user: User):
         latitude, longitude = data["latitude"], data["longitude"]
         name, short_desc = data["name"], data["short_description"]
         wikipedia_link = data.get("wikipedia_link", None)
+        base64_string = data["image"]
+        image_bytes = base64.b64decode(base64_string)
     except KeyError:
         return jsonify({"message": "Incomplete request"}), 400
 
