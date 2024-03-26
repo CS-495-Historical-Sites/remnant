@@ -19,6 +19,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.ua.historicalsitesapp.ui.screens.HomeScreen
 import com.ua.historicalsitesapp.ui.screens.UserProfilePage
 import com.ua.historicalsitesapp.ui.screens.FeedPage
+import androidx.activity.viewModels
+import com.ua.historicalsitesapp.ui.screens.CheckScreen
+import com.ua.historicalsitesapp.viewmodels.MainPageViewModel
 
 @Composable
 fun RowScope.AddItem(
@@ -68,7 +71,7 @@ fun BottomNavigationGraph(
     ) {
         composable(route = BottomBarScreen.Map.route) { HomeScreen(modifier) }
         composable(route = BottomBarScreen.Profile.route) { UserProfilePage(modifier) }
-        composable(route = BottomBarScreen.Home.route) { FeedPage() }
+        composable(route = BottomBarScreen.Home.route) { CheckScreen(modifier) }
     }
 }
 

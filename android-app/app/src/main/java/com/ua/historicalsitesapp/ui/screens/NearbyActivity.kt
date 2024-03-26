@@ -1,12 +1,12 @@
 package com.ua.historicalsitesapp.ui.screens
+import android.annotation.SuppressLint
 import android.os.Bundle
+import com.ua.historicalsitesapp.data.model.map.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -18,20 +18,15 @@ import androidx.compose.ui.unit.sp
 import com.example.compose.HistoricalSitesAppTheme
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
-
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.ui.platform.*
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.rounded.Favorite
-import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material.icons.Icons
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.filled.ChatBubble
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.background
@@ -39,16 +34,30 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import coil.compose.AsyncImage
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.rounded.Directions
-import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.runtime.*
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.toSize
-
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
+import com.google.android.gms.maps.model.LatLng
+import com.ua.historicalsitesapp.data.wikidata.constructWikidataImageLink
+import com.ua.historicalsitesapp.util.hasLocationPermission
+import com.ua.historicalsitesapp.viewmodels.MainPageViewModel
+import androidx.compose.runtime.*
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.maps.android.compose.rememberCameraPositionState
+import com.ua.historicalsitesapp.ui.components.GoogleMapsScreen
+import com.ua.historicalsitesapp.ui.components.LocationScreen
+import android.util.Log
 class FeedPageActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,7 +68,7 @@ class FeedPageActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    FeedPage()
+                    CheckScreen(Modifier.fillMaxSize())
                 }
             }
         }
@@ -100,8 +109,10 @@ fun HomeAppBar(){
 }
 
 @Composable
-fun HomeMainContent(){
+fun HomeMainContent(locationInfo: HsLocation){
+    val imageLink = constructWikidataImageLink(locationInfo.wikidataImageName, 40)
     val cornerRadius = 8.dp
+
     Surface(modifier = Modifier.padding(top=6.dp, bottom = 6.dp)) {
 
 
@@ -118,7 +129,7 @@ fun HomeMainContent(){
                         .padding(end = 16.dp)
                 ) {
                     AsyncImage(
-                        model = "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8UHJvZmlsZSUyMHBpY3R1cmV8ZW58MHx8MHx8fDA%3D",
+                        model = imageLink,
                         contentDescription = null,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -137,18 +148,12 @@ fun HomeMainContent(){
                         .padding(end = 16.dp)
                 ) {
                     Text(
-                        text = "Name of Location",
+                        text = locationInfo.name,
                         fontWeight = FontWeight.Normal,
                         fontSize = 18.sp
                     )
                     Text(
-                        text = "Miles away",
-                        fontWeight = FontWeight.Normal,
-                        fontStyle = FontStyle.Italic,
-                        fontSize = 10.sp
-                    )
-                    Text(
-                        text = "Tuscaloosa, Alabama",
+                        text = locationInfo.shortDescription!!,
                         fontWeight = FontWeight.Normal,
                         fontSize = 14.sp
                     )
@@ -167,7 +172,7 @@ fun HomeMainContent(){
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                    .height(40.dp),
+                        .height(40.dp),
 
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
@@ -220,20 +225,38 @@ fun HomeMainContent(){
 }
 
 
-
-
-
+@SuppressLint("MissingPermission")
 @Composable
-fun FeedPage() {
+fun FeedPage(view: MainPageViewModel) {
+    val context = LocalContext.current
+    val listOfLocationsState = remember { mutableStateOf<List<HsLocation>>(emptyList()) }
+
+    LaunchedEffect(Unit) {
+        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+        fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
+            .addOnSuccessListener { usersLocation ->
+                if (usersLocation != null) {
+                    val coordinates = LatLng(usersLocation.latitude, usersLocation.longitude)
+                    val locations = view.getHistoricalLocationNearPoint(coordinates, 8.0f)
+                    listOfLocationsState.value = locations
+                    Log.d("FeedPage", "List of locations: $locations")
+
+                }
+            }
+    }
+
+    val listOfLocations = listOfLocationsState.value
+    Log.d("FeedPage", "List of locations after effect: $listOfLocations")
+
     Scaffold(
         topBar = { HomeAppBar() },
     ) { paddingValues ->
-
         Column(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
+
         ) {
             Spacer(
                 modifier = Modifier
@@ -242,26 +265,43 @@ fun FeedPage() {
                     .background(Color.Black)
             )
             Column {
+                for (location in listOfLocations) {
 
-
-                //Main Content 1
-                HomeMainContent()
-                HomeMainContent()
-                HomeMainContent()
-
-                HomeMainContent()
-                HomeMainContent()
-                HomeMainContent()
-                HomeMainContent()
-                HomeMainContent()
-                HomeMainContent()
-
-
+                    HomeMainContent(location)
+                }
             }
-
-
         }
-
     }
 }
+
+
+@Composable
+fun CheckScreen(modifier: Modifier) {
+    Surface(
+        modifier = modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background,
+    ) {
+        val context = LocalContext.current
+        var hasPermission by remember { mutableStateOf(hasLocationPermission(context)) }
+
+        LaunchedEffect(Unit) {
+            hasPermission = hasLocationPermission(context)
+        }
+
+        if (hasPermission) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                val view = MainPageViewModel(context)
+
+                FeedPage(view)
+            }
+        } else {
+            // Show the LocationScreen if permissions are not granted
+            LocationScreen {
+                // Callback to update the state when permissions are granted
+                hasPermission = true
+            }
+        }
+    }
+}
+
 
