@@ -23,6 +23,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.SheetState
@@ -45,11 +46,10 @@ import com.ua.historicalsitesapp.ui.foreignintents.createGoogleMapsDirectionsInt
 import com.ua.historicalsitesapp.ui.theme.Typography
 import com.ua.historicalsitesapp.viewmodels.MainPageViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun LocationInfoCardContent(
     location: HsLocationComplete,
-    sheetState: SheetState,
 ) {
   val view = MainPageViewModel(LocalContext.current)
   var showEditForm by remember { mutableStateOf(false) }
@@ -73,9 +73,9 @@ fun LocationInfoCardContent(
     Column(
         modifier = Modifier.padding(horizontal = 32.dp).then(Modifier.verticalScroll(scrollState)),
     ) {
-      RenderLocationInfo(location, { showEditForm = true })
-      Spacer(modifier = Modifier.height(16.dp))
-      Divider(
+      RenderLocationInfo(location) { showEditForm = true }
+        Spacer(modifier = Modifier.height(16.dp))
+      HorizontalDivider(
           thickness = 3.dp,
       )
       Spacer(modifier = Modifier.height(16.dp))

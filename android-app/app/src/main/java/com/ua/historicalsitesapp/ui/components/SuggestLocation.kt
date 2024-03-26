@@ -88,7 +88,7 @@ fun SuggestLocationForm(
       confirmButton = {
         Button(
             onClick = {
-              val firstImage = selectedImages.get(0) ?: return@Button
+              val firstImage = selectedImages[0] ?: return@Button
               val image = readBytes(context, firstImage)
               if (image != null) {
                 onSubmitSuggestion(title, shortDescription, image)
