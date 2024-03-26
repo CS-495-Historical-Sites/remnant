@@ -15,6 +15,7 @@ from src.appl.models import (
 )
 
 from src.appl.auth import admin_required, user_required
+from src.appl.aws import upload_user_image
 from src.appl.remnant_db import suggestion_queries
 from src.appl.responses import add_suggestion_repr, edit_suggestion_repr
 from src.appl.validation import check_types
@@ -36,8 +37,7 @@ def add_location_suggestion(user: User):
         latitude, longitude = data["latitude"], data["longitude"]
         name, short_desc = data["name"], data["short_description"]
         wikipedia_link = data.get("wikipedia_link", None)
-        base64_string = data["image"]
-        image_bytes = base64.b64decode(base64_string)
+        image = base64.b64decode(data["image"])
     except KeyError:
         return jsonify({"message": "Incomplete request"}), 400
 
@@ -51,7 +51,9 @@ def add_location_suggestion(user: User):
         latitude, longitude, name, short_desc, wikipedia_link
     )
 
-    suggestion = LocationAddSuggestion(user, suggestion_req)
+    image_url = upload_user_image(image_bytes=image)
+
+    suggestion = LocationAddSuggestion(user, suggestion_req, image_url)
 
     db.session.add(suggestion)
     db.session.commit()
@@ -83,6 +85,8 @@ def add_location_edit_suggestion(user: User, location_id):
 
     if not check_types([(name, short_desc, long_desc, str)]):
         return jsonify({"message": "Invalid data submitted"}), 400
+    
+
 
     suggestion_req = LocationEditSuggestionRequest(
         location_id=location_key,
@@ -118,10 +122,27 @@ def get_location_edit_suggestion(admin: User, suggestion_id: str):
     except ValueError:
         return jsonify({"message": "Invalid suggestion ID"}), 400
 
-    suggestion = suggestion_queries.get_all_location_edit_suggestion_by_id(
+    suggestion = suggestion_queries.get_location_edit_suggestion_by_id(
         suggestion_key
     )
     return jsonify(edit_suggestion_repr(suggestion)), 200
+
+
+@suggestion_blueprint.route(
+    "/api/suggestions/locations/add/<suggestion_id>", methods=["GET"]
+)
+@jwt_required()
+@admin_required
+def get_location_add_suggestion(admin: User, suggestion_id: str):
+    try:
+        suggestion_key = int(suggestion_id)
+    except ValueError:
+        return jsonify({"message": "Invalid suggestion ID"}), 400
+
+    suggestion = suggestion_queries.get_location_add_suggestion_by_id(
+        suggestion_key
+    )
+    return jsonify(add_suggestion_repr(suggestion)), 200
 
 
 @suggestion_blueprint.route("/api/suggestions/locations/add", methods=["GET"])

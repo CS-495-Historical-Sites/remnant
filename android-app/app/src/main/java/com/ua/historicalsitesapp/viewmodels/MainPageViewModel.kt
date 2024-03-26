@@ -25,6 +25,7 @@ import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import kotlinx.coroutines.runBlocking
+import java.util.Base64
 
 class MainPageViewModel(context: Context) : ViewModel() {
   private val locationRepository = LocationRepository(LocationDataSource())
@@ -122,7 +123,7 @@ class MainPageViewModel(context: Context) : ViewModel() {
             longitude = long,
             shortDescription = shortDesc,
             wikipediaLink = null,
-            image = image)
+            image = Base64.getEncoder().encodeToString(image))
     return runBlocking {
       val response =
           client.post(ServerConfig.SERVER_URL + "/suggestions/locations/add") {

@@ -61,3 +61,25 @@ export const GetLocationEditSuggestion = async (
   }
   return response.json();
 };
+
+export const GetLocationAddSuggestion = async (
+  suggestionId: string,
+  token: string,
+  setToken: (token: string) => void,
+): Promise<LocationSuggestion> => {
+  const response = await fetch(
+    `http://localhost:8080/api/suggestions/locations/add/${suggestionId}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+  if (response.status === 401) {
+    setToken("");
+    throw new Error("Unauthorized access");
+  }
+  return response.json();
+};
+

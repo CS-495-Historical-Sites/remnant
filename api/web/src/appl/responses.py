@@ -40,6 +40,7 @@ def add_suggestion_repr(s: LocationAddSuggestion) -> dict:
         "longitude": s.longitude,
         "short_description": s.short_description,
         "wikipedia_link": s.wikipedia_link,
+        "image_url": s.image_url,
     }
 
 

@@ -202,14 +202,16 @@ class LocationAddSuggestion(db.Model):
     name = db.Column(db.String(120), index=True, unique=False, nullable=False)
     short_description = db.Column(db.Text, nullable=False)
     wikipedia_link = db.Column(db.Text, nullable=True)
+    image_url = db.Column(db.Text, nullable=True)
 
-    def __init__(self, user: User, req: LocationAddSuggestionRequest):
+    def __init__(self, user: User, req: LocationAddSuggestionRequest, image_url: str):
         self.user_id = user.id
         self.latitude = req.latitude
         self.longitude = req.longitude
         self.name = req.name
         self.short_description = req.short_description
         self.wikipedia_link = req.wikipedia_link
+        self.image_url = image_url
 
 
 class LocationEditSuggestion(db.Model):

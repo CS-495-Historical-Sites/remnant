@@ -14,9 +14,9 @@ import {
 } from "@mui/material";
 
 import LocationDetails from "../models/Location";
-import LocationEditSuggestions from "../models/LocationSuggestion";
-import { UpdateLocationSuggestion } from "../remnantAPI/UpdateLocationSuggestions";
-import { GetLocationEditSuggestion } from "../remnantAPI/GetLocationSuggestions";
+import LocationSuggestion from "../models/LocationSuggestion";
+import {  UpdateLocationSuggestion } from "../remnantAPI/UpdateLocationSuggestions";
+import { GetLocationAddSuggestion } from "../remnantAPI/GetLocationSuggestions";
 import { GetLocationDetails } from "../remnantAPI/GetLocation";
 
 interface UserProps {
@@ -24,10 +24,9 @@ interface UserProps {
   token: string;
 }
 
-const EditSuggestionPage: React.FC<UserProps> = ({ setToken, token }) => {
+const AddSuggestionPage: React.FC<UserProps> = ({ setToken, token }) => {
   const { suggestionId } = useParams<{ suggestionId: string }>();
-  const [suggestion, setSuggestion] = useState<LocationEditSuggestions>();
-  const [currentDetails, setCurrentDetails] = useState<LocationDetails>();
+  const [suggestion, setSuggestion] = useState<LocationSuggestion>();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const navigate = useNavigate();
 
@@ -35,18 +34,12 @@ const EditSuggestionPage: React.FC<UserProps> = ({ setToken, token }) => {
     const fetchData = async () => {
       if (suggestionId) {
         try {
-          const suggestionData = await GetLocationEditSuggestion(
+          const suggestionData = await GetLocationAddSuggestion(
             suggestionId,
             token,
             setToken,
           );
           setSuggestion(suggestionData);
-          const currentData = await GetLocationDetails(
-            suggestionData.location_id.toString(),
-            token,
-            setToken,
-          );
-          setCurrentDetails(currentData);
         } catch (error) {
           console.error("Failed to fetch data", error);
         } finally {
@@ -57,49 +50,9 @@ const EditSuggestionPage: React.FC<UserProps> = ({ setToken, token }) => {
     fetchData();
   }, [suggestionId, token]);
 
-  // Implement comparison logic here (as an example, this could be more elaborate)
-  const renderDifferences = () => {
-    if (!suggestion || !currentDetails) return null;
-    // Example comparison, extend according to your data structure
-    const diffs = [
-      {
-        label: "Name",
-        current: currentDetails.name,
-        suggested: suggestion.name,
-      },
-      {
-        label: "Short Description",
-        current: currentDetails.short_description,
-        suggested: suggestion.short_description,
-      },
-    ].filter((diff) => diff.current !== diff.suggested);
-
-    return diffs.length ? (
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>Field</TableCell>
-            <TableCell>Current Value</TableCell>
-            <TableCell>Suggested Value</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {diffs.map((diff, index) => (
-            <TableRow key={index}>
-              <TableCell>{diff.label}</TableCell>
-              <TableCell>{diff.current}</TableCell>
-              <TableCell>{diff.suggested}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    ) : (
-      <Typography>No differences found.</Typography>
-    );
-  };
   const handleApprove = async () => {
     try {
-      await UpdateLocationSuggestion(suggestionId!, token, "edit", "approved");
+      await UpdateLocationSuggestion(suggestionId!, token, "add", "approved");
       navigate("/admin/suggestions");
     } catch (error) {
       console.error("Failed to approve suggestion", error);
@@ -108,7 +61,7 @@ const EditSuggestionPage: React.FC<UserProps> = ({ setToken, token }) => {
 
   const handleDeny = async () => {
     try {
-      await UpdateLocationSuggestion(suggestionId!, token, "edit", "denied");
+      await UpdateLocationSuggestion(suggestionId!, token, "add", "denied");
       navigate("/admin/suggestions");
     } catch (error) {
       console.error("Failed to deny suggestion", error);
@@ -121,12 +74,12 @@ const EditSuggestionPage: React.FC<UserProps> = ({ setToken, token }) => {
   return (
     <Paper elevation={3} style={{ padding: "20px", margin: "20px" }}>
       <Typography variant="h4" gutterBottom>
-        Edit Suggestion Details
+        Location Suggestion Details
       </Typography>
-      {suggestion && currentDetails ? (
+      {suggestion  ? (
         <Box>
           <Typography variant="h5" gutterBottom>
-            Edit Suggestion for {currentDetails.name}
+            Location Suggest: {suggestion.name}
           </Typography>
 
           <Typography variant="body1">
@@ -134,7 +87,13 @@ const EditSuggestionPage: React.FC<UserProps> = ({ setToken, token }) => {
             {new Date(suggestion.suggestion_time).toLocaleDateString()}
           </Typography>
 
-          {renderDifferences()}
+          <Typography variant="body1">
+            Description: {suggestion.short_description}
+          </Typography>
+
+          
+          <img src={suggestion.image_url} alt={suggestion.wikidata_image_name} style={{width: "200px", height: "200px"}}/>  
+
 
           {/* Approval and Denial Buttons */}
           <div style={{ marginTop: "20px" }}>
@@ -158,4 +117,4 @@ const EditSuggestionPage: React.FC<UserProps> = ({ setToken, token }) => {
   );
 };
 
-export default EditSuggestionPage;
+export default AddSuggestionPage;
