@@ -6,6 +6,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.ua.historicalsitesapp.data.model.auth.LoggedInUser
 import com.ua.historicalsitesapp.data.model.map.HsLocation
 import com.ua.historicalsitesapp.data.model.map.HsLocationComplete
+import com.ua.historicalsitesapp.data.model.suggestions.LocationAddSuggestion
 import com.ua.historicalsitesapp.data.model.suggestions.LocationEditSuggestion
 import com.ua.historicalsitesapp.data.model.visits.GetUserVisitedLocationsResponse
 import com.ua.historicalsitesapp.data.model.visits.VisitAddRequest
@@ -95,13 +96,32 @@ class MainPageViewModel(context: Context) : ViewModel() {
       longDesc: String
   ): Boolean {
     val client = getUserClient()
-    val visitInfo = LocationEditSuggestion(name, shortDesc, longDesc)
+    val editSuggestion = LocationEditSuggestion(name, shortDesc, longDesc)
     return runBlocking {
       val response =
           client.post(ServerConfig.SERVER_URL + "/suggestions/locations/edit/" + locationId) {
             contentType(ContentType.Application.Json)
-            setBody(visitInfo)
+            setBody(editSuggestion)
           }
+      return@runBlocking response.status.value == 200
+    }
+  }
+
+  fun sendLocationAddRequest(
+    name: String,
+    lat: Double,
+    long: Double,
+    shortDesc: String,
+    image: ByteArray
+  ): Boolean {
+    val client = getUserClient()
+    val addSuggestion = LocationAddSuggestion(name = name, latitude = lat, longitude = long, shortDescription = shortDesc, wikipediaLink = null, image = image)
+    return runBlocking {
+      val response =
+        client.post(ServerConfig.SERVER_URL + "/suggestions/locations/add") {
+          contentType(ContentType.Application.Json)
+          setBody(addSuggestion)
+        }
       return@runBlocking response.status.value == 200
     }
   }

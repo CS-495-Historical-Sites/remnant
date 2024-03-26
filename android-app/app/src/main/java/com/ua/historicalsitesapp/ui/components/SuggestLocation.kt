@@ -1,6 +1,17 @@
 package com.ua.historicalsitesapp.ui.components
 
+import android.content.Context
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedButton
@@ -11,32 +22,96 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import java.io.File
+import java.io.IOException
+import java.net.URI
+import java.nio.file.Files
+import java.nio.file.Paths
+
+
+@Throws(IOException::class)
+private fun readBytes(context: Context, uri: Uri): ByteArray? =
+    context.contentResolver.openInputStream(uri)?.buffered()?.use { it.readBytes() }
 
 @Composable
-fun SuggestLocationForm(onSubmitSuggestion: (String, String) -> Unit, onDismiss: () -> Unit) {
+fun SuggestLocationForm(onSubmitSuggestion: (String, String, ByteArray) -> Unit, onDismiss: () -> Unit) {
+    val context = LocalContext.current
   var title by remember { mutableStateOf("") }
   var shortDescription by remember { mutableStateOf("") }
+  var selectedImages by remember { mutableStateOf<List<Uri?>>(emptyList()) }
+
+  val singlePhotoPickerLauncher =
+      rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        selectedImages = listOf(uri)
+      }
+
+  val multiplePhotoPickerLauncher =
+      rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia()) { uris ->
+        selectedImages = uris
+      }
 
   AlertDialog(
       onDismissRequest = { onDismiss() },
-      title = { Text("Suggest an Edit") },
+      title = { Text("Add Location") },
       text = {
-        Column {
-          TextField(value = title, onValueChange = { title = it }, label = { Text("Name") })
+        Column(modifier = Modifier.padding(16.dp)) {
+          TextField(
+              value = title,
+              onValueChange = { title = it },
+              label = { Text("Name") },
+              modifier = Modifier.fillMaxWidth())
+          Spacer(modifier = Modifier.height(8.dp))
           TextField(
               value = shortDescription,
               onValueChange = { shortDescription = it },
-              label = { Text("Short Description") })
+              label = { Text("Short Description") },
+              modifier = Modifier.fillMaxWidth())
+          Spacer(modifier = Modifier.height(8.dp))
+          Button(
+              onClick = {
+                singlePhotoPickerLauncher.launch(
+                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+              },
+              modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                Text("Upload Photo")
+              }
+          Spacer(modifier = Modifier.height(8.dp))
+          if (selectedImages.isNotEmpty()) {
+            ImageLayoutView(selectedImages = selectedImages)
+          }
         }
       },
       confirmButton = {
         Button(
             onClick = {
-              onSubmitSuggestion(title, shortDescription)
+                val firstImage = selectedImages.get(0) ?: return@Button
+                val image =readBytes(context, firstImage)
+                if (image != null) {
+                    onSubmitSuggestion(title, shortDescription, image)
+                }
               onDismiss()
             }) {
               Text("Submit")
             }
       },
       dismissButton = { OutlinedButton(onClick = { onDismiss() }) { Text("Cancel") } })
+}
+
+@Composable
+fun ImageLayoutView(selectedImages: List<Uri?>) {
+  LazyRow(modifier = Modifier) {
+    items(selectedImages) { uri ->
+      AsyncImage(
+          model = uri,
+          contentDescription = null,
+          modifier = Modifier.fillMaxWidth().height(150.dp).padding(4.dp),
+          contentScale = ContentScale.Crop)
+    }
+  }
 }

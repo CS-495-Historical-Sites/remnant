@@ -1,4 +1,5 @@
 # pylint: disable=unused-argument
+from re import L
 from flask import jsonify, Blueprint, request
 from flask_jwt_extended import jwt_required
 
@@ -29,6 +30,7 @@ suggestion_blueprint = Blueprint(
 @jwt_required()
 @user_required
 def add_location_suggestion(user: User):
+    LOGGER.info("Adding location suggestion")
     data = request.get_json()
     try:
         latitude, longitude = data["latitude"], data["longitude"]
