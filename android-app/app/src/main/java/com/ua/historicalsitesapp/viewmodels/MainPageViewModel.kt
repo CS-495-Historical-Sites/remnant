@@ -108,20 +108,27 @@ class MainPageViewModel(context: Context) : ViewModel() {
   }
 
   fun sendLocationAddRequest(
-    name: String,
-    lat: Double,
-    long: Double,
-    shortDesc: String,
-    image: ByteArray
+      name: String,
+      lat: Double,
+      long: Double,
+      shortDesc: String,
+      image: ByteArray
   ): Boolean {
     val client = getUserClient()
-    val addSuggestion = LocationAddSuggestion(name = name, latitude = lat, longitude = long, shortDescription = shortDesc, wikipediaLink = null, image = image)
+    val addSuggestion =
+        LocationAddSuggestion(
+            name = name,
+            latitude = lat,
+            longitude = long,
+            shortDescription = shortDesc,
+            wikipediaLink = null,
+            image = image)
     return runBlocking {
       val response =
-        client.post(ServerConfig.SERVER_URL + "/suggestions/locations/add") {
-          contentType(ContentType.Application.Json)
-          setBody(addSuggestion)
-        }
+          client.post(ServerConfig.SERVER_URL + "/suggestions/locations/add") {
+            contentType(ContentType.Application.Json)
+            setBody(addSuggestion)
+          }
       return@runBlocking response.status.value == 200
     }
   }

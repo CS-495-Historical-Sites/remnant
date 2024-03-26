@@ -28,20 +28,18 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import java.io.File
 import java.io.IOException
-import java.net.URI
-import java.nio.file.Files
-import java.nio.file.Paths
-
 
 @Throws(IOException::class)
 private fun readBytes(context: Context, uri: Uri): ByteArray? =
     context.contentResolver.openInputStream(uri)?.buffered()?.use { it.readBytes() }
 
 @Composable
-fun SuggestLocationForm(onSubmitSuggestion: (String, String, ByteArray) -> Unit, onDismiss: () -> Unit) {
-    val context = LocalContext.current
+fun SuggestLocationForm(
+    onSubmitSuggestion: (String, String, ByteArray) -> Unit,
+    onDismiss: () -> Unit
+) {
+  val context = LocalContext.current
   var title by remember { mutableStateOf("") }
   var shortDescription by remember { mutableStateOf("") }
   var selectedImages by remember { mutableStateOf<List<Uri?>>(emptyList()) }
@@ -90,11 +88,11 @@ fun SuggestLocationForm(onSubmitSuggestion: (String, String, ByteArray) -> Unit,
       confirmButton = {
         Button(
             onClick = {
-                val firstImage = selectedImages.get(0) ?: return@Button
-                val image =readBytes(context, firstImage)
-                if (image != null) {
-                    onSubmitSuggestion(title, shortDescription, image)
-                }
+              val firstImage = selectedImages.get(0) ?: return@Button
+              val image = readBytes(context, firstImage)
+              if (image != null) {
+                onSubmitSuggestion(title, shortDescription, image)
+              }
               onDismiss()
             }) {
               Text("Submit")

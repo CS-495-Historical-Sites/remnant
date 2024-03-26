@@ -20,8 +20,8 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
-import kotlinx.serialization.json.Json
 import java.io.IOException
+import kotlinx.serialization.json.Json
 
 /** Class that handles authentication w/ login credentials and retrieves user information. */
 class LoginDataSource {

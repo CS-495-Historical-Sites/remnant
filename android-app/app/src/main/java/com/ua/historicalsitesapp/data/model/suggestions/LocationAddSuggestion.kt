@@ -3,8 +3,6 @@ package com.ua.historicalsitesapp.data.model.suggestions
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-
-
 @Suppress("ArrayInDataClass")
 @Serializable
 data class LocationAddSuggestion(

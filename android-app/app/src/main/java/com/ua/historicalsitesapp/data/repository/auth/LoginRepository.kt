@@ -13,13 +13,13 @@ import com.ua.historicalsitesapp.data.model.auth.RegistrationDetails
 import com.ua.historicalsitesapp.data.model.auth.RegistrationResult
 import com.ua.historicalsitesapp.data.repository.auth.LoginDataSource.LogoutResult
 import com.ua.historicalsitesapp.util.Result
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
 import java.security.KeyStore
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 
 /**
  * Class that requests authentication and user information from the remote data source and maintains

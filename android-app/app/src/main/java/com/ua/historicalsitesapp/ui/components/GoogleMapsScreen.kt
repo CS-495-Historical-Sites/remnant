@@ -236,9 +236,17 @@ fun GoogleMapsScreen(
               Box(modifier = Modifier.padding(contentPadding)) {
                 if (showAddLocationDialog) {
                   SuggestLocationForm(
-                      onSubmitSuggestion = { name: String, shortDescription: String, image: ByteArray ->
-                          val cameraLocation = cameraPositionState.position.target
-                          view.sendLocationAddRequest(name = name, lat = cameraLocation.latitude, cameraLocation.longitude, shortDesc = shortDescription, image = image)
+                      onSubmitSuggestion = {
+                          name: String,
+                          shortDescription: String,
+                          image: ByteArray ->
+                        val cameraLocation = cameraPositionState.position.target
+                        view.sendLocationAddRequest(
+                            name = name,
+                            lat = cameraLocation.latitude,
+                            cameraLocation.longitude,
+                            shortDesc = shortDescription,
+                            image = image)
                       },
                       onDismiss = {
                         showAddLocationDialog = false
@@ -265,4 +273,3 @@ fun GoogleMapsScreen(
             }
       }
 }
-
