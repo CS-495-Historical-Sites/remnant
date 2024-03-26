@@ -15,7 +15,7 @@ import {
 
 import LocationDetails from "../models/Location";
 import LocationSuggestion from "../models/LocationSuggestion";
-import {  UpdateLocationSuggestion } from "../remnantAPI/UpdateLocationSuggestions";
+import { UpdateLocationSuggestion } from "../remnantAPI/UpdateLocationSuggestions";
 import { GetLocationAddSuggestion } from "../remnantAPI/GetLocationSuggestions";
 import { GetLocationDetails } from "../remnantAPI/GetLocation";
 
@@ -76,7 +76,7 @@ const AddSuggestionPage: React.FC<UserProps> = ({ setToken, token }) => {
       <Typography variant="h4" gutterBottom>
         Location Suggestion Details
       </Typography>
-      {suggestion  ? (
+      {suggestion ? (
         <Box>
           <Typography variant="h5" gutterBottom>
             Location Suggest: {suggestion.name}
@@ -91,9 +91,11 @@ const AddSuggestionPage: React.FC<UserProps> = ({ setToken, token }) => {
             Description: {suggestion.short_description}
           </Typography>
 
-          
-          <img src={suggestion.image_url} alt={suggestion.wikidata_image_name} style={{width: "200px", height: "200px"}}/>  
-
+          <img
+            src={suggestion.image_url}
+            alt={suggestion.wikidata_image_name}
+            style={{ width: "200px", height: "200px" }}
+          />
 
           {/* Approval and Denial Buttons */}
           <div style={{ marginTop: "20px" }}>

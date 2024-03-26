@@ -82,4 +82,3 @@ export const GetLocationAddSuggestion = async (
   }
   return response.json();
 };
-

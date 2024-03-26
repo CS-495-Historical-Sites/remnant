@@ -3,9 +3,6 @@ package com.ua.historicalsitesapp.data.model.suggestions
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-import java.util.Base64
-
-
 @Serializable
 data class LocationAddSuggestion(
     val name: String,

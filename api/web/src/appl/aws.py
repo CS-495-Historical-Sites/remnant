@@ -1,13 +1,14 @@
 import uuid
-import logging 
+import logging
 
 from src.appl.config import Config
 
 from botocore.exceptions import ClientError
 
+
 def upload_user_image(image_bytes: bytes):
     # Your bucket name
-    bucket_name = 'remnantphotos'
+    bucket_name = "remnantphotos"
 
     # Generate a random file name
     file_name = f"{uuid.uuid4()}.jpg"

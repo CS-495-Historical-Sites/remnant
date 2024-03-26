@@ -1,5 +1,7 @@
 # pylint: disable=unused-argument, line-too-long
+import base64
 import pytest
+from sqlalchemy.engine import base
 
 
 from src.tests import helpers

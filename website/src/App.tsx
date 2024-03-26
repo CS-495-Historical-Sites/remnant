@@ -46,7 +46,7 @@ function App() {
               element={<AddSuggestionPage setToken={setToken} token={token} />}
             />
           )}
-                    {!token && (
+          {!token && (
             <Route
               path="/admin/add-suggestion/:suggestionId"
               element={<Login setToken={setToken} />}

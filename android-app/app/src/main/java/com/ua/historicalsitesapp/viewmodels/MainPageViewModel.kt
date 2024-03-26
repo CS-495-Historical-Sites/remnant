@@ -24,8 +24,8 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
-import kotlinx.coroutines.runBlocking
 import java.util.Base64
+import kotlinx.coroutines.runBlocking
 
 class MainPageViewModel(context: Context) : ViewModel() {
   private val locationRepository = LocationRepository(LocationDataSource())

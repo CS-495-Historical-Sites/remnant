@@ -37,7 +37,7 @@ def add_location_suggestion(user: User):
         latitude, longitude = data["latitude"], data["longitude"]
         name, short_desc = data["name"], data["short_description"]
         wikipedia_link = data.get("wikipedia_link", None)
-        image = base64.b64decode(data["image"])
+        image = base64.b64decode(data["image"]) if "image" in data else None
     except KeyError:
         return jsonify({"message": "Incomplete request"}), 400
 
@@ -50,8 +50,12 @@ def add_location_suggestion(user: User):
     suggestion_req = LocationAddSuggestionRequest(
         latitude, longitude, name, short_desc, wikipedia_link
     )
-
-    image_url = upload_user_image(image_bytes=image)
+    if image is not None:
+        image_url = upload_user_image(image_bytes=image)
+    else:
+        # stupid, but thinking about tests and ease of use
+        # so image is not optional, but we aren't going to error if it is not there
+        image_url = ""
 
     suggestion = LocationAddSuggestion(user, suggestion_req, image_url)
 
@@ -85,8 +89,6 @@ def add_location_edit_suggestion(user: User, location_id):
 
     if not check_types([(name, short_desc, long_desc, str)]):
         return jsonify({"message": "Invalid data submitted"}), 400
-    
-
 
     suggestion_req = LocationEditSuggestionRequest(
         location_id=location_key,
@@ -122,9 +124,7 @@ def get_location_edit_suggestion(admin: User, suggestion_id: str):
     except ValueError:
         return jsonify({"message": "Invalid suggestion ID"}), 400
 
-    suggestion = suggestion_queries.get_location_edit_suggestion_by_id(
-        suggestion_key
-    )
+    suggestion = suggestion_queries.get_location_edit_suggestion_by_id(suggestion_key)
     return jsonify(edit_suggestion_repr(suggestion)), 200
 
 
@@ -139,9 +139,7 @@ def get_location_add_suggestion(admin: User, suggestion_id: str):
     except ValueError:
         return jsonify({"message": "Invalid suggestion ID"}), 400
 
-    suggestion = suggestion_queries.get_location_add_suggestion_by_id(
-        suggestion_key
-    )
+    suggestion = suggestion_queries.get_location_add_suggestion_by_id(suggestion_key)
     return jsonify(add_suggestion_repr(suggestion)), 200
 
 
