@@ -269,6 +269,7 @@ class LocationHistory(db.Model):
         "Location", backref=db.backref("history", lazy="dynamic")
     )
 
+
 class AWSBucket(db.Model):
     __tablename__ = "aws_bucket"
     metadata = program_metadata

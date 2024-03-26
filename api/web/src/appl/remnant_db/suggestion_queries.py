@@ -18,6 +18,7 @@ def get_location_edit_suggestion_by_id(
 ) -> LocationEditSuggestion | None:
     return LocationEditSuggestion.query.filter_by(id=suggestion_id).first()
 
+
 def get_location_add_suggestion_by_id(
     suggestion_id: int,
 ) -> LocationAddSuggestion | None:

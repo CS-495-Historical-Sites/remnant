@@ -45,7 +45,7 @@ def init_db_with_sources_file(app):
             short_desc = location["short_description"]
             long_desc = location["long_description"]
             coordinates = location["coordinates"]
-            
+
             image_name = location["wikidata_image_name"]
             image_name = f"https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/{image_name}"
             if not coordinates:

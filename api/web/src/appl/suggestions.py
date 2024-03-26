@@ -147,9 +147,7 @@ def handle_approval_result_for_location_edit(admin: User, suggestion_id: str):
     except ValueError:
         return jsonify({"message": "Invalid suggestion ID"}), 400
 
-    suggestion = suggestion_queries.get_location_edit_suggestion_by_id(
-        suggestion_id
-    )
+    suggestion = suggestion_queries.get_location_edit_suggestion_by_id(suggestion_id)
 
     if suggestion is None:
         return jsonify({"message": "Suggestion not found"}), 404
@@ -167,7 +165,6 @@ def handle_approval_result_for_location_edit(admin: User, suggestion_id: str):
         location = location_queries.get_location(suggestion.location_id)
         location.apply_edit_suggestion(suggestion)
         db.session.commit()
-
 
     return jsonify({"message": "Suggestion status updated"}), 200
 
@@ -189,9 +186,7 @@ def handle_approval_result_for_location_add(admin: User, suggestion_id: str):
     except ValueError:
         return jsonify({"message": "Invalid suggestion ID"}), 400
 
-    suggestion = suggestion_queries.get_location_add_suggestion_by_id(
-        suggestion_id
-    )
+    suggestion = suggestion_queries.get_location_add_suggestion_by_id(suggestion_id)
 
     if suggestion is None:
         return jsonify({"message": "Suggestion not found"}), 404
@@ -215,6 +210,5 @@ def handle_approval_result_for_location_add(admin: User, suggestion_id: str):
             long_description="",
         )
         location_queries.create_location(location)
-
 
     return jsonify({"message": "Suggestion status updated"}), 200
