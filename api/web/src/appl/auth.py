@@ -77,7 +77,7 @@ def register():
         return jsonify({"message": "Invalid credentials entered"}), 422
 
     registration_info = RegistrationRequest(
-        username=username, email=email, password=non_hash_password, interested_eras="none"
+        username=username, email=email, password=non_hash_password, interested_eras=None
     )
 
     LOGGER.debug(f"Attempting to register {registration_info.email}")

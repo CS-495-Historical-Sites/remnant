@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 from typing import TypedDict
-
+from typing import Set
 
 from sqlalchemy import MetaData, UniqueConstraint
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -14,7 +14,7 @@ class RegistrationRequest:
     username: str
     email: str
     password: str
-    interested_eras: str
+    interested_eras: Set[str]
     requesting_admin: bool = False
 
 
@@ -137,7 +137,7 @@ class User(db.Model):
     is_admin = db.Column(db.Boolean, default=False)
 
     def __init__(
-        self, username: str, email: str, supplied_password: str, interested_eras: str, is_admin=False
+        self, username: str, email: str, supplied_password: str, interested_eras: Set[str], is_admin=False
     ):
         self.username = username
         self.email = email
