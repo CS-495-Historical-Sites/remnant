@@ -58,6 +58,15 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import com.ua.historicalsitesapp.ui.components.GoogleMapsScreen
 import com.ua.historicalsitesapp.ui.components.LocationScreen
 import android.util.Log
+import androidx.compose.foundation.lazy.LazyColumn
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.launch
+import android.content.Context
+import androidx.compose.ui.Alignment
+import com.ua.historicalsitesapp.ui.foreignintents.createGoogleMapsDirectionsIntent
+
 class FeedPageActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,17 +84,6 @@ class FeedPageActivity : ComponentActivity() {
     }
 }
 
-//@Composable
-//fun Menu(){
-//    var expanded by remember { mutableStateOf( false ) }
-//    val radius = listOf("5", "10", "25", "50")
-//
-//    var mSelectedText by remember { mutableStateOf("") }
-//
-//    var mTextFieldSize by remember { mutableStateOf(Size.Zero)}
-//
-//
-//}
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeAppBar(){
@@ -99,19 +97,15 @@ fun HomeAppBar(){
             )
         },
         actions = {
-
-
         }
-
     )
-
-
 }
 
 @Composable
 fun HomeMainContent(locationInfo: HsLocation){
     val imageLink = constructWikidataImageLink(locationInfo.wikidataImageName, 40)
     val cornerRadius = 8.dp
+    val context = LocalContext.current
 
     Surface(modifier = Modifier.padding(top=6.dp, bottom = 6.dp)) {
 
@@ -155,7 +149,7 @@ fun HomeMainContent(locationInfo: HsLocation){
                     Text(
                         text = locationInfo.shortDescription!!,
                         fontWeight = FontWeight.Normal,
-                        fontSize = 14.sp
+                        fontSize = 10.sp
                     )
                 }
 
@@ -180,7 +174,7 @@ fun HomeMainContent(locationInfo: HsLocation){
                     Box(
                         modifier = Modifier
                             .weight(1f)
-                            .clickable(onClick = { /* Click action for the first button */ })
+                            .clickable(onClick = {  })
                             .height(40.dp),
                         contentAlignment = Alignment.Center
                     ) {
@@ -201,7 +195,13 @@ fun HomeMainContent(locationInfo: HsLocation){
                     Box(
                         modifier = Modifier
                             .weight(1f)
-                            .clickable(onClick = {})
+                            .clickable(onClick = {val intent =
+                                createGoogleMapsDirectionsIntent(
+                                    locationInfo.latitude,
+                                    locationInfo.longitude,
+                                    locationInfo.name,
+                                )
+                                context.startActivity(intent)})
                             .height(40.dp),
                         contentAlignment = Alignment.Center
 
@@ -224,52 +224,76 @@ fun HomeMainContent(locationInfo: HsLocation){
 
 }
 
-
 @SuppressLint("MissingPermission")
 @Composable
-fun FeedPage(view: MainPageViewModel) {
-    val context = LocalContext.current
+fun FeedPage(view: MainPageViewModel,context: Context) {
     val listOfLocationsState = remember { mutableStateOf<List<HsLocation>>(emptyList()) }
+    val errorMessage = remember { mutableStateOf<String?>(null) }
+    val isLoading = remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
+
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
-        fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
-            .addOnSuccessListener { usersLocation ->
-                if (usersLocation != null) {
-                    val coordinates = LatLng(usersLocation.latitude, usersLocation.longitude)
-                    val locations = view.getHistoricalLocationNearPoint(coordinates, 8.0f)
-                    listOfLocationsState.value = locations
-                    Log.d("FeedPage", "List of locations: $locations")
-
+        try {
+            fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
+                .addOnSuccessListener { usersLocation ->
+                    if (usersLocation != null) {
+                        val coordinates =
+                            LatLng(usersLocation.latitude, usersLocation.longitude)
+                        val fetchedLocations =
+                            view.getHistoricalLocationNearPoint(coordinates, 40.0f)
+                        listOfLocationsState.value = fetchedLocations
+                    } else {
+                        errorMessage.value = "User location not available"
+                        Log.d("FeedPage", errorMessage.value!!)
+                    }
+                    isLoading.value = false
                 }
-            }
+                .addOnFailureListener { e ->
+                    errorMessage.value = "Failed to fetch user location: ${e.message}"
+                    Log.e("FeedPage", errorMessage.value!!)
+                }
+        } catch (e: Exception) {
+            errorMessage.value = "Exception in fetching location: ${e.message}"
+            Log.e("FeedPage", errorMessage.value!!)
+        }
     }
-
-    val listOfLocations = listOfLocationsState.value
-    Log.d("FeedPage", "List of locations after effect: $listOfLocations")
 
     Scaffold(
         topBar = { HomeAppBar() },
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-
-        ) {
-            Spacer(
+        if (isLoading.value) {
+            Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                CircularProgressIndicator()
+            }
+        } else {
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(.5.dp)
-                    .background(Color.Black)
-            )
-            Column {
-                for (location in listOfLocations) {
+                    .padding(paddingValues)
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
 
-                    HomeMainContent(location)
+            ) {
+                Spacer(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(.5.dp)
+                        .background(Color.Black)
+                )
+                Column {
+
+                    Log.d("FeedPage", "List $listOfLocationsState")
+//                    for (location in listOfLocationsState.value) {
+//                        HomeMainContent(location)
+//                    }
+                    listOfLocationsState.value.take(3).forEach { location ->
+                        HomeMainContent(location)
+                    }
                 }
             }
+        }
+        if (errorMessage.value != null) {
+            Text("Error: ${errorMessage.value}", color = Color.Red)
         }
     }
 }
@@ -291,13 +315,10 @@ fun CheckScreen(modifier: Modifier) {
         if (hasPermission) {
             Box(modifier = Modifier.fillMaxSize()) {
                 val view = MainPageViewModel(context)
-
-                FeedPage(view)
+                FeedPage(view = view, context = context)
             }
         } else {
-            // Show the LocationScreen if permissions are not granted
             LocationScreen {
-                // Callback to update the state when permissions are granted
                 hasPermission = true
             }
         }
