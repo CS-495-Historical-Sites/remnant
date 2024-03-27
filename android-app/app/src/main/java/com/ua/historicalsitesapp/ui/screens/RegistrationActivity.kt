@@ -364,7 +364,7 @@ private fun RegistrationMenu(modifier: Modifier = Modifier) {
         title = {
           Text(
               text = "We already have an account associated with this email!",
-              textAlign = TextAlign.Center,
+              textAlign = TextAlign.Left,
               modifier = Modifier.padding(top = 16.dp, bottom = 8.dp))
         },
         text = {

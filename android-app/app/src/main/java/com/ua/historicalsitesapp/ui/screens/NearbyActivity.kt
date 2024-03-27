@@ -17,17 +17,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.compose.HistoricalSitesAppTheme
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
+import kotlin.math.*
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.ui.platform.*
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.Icons
-import androidx.compose.ui.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.background
 import androidx.compose.runtime.mutableStateOf
@@ -35,7 +33,6 @@ import androidx.compose.ui.graphics.Color
 import coil.compose.AsyncImage
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.material.icons.rounded.Directions
-import androidx.compose.runtime.*
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -50,23 +47,13 @@ import com.google.android.gms.maps.model.LatLng
 import com.ua.historicalsitesapp.data.wikidata.constructWikidataImageLink
 import com.ua.historicalsitesapp.util.hasLocationPermission
 import com.ua.historicalsitesapp.viewmodels.MainPageViewModel
-import androidx.compose.runtime.*
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.maps.android.compose.rememberCameraPositionState
-import com.ua.historicalsitesapp.ui.components.GoogleMapsScreen
 import com.ua.historicalsitesapp.ui.components.LocationScreen
 import android.util.Log
-import androidx.compose.foundation.lazy.LazyColumn
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.launch
 import android.content.Context
 import androidx.compose.ui.Alignment
 import com.ua.historicalsitesapp.ui.foreignintents.createGoogleMapsDirectionsIntent
-
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 class FeedPageActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -139,18 +126,18 @@ fun HomeMainContent(locationInfo: HsLocation){
                 Column(
                     Modifier
                         .weight(6f)
-                        .padding(end = 16.dp)
+                        .padding(bottom = 40.dp)
                 ) {
                     Text(
                         text = locationInfo.name,
                         fontWeight = FontWeight.Normal,
-                        fontSize = 18.sp
+                        fontSize = 15.sp
                     )
-                    Text(
-                        text = locationInfo.shortDescription!!,
-                        fontWeight = FontWeight.Normal,
-                        fontSize = 10.sp
-                    )
+//                    Text(
+//                        text = locationInfo.shortDescription,
+//                        fontWeight = FontWeight.Normal,
+//                        fontSize = 10.sp
+//                    )
                 }
 
             }
@@ -223,39 +210,34 @@ fun HomeMainContent(locationInfo: HsLocation){
     }
 
 }
-
 @SuppressLint("MissingPermission")
 @Composable
-fun FeedPage(view: MainPageViewModel,context: Context) {
-    val listOfLocationsState = remember { mutableStateOf<List<HsLocation>>(emptyList()) }
+fun FeedPage(view: MainPageViewModel, context: Context) {
+    val listOfLocationsState = remember { mutableStateOf<List<HsLocation>?>(null) }
     val errorMessage = remember { mutableStateOf<String?>(null) }
     val isLoading = remember { mutableStateOf(true) }
 
-    LaunchedEffect(Unit) {
-
-        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+    LaunchedEffect(key1 = true) { // Key set to true to run once
         try {
+            val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
             fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
                 .addOnSuccessListener { usersLocation ->
                     if (usersLocation != null) {
-                        val coordinates =
-                            LatLng(usersLocation.latitude, usersLocation.longitude)
-                        val fetchedLocations =
-                            view.getHistoricalLocationNearPoint(coordinates, 40.0f)
+                        val coordinates = LatLng(usersLocation.latitude, usersLocation.longitude)
+                        val fetchedLocations = view.getHistoricalLocationNearPoint(coordinates, 10.0f)
                         listOfLocationsState.value = fetchedLocations
                     } else {
                         errorMessage.value = "User location not available"
-                        Log.d("FeedPage", errorMessage.value!!)
                     }
                     isLoading.value = false
                 }
                 .addOnFailureListener { e ->
                     errorMessage.value = "Failed to fetch user location: ${e.message}"
-                    Log.e("FeedPage", errorMessage.value!!)
+                    isLoading.value = false
                 }
         } catch (e: Exception) {
             errorMessage.value = "Exception in fetching location: ${e.message}"
-            Log.e("FeedPage", errorMessage.value!!)
+            isLoading.value = false
         }
     }
 
@@ -263,40 +245,123 @@ fun FeedPage(view: MainPageViewModel,context: Context) {
         topBar = { HomeAppBar() },
     ) { paddingValues ->
         if (isLoading.value) {
-            Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-                CircularProgressIndicator()
-            }
+            CircularProgressIndicator()
         } else {
-            Column(
-                modifier = Modifier
-                    .padding(paddingValues)
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-
-            ) {
-                Spacer(
+            listOfLocationsState.value?.let { locations ->
+                LazyColumn(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(.5.dp)
-                        .background(Color.Black)
-                )
-                Column {
-
-                    Log.d("FeedPage", "List $listOfLocationsState")
-//                    for (location in listOfLocationsState.value) {
-//                        HomeMainContent(location)
-//                    }
-                    listOfLocationsState.value.take(3).forEach { location ->
+                        .padding(paddingValues)
+                        .fillMaxSize()
+                ) {
+                    items(locations) { location ->
                         HomeMainContent(location)
                     }
                 }
+            } ?: run {
+                Text("No locations available", Modifier.padding(16.dp))
             }
-        }
-        if (errorMessage.value != null) {
-            Text("Error: ${errorMessage.value}", color = Color.Red)
+
         }
     }
 }
+
+
+
+fun calculateDistanceInMiles(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
+    val earthRadius = 3958.8 // Earth radius in miles
+
+    val dLat = Math.toRadians(lat2 - lat1)
+    val dLon = Math.toRadians(lon2 - lon1)
+
+    val originLat = Math.toRadians(lat1)
+    val destinationLat = Math.toRadians(lat2)
+
+    val a = sin(dLat / 2).pow(2) + sin(dLon / 2).pow(2) * cos(originLat) * cos(destinationLat)
+    val c = 2 * asin(sqrt(a))
+
+    return earthRadius * c
+}
+
+
+//@SuppressLint("MissingPermission")
+//@Composable
+//fun FeedPage(view: MainPageViewModel,context: Context) {
+//    val listOfLocationsState = remember { mutableStateOf<List<HsLocation>>(emptyList()) }
+//    val errorMessage = remember { mutableStateOf<String?>(null) }
+//    val isLoading = remember { mutableStateOf(true) }
+//    val isDataFetched = remember { mutableStateOf(true) }
+////    LaunchedEffect(isDataFetched.value) {
+//        Log.d("FeedPage", "Launched effect called")
+//        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+//        try {
+//            fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
+//                .addOnSuccessListener { usersLocation ->
+//                    if (usersLocation != null) {
+//                        val coordinates =
+//                            LatLng(usersLocation.latitude, usersLocation.longitude)
+//                        val fetchedLocations =
+//                            view.getHistoricalLocationNearPoint(coordinates, 5.0f)
+//                        listOfLocationsState.value = fetchedLocations
+//                        Log.d("FeedPage", "Successful $coordinates")
+//
+//                    } else {
+//                        errorMessage.value = "User location not available"
+//                        Log.d("FeedPage", errorMessage.value!!)
+//                    }
+//                    isDataFetched.value = false
+//                    isLoading.value = false
+//                }
+//                .addOnFailureListener { e ->
+//                    errorMessage.value = "Failed to fetch user location: ${e.message}"
+//                    Log.e("FeedPage", errorMessage.value!!)
+//                }
+//        } catch (e: Exception) {
+//            errorMessage.value = "Exception in fetching location: ${e.message}"
+//            Log.e("FeedPage", errorMessage.value!!)
+//        }
+////    }
+//
+//    Log.d("FeedPage", "Feed Page is being composed")
+//
+//        Scaffold(
+//            topBar = { HomeAppBar() },
+//        ) { paddingValues ->
+//            if (isLoading.value) {
+//                Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+//                    CircularProgressIndicator()
+//                }
+//            } else {
+//                Column(
+//                    modifier = Modifier
+//                        .padding(paddingValues)
+//                        .fillMaxSize()
+//                        .verticalScroll(rememberScrollState())
+//
+//                ) {
+//                    Spacer(
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .height(.5.dp)
+//                            .background(Color.Black)
+//                    )
+//                    LazyColumn {
+//
+//                        Log.d("FeedPage", "List ${listOfLocationsState.value.size}")
+//                        items(listOfLocationsState.value.take(3)) { location ->
+//                            Log.d("FeedPage", "Processing location: $location")
+//                            HomeMainContent(location)
+//                        }
+//
+//                    }
+//                }
+//            }
+//        }
+//        if (errorMessage.value != null) {
+//            Text("Error: ${errorMessage.value}", color = Color.Red)
+//        }
+//    }
+
+
 
 
 @Composable
