@@ -89,7 +89,7 @@ fun HomeAppBar(){
 }
 
 @Composable
-fun HomeMainContent(locationInfo: HsLocation){
+fun HomeMainContent(locationInfo: HsLocation, distance: Double){
     val imageLink = constructWikidataImageLink(locationInfo.wikidataImageName, 40)
     val cornerRadius = 8.dp
     val context = LocalContext.current
@@ -133,11 +133,12 @@ fun HomeMainContent(locationInfo: HsLocation){
                         fontWeight = FontWeight.Normal,
                         fontSize = 15.sp
                     )
-//                    Text(
-//                        text = locationInfo.shortDescription,
-//                        fontWeight = FontWeight.Normal,
-//                        fontSize = 10.sp
-//                    )
+                    val formattedDistance = String.format("%.1f", distance)
+                    Text(
+                        text = "$formattedDistance Miles away",
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 10.sp
+                    )
                 }
 
             }
@@ -213,7 +214,7 @@ fun HomeMainContent(locationInfo: HsLocation){
 @SuppressLint("MissingPermission")
 @Composable
 fun FeedPage(view: MainPageViewModel, context: Context) {
-    val listOfLocationsState = remember { mutableStateOf<List<HsLocation>?>(null) }
+    val listOfLocationsState = remember { mutableStateOf<List<Pair<HsLocation, Double>>?>(null) }
     val errorMessage = remember { mutableStateOf<String?>(null) }
     val isLoading = remember { mutableStateOf(true) }
 
@@ -225,7 +226,14 @@ fun FeedPage(view: MainPageViewModel, context: Context) {
                     if (usersLocation != null) {
                         val coordinates = LatLng(usersLocation.latitude, usersLocation.longitude)
                         val fetchedLocations = view.getHistoricalLocationNearPoint(coordinates, 10.0f)
-                        listOfLocationsState.value = fetchedLocations
+                        val locationsWithDistances = fetchedLocations.map { location ->
+                            Pair(location, calculateDistanceInMiles(
+                                usersLocation.latitude,
+                                usersLocation.longitude,
+                                location.latitude,
+                                location.longitude))
+                        }.sortedBy {it.second}
+                        listOfLocationsState.value = locationsWithDistances
                     } else {
                         errorMessage.value = "User location not available"
                     }
@@ -247,14 +255,14 @@ fun FeedPage(view: MainPageViewModel, context: Context) {
         if (isLoading.value) {
             CircularProgressIndicator()
         } else {
-            listOfLocationsState.value?.let { locations ->
+            listOfLocationsState.value?.let { locationsWithDistances ->
                 LazyColumn(
                     modifier = Modifier
                         .padding(paddingValues)
                         .fillMaxSize()
                 ) {
-                    items(locations) { location ->
-                        HomeMainContent(location)
+                    items(locationsWithDistances) { (location, distance) ->
+                        HomeMainContent(location, distance)
                     }
                 }
             } ?: run {
@@ -267,20 +275,21 @@ fun FeedPage(view: MainPageViewModel, context: Context) {
 
 
 
-fun calculateDistanceInMiles(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
+fun calculateDistanceInMiles(lat1: Double, lon1: Double, lat2: Float, lon2: Float): Double {
     val earthRadius = 3958.8 // Earth radius in miles
 
-    val dLat = Math.toRadians(lat2 - lat1)
-    val dLon = Math.toRadians(lon2 - lon1)
+    val dLat = Math.toRadians((lat2 - lat1))
+    val dLon = Math.toRadians((lon2 - lon1))
 
     val originLat = Math.toRadians(lat1)
-    val destinationLat = Math.toRadians(lat2)
+    val destinationLat = Math.toRadians(lat2.toDouble())
 
     val a = sin(dLat / 2).pow(2) + sin(dLon / 2).pow(2) * cos(originLat) * cos(destinationLat)
     val c = 2 * asin(sqrt(a))
 
     return earthRadius * c
 }
+
 
 
 //@SuppressLint("MissingPermission")
