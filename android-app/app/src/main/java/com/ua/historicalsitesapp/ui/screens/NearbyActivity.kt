@@ -1,5 +1,6 @@
 package com.ua.historicalsitesapp.ui.screens
 import android.annotation.SuppressLint
+import androidx.compose.ui.unit.dp
 import android.os.Bundle
 import com.ua.historicalsitesapp.data.model.map.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -257,6 +258,29 @@ fun FeedPage(view: MainPageViewModel, context: Context) {
                 ) {
                     items(locationsWithDistances) { (location, distance) ->
                         HomeMainContent(location, distance)
+                    }
+                    item {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(4.dp)
+                        ) {
+                            Button(
+                                onClick = { /* Load more data logic */ },
+                                modifier = Modifier
+                                    .padding(horizontal = 16.dp, vertical = 2.dp)
+                                    .fillMaxWidth(),
+                                shape = RoundedCornerShape(50),
+                                colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
+// Circular corners
+                            ) {
+                                Text(
+                                    "Load More",
+                                color = Color.White,
+                                )
+                            }
+                        }
                     }
                 }
             } ?: run {
