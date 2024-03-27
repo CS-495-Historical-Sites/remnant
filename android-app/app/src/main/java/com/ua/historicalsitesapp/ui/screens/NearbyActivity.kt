@@ -202,14 +202,8 @@ fun HomeMainContent(locationInfo: HsLocation, distance: Double){
                 }
             }
             Divider(modifier = Modifier.padding(horizontal = 6.dp), color = Color.Gray)
-
-
-
-
-
         }
     }
-
 }
 @SuppressLint("MissingPermission")
 @Composable
@@ -218,7 +212,7 @@ fun FeedPage(view: MainPageViewModel, context: Context) {
     val errorMessage = remember { mutableStateOf<String?>(null) }
     val isLoading = remember { mutableStateOf(true) }
 
-    LaunchedEffect(key1 = true) { // Key set to true to run once
+    LaunchedEffect(key1 = true) {
         try {
             val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
             fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
@@ -274,7 +268,6 @@ fun FeedPage(view: MainPageViewModel, context: Context) {
 }
 
 
-
 fun calculateDistanceInMiles(lat1: Double, lon1: Double, lat2: Float, lon2: Float): Double {
     val earthRadius = 3958.8 // Earth radius in miles
 
@@ -289,88 +282,6 @@ fun calculateDistanceInMiles(lat1: Double, lon1: Double, lat2: Float, lon2: Floa
 
     return earthRadius * c
 }
-
-
-
-//@SuppressLint("MissingPermission")
-//@Composable
-//fun FeedPage(view: MainPageViewModel,context: Context) {
-//    val listOfLocationsState = remember { mutableStateOf<List<HsLocation>>(emptyList()) }
-//    val errorMessage = remember { mutableStateOf<String?>(null) }
-//    val isLoading = remember { mutableStateOf(true) }
-//    val isDataFetched = remember { mutableStateOf(true) }
-////    LaunchedEffect(isDataFetched.value) {
-//        Log.d("FeedPage", "Launched effect called")
-//        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
-//        try {
-//            fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
-//                .addOnSuccessListener { usersLocation ->
-//                    if (usersLocation != null) {
-//                        val coordinates =
-//                            LatLng(usersLocation.latitude, usersLocation.longitude)
-//                        val fetchedLocations =
-//                            view.getHistoricalLocationNearPoint(coordinates, 5.0f)
-//                        listOfLocationsState.value = fetchedLocations
-//                        Log.d("FeedPage", "Successful $coordinates")
-//
-//                    } else {
-//                        errorMessage.value = "User location not available"
-//                        Log.d("FeedPage", errorMessage.value!!)
-//                    }
-//                    isDataFetched.value = false
-//                    isLoading.value = false
-//                }
-//                .addOnFailureListener { e ->
-//                    errorMessage.value = "Failed to fetch user location: ${e.message}"
-//                    Log.e("FeedPage", errorMessage.value!!)
-//                }
-//        } catch (e: Exception) {
-//            errorMessage.value = "Exception in fetching location: ${e.message}"
-//            Log.e("FeedPage", errorMessage.value!!)
-//        }
-////    }
-//
-//    Log.d("FeedPage", "Feed Page is being composed")
-//
-//        Scaffold(
-//            topBar = { HomeAppBar() },
-//        ) { paddingValues ->
-//            if (isLoading.value) {
-//                Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-//                    CircularProgressIndicator()
-//                }
-//            } else {
-//                Column(
-//                    modifier = Modifier
-//                        .padding(paddingValues)
-//                        .fillMaxSize()
-//                        .verticalScroll(rememberScrollState())
-//
-//                ) {
-//                    Spacer(
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .height(.5.dp)
-//                            .background(Color.Black)
-//                    )
-//                    LazyColumn {
-//
-//                        Log.d("FeedPage", "List ${listOfLocationsState.value.size}")
-//                        items(listOfLocationsState.value.take(3)) { location ->
-//                            Log.d("FeedPage", "Processing location: $location")
-//                            HomeMainContent(location)
-//                        }
-//
-//                    }
-//                }
-//            }
-//        }
-//        if (errorMessage.value != null) {
-//            Text("Error: ${errorMessage.value}", color = Color.Red)
-//        }
-//    }
-
-
 
 
 @Composable
