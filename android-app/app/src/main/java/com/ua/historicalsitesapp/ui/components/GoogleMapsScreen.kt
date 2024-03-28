@@ -1,6 +1,8 @@
 package com.ua.historicalsitesapp.ui.components
 
 import android.annotation.SuppressLint
+import android.app.PendingIntent
+import android.content.Intent
 import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -40,7 +42,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.google.android.gms.location.Geofence
+import com.google.android.gms.location.GeofencingClient
+import com.google.android.gms.location.GeofencingRequest
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.LocationServices.getGeofencingClient
 import com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMapOptions
@@ -56,6 +62,7 @@ import com.google.maps.android.compose.clustering.rememberClusterManager
 import com.google.maps.android.compose.clustering.rememberClusterRenderer
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.ua.historicalsitesapp.data.model.map.ClusterItem
+import com.ua.historicalsitesapp.geofence.GeofenceBroadcastReceiver
 import com.ua.historicalsitesapp.ui.screens.TAG
 import com.ua.historicalsitesapp.viewmodels.MainPageViewModel
 import kotlinx.coroutines.launch
@@ -127,6 +134,8 @@ private fun CustomRendererClustering(
   }
 }
 
+var geofenceList: ArrayList<Geofence> = ArrayList(100)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("MissingPermission")
 @Composable
@@ -156,7 +165,6 @@ fun GoogleMapsScreen(
       cameraPositionState.move(CameraUpdateFactory.newCameraPosition(cameraPosition))
 
       val historicalLocations = view.getHistoricalLocationNearPoint(coordinates, 50.0f)
-
       for (location in historicalLocations) {
         val locationId = location.id
         val position = LatLng(location.latitude.toDouble(), location.longitude.toDouble())
@@ -170,6 +178,38 @@ fun GoogleMapsScreen(
                 0f,
             ),
         )
+      }
+
+      val geofenceLocations = view.getHistoricalLocationNearPoint(coordinates, 0.5f)
+      var count = 0
+      for (location in geofenceLocations) {
+        if (count < 100) {
+          geofenceList.add(
+              Geofence.Builder()
+                  .setRequestId(location.name)
+                  .setCircularRegion(
+                      location.latitude.toDouble(), location.longitude.toDouble(), 100f)
+                  .setNotificationResponsiveness(1000)
+                  .setExpirationDuration(Geofence.NEVER_EXPIRE)
+                  .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL)
+                  .setLoiteringDelay(2500)
+                  .build())
+        }
+        count += 1
+      }
+
+      val geofencingClient: GeofencingClient = getGeofencingClient(context)
+      val geofencingPendingIntent: PendingIntent by lazy {
+        val intent = Intent(context, GeofenceBroadcastReceiver::class.java)
+        PendingIntent.getBroadcast(
+            context, 0, intent, PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+      }
+
+      geofencingClient.addGeofences(getGeofencingRequest(), geofencingPendingIntent).run {
+        addOnSuccessListener { Log.d("Geofence", "Successfully add geofences") }
+        addOnFailureListener {
+          Log.d("Geofence", "Request: ${getGeofencingRequest()}, Intent: $geofencingPendingIntent")
+        }
       }
     }
   }
@@ -272,4 +312,13 @@ fun GoogleMapsScreen(
               }
             }
       }
+}
+
+fun getGeofencingRequest(): GeofencingRequest {
+  return GeofencingRequest.Builder()
+      .apply {
+        setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_DWELL)
+        addGeofences(geofenceList)
+      }
+      .build()
 }
