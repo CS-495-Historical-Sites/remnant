@@ -73,12 +73,12 @@ const AddSuggestionPage: React.FC<UserProps> = ({ setToken, token }) => {
   return (
     <Paper elevation={3} style={{ padding: "20px", margin: "20px" }}>
       <Typography variant="h4" gutterBottom>
-        Location Suggestion Details
+        Details
       </Typography>
       {suggestion ? (
         <Box>
           <Typography variant="h5" gutterBottom>
-            Location Suggest: {suggestion.name}
+            Location Suggestion: {suggestion.name}
           </Typography>
 
           <Typography variant="body1">
