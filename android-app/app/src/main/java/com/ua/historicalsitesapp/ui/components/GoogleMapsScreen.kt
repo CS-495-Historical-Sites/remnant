@@ -135,6 +135,7 @@ private fun CustomRendererClustering(
 }
 
 var geofenceList: ArrayList<Geofence> = ArrayList(100)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("MissingPermission")
 @Composable
@@ -179,34 +180,37 @@ fun GoogleMapsScreen(
         )
       }
 
-        val geofenceLocations = view.getHistoricalLocationNearPoint(coordinates, 0.5f)
-        var count = 0
-        for (location in geofenceLocations) {
-            if (count < 100) {
-                geofenceList.add(
-                    Geofence.Builder()
-                        .setRequestId(location.name)
-                        .setCircularRegion(location.latitude.toDouble(), location.longitude.toDouble(), 100f)
-                        .setNotificationResponsiveness(1000)
-                        .setExpirationDuration(Geofence.NEVER_EXPIRE)
-                        .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL)
-                        .setLoiteringDelay(2500)
-                        .build())
-            }
-            count += 1
+      val geofenceLocations = view.getHistoricalLocationNearPoint(coordinates, 0.5f)
+      var count = 0
+      for (location in geofenceLocations) {
+        if (count < 100) {
+          geofenceList.add(
+              Geofence.Builder()
+                  .setRequestId(location.name)
+                  .setCircularRegion(
+                      location.latitude.toDouble(), location.longitude.toDouble(), 100f)
+                  .setNotificationResponsiveness(1000)
+                  .setExpirationDuration(Geofence.NEVER_EXPIRE)
+                  .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL)
+                  .setLoiteringDelay(2500)
+                  .build())
         }
+        count += 1
+      }
 
-        val geofencingClient: GeofencingClient = getGeofencingClient(context)
-        val geofencingPendingIntent: PendingIntent by lazy {
-            val intent = Intent(context, GeofenceBroadcastReceiver::class.java)
-            PendingIntent.getBroadcast(
-                context, 0, intent, PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
-        }
+      val geofencingClient: GeofencingClient = getGeofencingClient(context)
+      val geofencingPendingIntent: PendingIntent by lazy {
+        val intent = Intent(context, GeofenceBroadcastReceiver::class.java)
+        PendingIntent.getBroadcast(
+            context, 0, intent, PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+      }
 
-        geofencingClient.addGeofences(getGeofencingRequest(), geofencingPendingIntent).run {
-            addOnSuccessListener { Log.d("Geofence", "Successfully add geofences")}
-            addOnFailureListener { Log.d("Geofence", "Request: ${getGeofencingRequest()}, Intent: $geofencingPendingIntent") }
+      geofencingClient.addGeofences(getGeofencingRequest(), geofencingPendingIntent).run {
+        addOnSuccessListener { Log.d("Geofence", "Successfully add geofences") }
+        addOnFailureListener {
+          Log.d("Geofence", "Request: ${getGeofencingRequest()}, Intent: $geofencingPendingIntent")
         }
+      }
     }
   }
   val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -311,9 +315,10 @@ fun GoogleMapsScreen(
 }
 
 fun getGeofencingRequest(): GeofencingRequest {
-    return GeofencingRequest.Builder()
-        .apply {
-            setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_DWELL)
-            addGeofences(geofenceList)
-        }.build()
+  return GeofencingRequest.Builder()
+      .apply {
+        setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_DWELL)
+        addGeofences(geofenceList)
+      }
+      .build()
 }
