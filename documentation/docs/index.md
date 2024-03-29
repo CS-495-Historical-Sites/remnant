@@ -16,11 +16,11 @@ The app will provide a simple, easy to use UI, track the users "steps" through h
 ## Features
 - [x] Display landmark’s details
     * [x] Name, location, historical significance, and photos
-- [ ] Proximity notifications
+- [x] Proximity notifications
 - [ ] Track users’ exploration progress
-- [ ] User suggestions  
-    * [ ] Form where users can suggest a site to be added to the database
-- [ ] Directions to historical area
+- [x] User suggestions  
+    * [x] Form where users can suggest a site to be added to the database
+- [x] Directions to historical area
 - [ ] Recommendations
     * [ ] Sorting by historical era
 

@@ -4,6 +4,17 @@
 - Docker Compose
 - Ansible (for AWS EC2 configuration)
 
+### S3 Setup
+
+Currently, this only needed for uploading a photo during location suggestion creation.
+
+A `.env` file is required in the root of the project (in the .api folder next to .env) with the following variables:
+
+```
+AWS_ACCESS_KEY_ID=<access_key>
+AWS_SECRET_KEY=<secret_key
+```
+
 
 ## Development commands
 
