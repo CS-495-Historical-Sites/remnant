@@ -55,6 +55,7 @@ import androidx.compose.ui.Alignment
 import com.ua.historicalsitesapp.ui.foreignintents.createGoogleMapsDirectionsIntent
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.TopAppBar
 class FeedPageActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,20 +75,38 @@ class FeedPageActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeAppBar(){
-    TopAppBar(
-        title = {
-            Text(
-                "Remnant",
-                fontFamily = FontFamily.Serif,
-                fontWeight = FontWeight.Bold,
-                fontSize = 20.sp,
-            )
-        },
-        actions = {
-        }
-    )
+fun HomeAppBar(displayCount: Int, totalCount: Int) {
+    Column {
+        TopAppBar(
+            title = {
+                Column {
+                    Text(
+                        "Remnant",
+                        fontFamily = FontFamily.Serif,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp
+                    )
+                    Text(
+                        "Displaying $displayCount locations out of $totalCount",
+                        fontFamily = FontFamily.Serif,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 10.sp
+                    )
+                }
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = Color.Black, // App Bar background color
+                titleContentColor = Color.White, // App Bar title text color
+                actionIconContentColor = Color.White // App Bar action icon color
+            ),
+            actions = {
+                // Your action icons/buttons here
+            }
+        )
+//        Divider(color = Color.Black, thickness = 6.dp)
+    }
 }
+
 
 @Composable
 fun HomeMainContent(locationInfo: HsLocation, distance: Double){
@@ -223,6 +242,7 @@ fun FeedPage(view: MainPageViewModel, context: Context) {
     }
 
     LaunchedEffect(key1 = true) {
+        isLoading.value = true
         try {
             val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
             fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
@@ -239,30 +259,36 @@ fun FeedPage(view: MainPageViewModel, context: Context) {
                         }.sortedBy {it.second}
                         allLocations.value = locationsWithDistances
                         loadMoreLocations()
+                        isLoading.value = false
                     } else {
+                        isLoading.value = false
                         errorMessage.value = "User location not available"
                     }
-                    isLoading.value = false
                 }
                 .addOnFailureListener { e ->
                     errorMessage.value = "Failed to fetch user location: ${e.message}"
-                    isLoading.value = false
                 }
         } catch (e: Exception) {
             errorMessage.value = "Exception in fetching location: ${e.message}"
-            isLoading.value = false
         }
     }
     Log.d("FeedPage", "display locations ${displayedLocations.value.size}")
     Log.d("FeedPage", "all locations ${allLocations.value.size}")
+    Log.d("FeedPage", "Loading Value ${isLoading.value}")
 
-
+    val displayedCount = displayedLocations.value.size
+    val totalCount = allLocations.value.size
 
     Scaffold(
-        topBar = { HomeAppBar() },
+        topBar = { HomeAppBar(displayCount = displayedCount, totalCount = totalCount) },
     ) { paddingValues ->
         if (isLoading.value) {
-            CircularProgressIndicator()
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
         } else {
             displayedLocations.value.let { locationsWithDistances ->
                 LazyColumn(
