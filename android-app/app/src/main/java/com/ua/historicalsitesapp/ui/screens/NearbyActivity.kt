@@ -209,9 +209,18 @@ fun HomeMainContent(locationInfo: HsLocation, distance: Double){
 @SuppressLint("MissingPermission")
 @Composable
 fun FeedPage(view: MainPageViewModel, context: Context) {
-    val listOfLocationsState = remember { mutableStateOf<List<Pair<HsLocation, Double>>?>(null) }
+    val allLocations = remember { mutableStateOf<List<Pair<HsLocation, Double>>>(emptyList()) }
+    val displayedLocations = remember { mutableStateOf<List<Pair<HsLocation, Double>>>(emptyList()) }
+
     val errorMessage = remember { mutableStateOf<String?>(null) }
     val isLoading = remember { mutableStateOf(true) }
+    val loadMoreCount = 20
+
+    fun loadMoreLocations() {
+        val currentCount = displayedLocations.value.size
+        val nextCount = min(currentCount + loadMoreCount, allLocations.value.size)
+        displayedLocations.value = allLocations.value.subList(0, nextCount)
+    }
 
     LaunchedEffect(key1 = true) {
         try {
@@ -228,7 +237,8 @@ fun FeedPage(view: MainPageViewModel, context: Context) {
                                 location.latitude,
                                 location.longitude))
                         }.sortedBy {it.second}
-                        listOfLocationsState.value = locationsWithDistances
+                        allLocations.value = locationsWithDistances
+                        loadMoreLocations()
                     } else {
                         errorMessage.value = "User location not available"
                     }
@@ -243,6 +253,10 @@ fun FeedPage(view: MainPageViewModel, context: Context) {
             isLoading.value = false
         }
     }
+    Log.d("FeedPage", "display locations ${displayedLocations.value.size}")
+    Log.d("FeedPage", "all locations ${allLocations.value.size}")
+
+
 
     Scaffold(
         topBar = { HomeAppBar() },
@@ -250,7 +264,7 @@ fun FeedPage(view: MainPageViewModel, context: Context) {
         if (isLoading.value) {
             CircularProgressIndicator()
         } else {
-            listOfLocationsState.value?.let { locationsWithDistances ->
+            displayedLocations.value.let { locationsWithDistances ->
                 LazyColumn(
                     modifier = Modifier
                         .padding(paddingValues)
@@ -266,19 +280,21 @@ fun FeedPage(view: MainPageViewModel, context: Context) {
                                 .fillMaxWidth()
                                 .padding(4.dp)
                         ) {
-                            Button(
-                                onClick = { /* Load more data logic */ },
-                                modifier = Modifier
-                                    .padding(horizontal = 16.dp, vertical = 2.dp)
-                                    .fillMaxWidth(),
-                                shape = RoundedCornerShape(50),
-                                colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
+                            if (displayedLocations.value.size < allLocations.value.size) {
+                                Button(
+                                    onClick = { loadMoreLocations() },
+                                    modifier = Modifier
+                                        .padding(horizontal = 16.dp, vertical = 2.dp)
+                                        .fillMaxWidth(),
+                                    shape = RoundedCornerShape(50),
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
 // Circular corners
-                            ) {
-                                Text(
-                                    "Load More",
-                                color = Color.White,
-                                )
+                                ) {
+                                    Text(
+                                        "Load More",
+                                        color = Color.White,
+                                    )
+                                }
                             }
                         }
                     }
