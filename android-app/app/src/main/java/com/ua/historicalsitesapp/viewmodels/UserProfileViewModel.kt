@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.ua.historicalsitesapp.data.model.auth.LoggedInUser
 import com.ua.historicalsitesapp.data.repository.auth.LoginDataSource
 import com.ua.historicalsitesapp.data.repository.auth.LoginRepositoryProvider
-import com.ua.historicalsitesapp.data.model.userinfo.QuestionnaireAnswersAddRequest
+import com.ua.historicalsitesapp.data.model.userinfo.UserProfileUpdateRequest
 import com.ua.historicalsitesapp.util.constructUserClient
 import io.ktor.client.HttpClient
 import com.ua.historicalsitesapp.util.ServerConfig

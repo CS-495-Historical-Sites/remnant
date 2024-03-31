@@ -28,10 +28,13 @@ def update_profile_info(user: User):
         if not check_valid_username(new_username):
             return jsonify({"message": "Invalid username entered"}), 422 
         user.username = new_username
+        LOGGER.debug(f"Attemping to update username: {user.username}")
 
+    
 
-    if "interested_eras" in data:
-        user.interested_eras = data["interested_eras"]
+    if "answers" in data:
+        user.answers = data["answers"]
+        LOGGER.debug(f"Attemping to update questionnaire answers: {user.answers}")
     db.session.commit()    
-    user_info: dict = {"email": user.email, "username": user.username, "interested_eras": user.interested_eras}
+    user_info: dict = {"email": user.email, "username": user.username, "answers": user.answers}
     return jsonify(user_info), 200

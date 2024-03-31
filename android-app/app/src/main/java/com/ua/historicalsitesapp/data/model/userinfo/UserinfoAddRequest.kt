@@ -3,5 +3,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class UserProfileUpdateRequest(
-    var interested_eras: String
+    var interested_eras: Set<String>?
 )
