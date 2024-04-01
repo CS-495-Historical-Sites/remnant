@@ -14,7 +14,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.compose.HistoricalSitesAppTheme
 import androidx.compose.ui.text.font.FontFamily
@@ -23,12 +22,9 @@ import androidx.compose.material3.*
 import kotlin.math.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.Icons
 import androidx.compose.ui.draw.clip
-import androidx.compose.foundation.background
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import coil.compose.AsyncImage
@@ -56,6 +52,12 @@ import com.ua.historicalsitesapp.ui.foreignintents.createGoogleMapsDirectionsInt
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.*
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.ui.text.TextStyle
+
+
 class FeedPageActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,7 +77,9 @@ class FeedPageActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeAppBar(displayCount: Int, totalCount: Int) {
+fun HomeAppBar(displayCount: Int, totalCount: Int, radius: MutableState<Float>, onRadiusChange: (Float) -> Unit) {
+    val radiusInMiles = (radius.value / 1.60934f).roundToInt()
+
     Column {
         TopAppBar(
             title = {
@@ -87,11 +91,12 @@ fun HomeAppBar(displayCount: Int, totalCount: Int) {
                         fontSize = 20.sp
                     )
                     Text(
-                        "Displaying $displayCount locations out of $totalCount",
+                        "Displaying $displayCount locations out of $totalCount within $radiusInMiles miles",
                         fontFamily = FontFamily.Serif,
                         fontWeight = FontWeight.Bold,
                         fontSize = 10.sp
                     )
+
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
@@ -100,11 +105,59 @@ fun HomeAppBar(displayCount: Int, totalCount: Int) {
                 actionIconContentColor = Color.White // App Bar action icon color
             ),
             actions = {
-                // Your action icons/buttons here
+                var showMenu by remember { mutableStateOf(false) }
+                val radiusOptions = listOf(5, 10, 20)
+
+                IconButton(onClick = { showMenu = !showMenu }) {
+                    Icon(imageVector = Icons.Default.FilterList, contentDescription = "Filter")
+                }
+
+                DropdownMenu(
+                    expanded = showMenu,
+                    onDismissRequest = { showMenu = false }
+                ) {
+                    radiusOptions.forEach { distanceInMiles ->
+                        val distanceInKilometers = distanceInMiles * 1.60934f
+                        DropdownMenuItem(
+                            text = { Text(text = "$distanceInMiles miles") },
+                            onClick = {
+                            onRadiusChange(distanceInKilometers)
+                            showMenu = false
+                        })
+                    }
+                }
             }
         )
-//        Divider(color = Color.Black, thickness = 6.dp)
     }
+}
+
+@Composable
+fun SearchBar(searchQuery: MutableState<String>, onSearch: (String) -> Unit) {
+
+
+    OutlinedTextField(
+        value = searchQuery.value,
+        onValueChange = {
+            searchQuery.value = it
+            onSearch(it)
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 42.dp, max = 50.dp)
+            .padding(2.dp),
+        textStyle = TextStyle(
+            fontSize = 11.sp
+        ),
+        placeholder = { Text("Search locations", fontSize = 11.sp) },
+        maxLines = 1,
+        singleLine = true,
+        shape = RoundedCornerShape(24.dp),
+        colors =
+        OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = MaterialTheme.colorScheme.secondary,
+        ),
+    )
+
 }
 
 
@@ -166,11 +219,9 @@ fun HomeMainContent(locationInfo: HsLocation, distance: Double){
 
             Divider(modifier = Modifier.padding(horizontal = 6.dp), color = Color.Gray)
 
-            // Content (Reactions)
             Box(
                 modifier = Modifier.fillMaxWidth()
             ) {
-//
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -228,6 +279,8 @@ fun HomeMainContent(locationInfo: HsLocation, distance: Double){
 @SuppressLint("MissingPermission")
 @Composable
 fun FeedPage(view: MainPageViewModel, context: Context) {
+    val searchRadius = remember { mutableStateOf(16.09f) }
+    val searchQuery = remember { mutableStateOf("") }
     val allLocations = remember { mutableStateOf<List<Pair<HsLocation, Double>>>(emptyList()) }
     val displayedLocations = remember { mutableStateOf<List<Pair<HsLocation, Double>>>(emptyList()) }
 
@@ -235,13 +288,53 @@ fun FeedPage(view: MainPageViewModel, context: Context) {
     val isLoading = remember { mutableStateOf(true) }
     val loadMoreCount = 20
 
-    fun loadMoreLocations() {
-        val currentCount = displayedLocations.value.size
-        val nextCount = min(currentCount + loadMoreCount, allLocations.value.size)
-        displayedLocations.value = allLocations.value.subList(0, nextCount)
+//    fun loadMoreLocations() {
+//        val currentCount = displayedLocations.value.size
+//        val nextCount = min(currentCount + loadMoreCount, allLocations.value.size)
+//        displayedLocations.value = allLocations.value.subList(0, nextCount)
+//    }
+    val filteredLocations = allLocations.value.filter {
+        it.first.name.contains(searchQuery.value, ignoreCase = true)
+    }
+//    fun loadMoreLocations() {
+//        val currentCount = displayedLocations.value.size
+//        val locationsToDisplay = if (searchQuery.value.isEmpty()) {
+//            allLocations.value
+//        } else {
+//            filteredLocations
+//        }
+//        val nextCount = min(currentCount + loadMoreCount, locationsToDisplay.size)
+//        displayedLocations.value = locationsToDisplay.take(nextCount)
+//    }
+
+//    fun loadMoreLocations(loadMore: Boolean = false) {
+//        val currentCount = if (loadMore) displayedLocations.value.size else 0
+//        val locationsToDisplay = if (searchQuery.value.isEmpty()) {
+//            allLocations.value
+//        } else {
+//            filteredLocations
+//        }
+//        val nextCount = min(currentCount + loadMoreCount, locationsToDisplay.size)
+//        displayedLocations.value = locationsToDisplay.take(nextCount)
+//    }
+
+    fun loadMoreLocations(loadMore: Boolean = false) {
+        val currentCount = if (loadMore) displayedLocations.value.size else 0
+        val locationsToDisplay = if (searchQuery.value.isEmpty()) {
+            allLocations.value
+        } else {
+            filteredLocations
+        }
+        val nextCount = min(currentCount + loadMoreCount, locationsToDisplay.size)
+        displayedLocations.value = locationsToDisplay.take(nextCount)
     }
 
-    LaunchedEffect(key1 = true) {
+
+    LaunchedEffect(Unit) {
+        loadMoreLocations(loadMore = false)
+    }
+
+    LaunchedEffect(searchRadius.value) {
         isLoading.value = true
         try {
             val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
@@ -249,7 +342,7 @@ fun FeedPage(view: MainPageViewModel, context: Context) {
                 .addOnSuccessListener { usersLocation ->
                     if (usersLocation != null) {
                         val coordinates = LatLng(usersLocation.latitude, usersLocation.longitude)
-                        val fetchedLocations = view.getHistoricalLocationNearPoint(coordinates, 10.0f)
+                        val fetchedLocations = view.getHistoricalLocationNearPoint(coordinates, searchRadius.value)
                         val locationsWithDistances = fetchedLocations.map { location ->
                             Pair(location, calculateDistanceInMiles(
                                 usersLocation.latitude,
@@ -258,7 +351,7 @@ fun FeedPage(view: MainPageViewModel, context: Context) {
                                 location.longitude))
                         }.sortedBy {it.second}
                         allLocations.value = locationsWithDistances
-                        loadMoreLocations()
+                        loadMoreLocations(loadMore = false)
                         isLoading.value = false
                     } else {
                         isLoading.value = false
@@ -279,56 +372,77 @@ fun FeedPage(view: MainPageViewModel, context: Context) {
     val displayedCount = displayedLocations.value.size
     val totalCount = allLocations.value.size
 
+
+
     Scaffold(
-        topBar = { HomeAppBar(displayCount = displayedCount, totalCount = totalCount) },
+        topBar = { HomeAppBar(
+            displayCount = displayedCount,
+            totalCount = totalCount,
+            radius = searchRadius,
+            onRadiusChange =  { newRadius ->
+                searchRadius.value = newRadius
+            }) },
     ) { paddingValues ->
-        if (isLoading.value) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
-        } else {
-            displayedLocations.value.let { locationsWithDistances ->
-                LazyColumn(
-                    modifier = Modifier
-                        .padding(paddingValues)
-                        .fillMaxSize()
+        Column (
+            modifier = Modifier.padding(paddingValues)
+        ){
+
+            SearchBar(searchQuery = searchQuery, onSearch = { searchText ->
+                loadMoreLocations()
+            })
+
+            if (isLoading.value) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
                 ) {
-                    items(locationsWithDistances) { (location, distance) ->
-                        HomeMainContent(location, distance)
+                    CircularProgressIndicator()
+                }
+            }
+                else if (displayedLocations.value.isEmpty()) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("No results found", Modifier.padding(16.dp))
                     }
-                    item {
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(4.dp)
-                        ) {
-                            if (displayedLocations.value.size < allLocations.value.size) {
-                                Button(
-                                    onClick = { loadMoreLocations() },
-                                    modifier = Modifier
-                                        .padding(horizontal = 16.dp, vertical = 2.dp)
-                                        .fillMaxWidth(),
-                                    shape = RoundedCornerShape(50),
-                                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
-// Circular corners
-                                ) {
-                                    Text(
-                                        "Load More",
-                                        color = Color.White,
-                                    )
+            } else {
+                displayedLocations.value.let { locationsWithDistances ->
+                    LazyColumn(
+                        modifier = Modifier
+                            .padding(4.dp)
+                            .fillMaxSize()
+                    ) {
+                        items(locationsWithDistances) { (location, distance) ->
+                            HomeMainContent(location, distance)
+                        }
+                        item {
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(4.dp)
+                            ) {
+                                if (displayedLocations.value.size < allLocations.value.size) {
+                                    Button(
+                                        onClick = { loadMoreLocations(loadMore = true) },
+                                        modifier = Modifier
+                                            .padding(horizontal = 16.dp, vertical = 2.dp)
+                                            .fillMaxWidth(),
+                                        shape = RoundedCornerShape(50),
+                                        colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
+                                    ) {
+                                        Text(
+                                            "Load More",
+                                            color = Color.White,
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            } ?: run {
-                Text("No locations available", Modifier.padding(16.dp))
             }
-
         }
     }
 }
