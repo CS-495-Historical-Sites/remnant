@@ -151,15 +151,23 @@ class User(db.Model):
     username = db.Column(db.String(120), index=False, unique=False)
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(256), nullable=False)
+    email_confirmation_token = db.Column(db.String(256), nullable=False)
 
     is_admin = db.Column(db.Boolean, default=False)
+    has_confirmed_email = db.Column(db.Boolean, default=False)
 
     def __init__(
-        self, username: str, email: str, supplied_password: str, is_admin=False
+        self,
+        username: str,
+        email: str,
+        supplied_password: str,
+        confirmation_token: str,
+        is_admin=False,
     ):
         self.username = username
         self.email = email
         self.password_hash = generate_password_hash(supplied_password)
+        self.email_confirmation_token = confirmation_token
         self.is_admin = is_admin
 
     def password_matches_hash(self, password: str) -> bool:

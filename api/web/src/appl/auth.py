@@ -12,6 +12,8 @@ from flask_jwt_extended import (
 from sqlalchemy.exc import DatabaseError
 
 from src.appl import LOGGER, Config
+from src.appl.generators import generate_email_confirmation_token
+from src.appl.postmark import send_welcome_email
 from src.appl.models import RegistrationRequest, LoginRequest
 from src.appl.remnant_db import user_queries, token_queries
 from src.appl.validation import check_valid_password, check_valid_email, check_types
@@ -88,7 +90,9 @@ def register():
     if registration_info.email in Config.ADMIN_EMAILS:
         user_queries.create_admin(registration_info)
     else:
-        user_queries.create_user(registration_info)
+        user = user_queries.create_user(registration_info)
+
+        send_success = send_welcome_email(user)
 
     return jsonify({"email": registration_info.email, "errorString": ""}), 200
 
