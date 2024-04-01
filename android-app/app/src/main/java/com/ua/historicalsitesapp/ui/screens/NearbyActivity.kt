@@ -54,8 +54,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.*
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.filled.Sort
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 
 
 class FeedPageActivity : ComponentActivity() {
@@ -108,8 +110,19 @@ fun HomeAppBar(displayCount: Int, totalCount: Int, radius: MutableState<Float>, 
                 var showMenu by remember { mutableStateOf(false) }
                 val radiusOptions = listOf(5, 10, 20)
 
-                IconButton(onClick = { showMenu = !showMenu }) {
-                    Icon(imageVector = Icons.Default.FilterList, contentDescription = "Filter")
+                IconButton(
+                    onClick = { showMenu = !showMenu },
+                    modifier = Modifier
+                        .border(
+                            border = BorderStroke(1.dp, Color.White), // Define the border width and color
+                            shape = RoundedCornerShape(4.dp) // Define the corner radius for the rounded square
+                        )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Sort,
+                        contentDescription = "Filter",
+                        tint = Color.White
+                    )
                 }
 
                 DropdownMenu(
