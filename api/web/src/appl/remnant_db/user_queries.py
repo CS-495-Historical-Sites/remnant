@@ -1,19 +1,26 @@
 from src.appl import db
 from src.appl.models import LoginAttempt, RegistrationRequest, User
 
+from src.appl.generators import generate_email_confirmation_token
+
 
 def email_exists(email: str) -> bool:
     return User.query.filter_by(email=email).first() is not None
 
 
-def create_user(registration_info: RegistrationRequest) -> None:
+def create_user(registration_info: RegistrationRequest) -> User:
+    email_confirmation_token = generate_email_confirmation_token()
     user = User(
         username=registration_info.username,
         email=registration_info.email,
         supplied_password=registration_info.password,
+        confirmation_token=email_confirmation_token,
+        is_admin=False,
     )
     db.session.add(user)
     db.session.commit()
+
+    return user
 
 
 def create_admin(registration_info: RegistrationRequest) -> None:

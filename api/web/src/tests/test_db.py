@@ -13,7 +13,10 @@ def valid_user() -> User:
     user_email = "DamonArnette34@gmail.com"
     user_unhashed_password = "IloveSQL#667"
     return User(
-        username=username, email=user_email, supplied_password=user_unhashed_password
+        username=username,
+        email=user_email,
+        supplied_password=user_unhashed_password,
+        confirmation_token="abcde",
     )
 
 

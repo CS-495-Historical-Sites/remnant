@@ -8,6 +8,15 @@ class Config:
     SECRET_KEY = os.environ.get("FLASK_SECRET_KEY")
     LOG_LEVEL = logging.DEBUG
 
+    PRODUCT_URL = "https://uahistoricalsites.com/"
+    PRODUCT_NAME = "Remnant"
+
+    EMAIL_CONFIRMATION_URL = ""
+    COMPANY_NAME = "Remnant"
+    COMPANY_ADDRESS = "Tuscaloosa, AL"
+
+    EMAIL_ADDRESS = "erich.reitz@uahistoricalsites.com"
+
     # Configure PostgreSQL database connection
     POSTGRES_USER = os.environ.get("POSTGRES_USER")
     POSTGRES_PASSWORD = os.environ.get("POSTGRES_PASSWORD")
@@ -26,6 +35,8 @@ class Config:
         aws_access_key_id=AWS_ACCESS_KEY,
         aws_secret_access_key=AWS_SECRET_KEY,
     )
+
+    POSTMARK_API_KEY = os.getenv("POSTMARK_API_KEY")
 
     assert all(
         [
