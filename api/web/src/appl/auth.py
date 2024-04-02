@@ -133,12 +133,13 @@ def login():
     access_token = create_access_token(identity=user.email)
     refresh_token = create_refresh_token(identity=user.email)
     is_first_login = user_queries.successful_login_attempts(email=login_info.email) == 1
+
     return (
         jsonify(
             access_token=access_token,
             refresh_token=refresh_token,
             first_login=is_first_login,
-            has_confirmed_email=user.has_confirmed_email,
+            has_confirmed_email=True,
         ),
         200,
     )
