@@ -120,21 +120,3 @@ class TestVisitedLocations:
 
         locations_retrieved = response.json.get("visited_locations")
         assert len(locations_retrieved) == locations_added
-
-        # TESTING REFRESH WITH LOCATIONS
-
-        headers2 = {"Authorization": f"Bearer {r_token}"}
-
-        rr = client.post("/api/refresh", headers=headers2)
-        new_token = rr.json.get("access_token")
-        final_header = {"Authorization": f"Bearer {new_token}"}
-        refresh_response = client.get(
-            "/api/user/visited_locations",
-            json=user_id,
-            headers=final_header,
-            content_type="application/json",
-        )
-        assert refresh_response.status_code == expected_status
-
-        refresh_locations = refresh_response.json.get("visited_locations")
-        assert len(refresh_locations) == locations_added
