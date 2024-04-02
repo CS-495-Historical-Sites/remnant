@@ -138,6 +138,7 @@ def login():
             access_token=access_token,
             refresh_token=refresh_token,
             first_login=is_first_login,
+            has_confirmed_email=user.has_confirmed_email,
         ),
         200,
     )

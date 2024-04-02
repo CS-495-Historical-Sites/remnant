@@ -135,7 +135,7 @@ private fun UsernameTextField(onUserNameChange: (String) -> Unit) {
 }
 
 private fun isEmailValid(email: String): Boolean {
-  return Regex("[\\w-]+@([\\w-]+\\.)+[\\w-]+").matches(email)
+  return Regex("[\\w.-]+@([\\w-]+\\.)+[\\w-]+").matches(email)
 }
 
 private fun validatePassword(password: String): PasswordValidationResult {
