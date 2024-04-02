@@ -92,7 +92,7 @@ def register():
     else:
         user = user_queries.create_user(registration_info)
 
-        send_success = send_welcome_email(user)
+        # send_success = send_welcome_email(user)
 
     return jsonify({"email": registration_info.email, "errorString": ""}), 200
 
@@ -137,7 +137,7 @@ def login():
     return (
         jsonify(
             access_token=access_token,
-            refresh_token=refresh_token,
+            refresh_slangtoken=refresh_token,
             first_login=is_first_login,
             has_confirmed_email=True,
         ),
