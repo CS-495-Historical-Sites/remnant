@@ -126,11 +126,14 @@ class LoginRepository(
 
     val decryptedAccessToken = decrypt(encryptedAccessToken, "accessToken")
     val decryptedRefreshToken = decrypt(encryptedRefreshToken, "refreshToken")
-
+    // hasConfirmed = true, because the user only gets tokens if they login, and the user can only
+    // login if they confirm their email
     return LoggedInUser(
         accessToken = decryptedAccessToken,
         refreshToken = decryptedRefreshToken,
-        isFirstLogin = false)
+        isFirstLogin = false,
+        hasConfirmedEmail = true,
+    )
   }
 
   private suspend fun storeInitBuffer(
