@@ -38,7 +38,6 @@ class AuthViewModel(context: Context) : ViewModel() {
   ): Result<LoggedInUser> {
     var result: Result<LoggedInUser> = Result.Error(Exception(("Unknown Error")))
     runBlocking { result = loginRepository.login(LoginDetails(email, password)) }
-
     return result
   }
 

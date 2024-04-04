@@ -20,5 +20,5 @@ data class HsLocationComplete(
     val longitude: Float,
     @SerialName("short_description") val shortDescription: String?,
     @SerialName("long_description") val longDescription: String?,
-    @SerialName("wikidata_image_name") val wikidataImageName: String,
+    @SerialName("image_link") val imageLink: String,
 )

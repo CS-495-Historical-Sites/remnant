@@ -16,6 +16,9 @@ pylint = "^3.0.3"
 pytest = "8.0.0"
 psycopg2-binary = "^2.9.9"
 flask-cors = "^4.0.0"
+boto3 = "^1.34.70"
+botocore = "^1.34.70"
+requests = "^2.31.0"
 
 
 [build-system]

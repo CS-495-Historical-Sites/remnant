@@ -49,7 +49,12 @@ export const SuggestionsView: React.FC<UserProps> = ({ setToken, token }) => {
     fetchLocationEditSuggestions();
   }, [token, setToken]);
 
-  const handleSuggestionClick = (suggestionId: number) => {
+  const handleAddSuggestionClick = (suggestionId: number) => {
+    // Navigate to the edit suggestion page with the suggestionId
+    navigate(`/admin/add-suggestion/${suggestionId}`);
+  };
+
+  const handleEditSuggestionClick = (suggestionId: number) => {
     // Navigate to the edit suggestion page with the suggestionId
     navigate(`/admin/edit-suggestion/${suggestionId}`);
   };
@@ -69,7 +74,7 @@ export const SuggestionsView: React.FC<UserProps> = ({ setToken, token }) => {
             key={suggestion.id}
             divider
             button
-            onClick={() => handleSuggestionClick(suggestion.id)}
+            onClick={() => handleAddSuggestionClick(suggestion.id)}
           >
             <ListItemText
               primary={suggestion.name}
@@ -88,7 +93,7 @@ export const SuggestionsView: React.FC<UserProps> = ({ setToken, token }) => {
             key={suggestion.id}
             divider
             button
-            onClick={() => handleSuggestionClick(suggestion.id)}
+            onClick={() => handleEditSuggestionClick(suggestion.id)}
           >
             <ListItemText
               primary={suggestion.name}

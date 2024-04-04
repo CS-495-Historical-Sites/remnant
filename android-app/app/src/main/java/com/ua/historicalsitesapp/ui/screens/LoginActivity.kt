@@ -245,18 +245,23 @@ private fun LoginMenu(modifier: Modifier = Modifier) {
   LoginCard(
       onEmailChange = { email = it },
       onPasswordChange = { password = it },
-      onLoginClick = {
-        val loginResult = view.performLogin(email, password)
+      onLoginClick = onLoginClick@{
+            val loginResult = view.performLogin(email, password)
 
-        if (loginResult is Result.Success) {
-          showSuccessSnackbar = true
-          if (loginResult.data.isFirstLogin) {
-            firstLogin = true
-          }
-        } else {
-          isErrorLocal = true
-        }
-      },
+            if (loginResult is Result.Success) {
+              if (!loginResult.data.hasConfirmedEmail) {
+                isErrorLocal = true
+                // Optionally, add a message about email confirmation requirement
+                return@onLoginClick // Early exit from the lambda expression
+              }
+              showSuccessSnackbar = true
+              if (loginResult.data.isFirstLogin) {
+                firstLogin = true
+              }
+            } else {
+              isErrorLocal = true
+            }
+          },
       loginSuccess = showSuccessSnackbar,
       isError = isErrorLocal,
       onRegisterClick = {

@@ -9,6 +9,7 @@ import AdminView from "./pages/AdminView";
 import SuggestionsView from "./pages/SuggestionView";
 import EditSuggestionPage from "./pages/EditSuggestionPage";
 import useToken from "./hooks/useToken";
+import AddSuggestionPage from "./pages/AddSuggestionPage";
 
 function App() {
   const { token, setToken, removeToken } = useToken();
@@ -36,6 +37,18 @@ function App() {
           {!token && (
             <Route
               path="/admin/suggestions"
+              element={<Login setToken={setToken} />}
+            />
+          )}
+          {token && (
+            <Route
+              path="/admin/add-suggestion/:suggestionId"
+              element={<AddSuggestionPage setToken={setToken} token={token} />}
+            />
+          )}
+          {!token && (
+            <Route
+              path="/admin/add-suggestion/:suggestionId"
               element={<Login setToken={setToken} />}
             />
           )}

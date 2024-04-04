@@ -7,6 +7,7 @@ export default interface LocationSuggestion {
   longitude: number;
   short_description: number;
   wikidata_image_name: string;
+  image_url: string;
 }
 
 export default interface LocationEditSuggestion {

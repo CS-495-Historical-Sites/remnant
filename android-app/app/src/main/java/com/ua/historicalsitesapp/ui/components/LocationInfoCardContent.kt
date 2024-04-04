@@ -19,17 +19,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Map
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -44,16 +39,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.ua.historicalsitesapp.data.model.map.HsLocationComplete
-import com.ua.historicalsitesapp.data.wikidata.constructWikidataImageLink
 import com.ua.historicalsitesapp.ui.foreignintents.createGoogleMapsDirectionsIntent
 import com.ua.historicalsitesapp.ui.theme.Typography
 import com.ua.historicalsitesapp.viewmodels.MainPageViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LocationInfoCardContent(
     location: HsLocationComplete,
-    sheetState: SheetState,
 ) {
   val view = MainPageViewModel(LocalContext.current)
   var showEditForm by remember { mutableStateOf(false) }
@@ -77,9 +69,9 @@ fun LocationInfoCardContent(
     Column(
         modifier = Modifier.padding(horizontal = 32.dp).then(Modifier.verticalScroll(scrollState)),
     ) {
-      RenderLocationInfo(location, { showEditForm = true })
+      RenderLocationInfo(location) { showEditForm = true }
       Spacer(modifier = Modifier.height(16.dp))
-      Divider(
+      HorizontalDivider(
           thickness = 3.dp,
       )
       Spacer(modifier = Modifier.height(16.dp))
@@ -91,7 +83,10 @@ fun LocationInfoCardContent(
 
 @Composable
 private fun RenderLocationInfo(location: HsLocationComplete, onEditClick: () -> Unit) {
-  val imageLink = constructWikidataImageLink(location.wikidataImageName, 1000)
+  var imageLink = location.imageLink
+  if (!location.imageLink.startsWith("https://remnantphotos.s3.")) {
+    imageLink = location.imageLink + "&width=1000"
+  }
 
   ImageBox(imageLink)
   Spacer(modifier = Modifier.height(6.dp))
@@ -126,44 +121,6 @@ private fun TitleBox(locationName: String, onEditClick: () -> Unit) {
       Icon(Icons.Filled.Edit, contentDescription = "Suggest Edit")
     }
   }
-}
-
-@Composable
-fun SuggestEditForm(
-    location: HsLocationComplete,
-    onSubmitSuggestion: (String, String, String) -> Unit,
-    onDismiss: () -> Unit
-) {
-  var title by remember { mutableStateOf(location.name) }
-  var shortDescription by remember { mutableStateOf(location.shortDescription ?: "") }
-  var longDescription by remember { mutableStateOf(location.longDescription ?: "") }
-
-  AlertDialog(
-      onDismissRequest = { onDismiss() },
-      title = { Text("Suggest an Edit") },
-      text = {
-        Column {
-          TextField(value = title, onValueChange = { title = it }, label = { Text("Name") })
-          TextField(
-              value = shortDescription,
-              onValueChange = { shortDescription = it },
-              label = { Text("Short Description") })
-          TextField(
-              value = longDescription,
-              onValueChange = { longDescription = it },
-              label = { Text("Long Description") })
-        }
-      },
-      confirmButton = {
-        Button(
-            onClick = {
-              onSubmitSuggestion(title, shortDescription, longDescription)
-              onDismiss()
-            }) {
-              Text("Submit")
-            }
-      },
-      dismissButton = { OutlinedButton(onClick = { onDismiss() }) { Text("Cancel") } })
 }
 
 @Composable

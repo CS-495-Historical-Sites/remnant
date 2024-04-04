@@ -13,7 +13,9 @@ services:
       postgres:
         condition: service_healthy
     
-    env_file: .env.dev
+    env_file: 
+      - .env.dev 
+      - .env
 
   postgres:
     image: postgres

@@ -1,10 +1,21 @@
 import logging
 import os
 
+import boto3
+
 
 class Config:
     SECRET_KEY = os.environ.get("FLASK_SECRET_KEY")
     LOG_LEVEL = logging.DEBUG
+
+    PRODUCT_URL = "https://uahistoricalsites.com/"
+    PRODUCT_NAME = "Remnant"
+
+    EMAIL_CONFIRMATION_URL = ""
+    COMPANY_NAME = "Remnant"
+    COMPANY_ADDRESS = "Tuscaloosa, AL"
+
+    EMAIL_ADDRESS = "erich.reitz@uahistoricalsites.com"
 
     # Configure PostgreSQL database connection
     POSTGRES_USER = os.environ.get("POSTGRES_USER")
@@ -12,8 +23,20 @@ class Config:
     POSTGRES_HOST = os.environ.get("POSTGRES_HOST", "postgres")
     POSTGRES_PORT = os.environ.get("POSTGRES_PORT")
     POSTGRES_DB = os.environ.get("POSTGRES_DB")
+    IMAGES_DIR = os.environ.get("FLASK_IMAGES_DIR", "/path/to/default/images/directory")
 
     ADMIN_EMAILS = os.getenv("ADMIN_EMAILS").split(";")
+
+    AWS_ACCESS_KEY = os.getenv("AWS_ACCESS_KEY")
+    AWS_SECRET_KEY = os.getenv("AWS_SECRET_KEY")
+
+    S3_CLIENT = boto3.client(
+        "s3",
+        aws_access_key_id=AWS_ACCESS_KEY,
+        aws_secret_access_key=AWS_SECRET_KEY,
+    )
+
+    POSTMARK_API_KEY = os.getenv("POSTMARK_API_KEY")
 
     assert all(
         [

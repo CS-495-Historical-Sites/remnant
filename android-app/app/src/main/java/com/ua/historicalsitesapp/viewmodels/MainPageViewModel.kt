@@ -6,6 +6,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.ua.historicalsitesapp.data.model.auth.LoggedInUser
 import com.ua.historicalsitesapp.data.model.map.HsLocation
 import com.ua.historicalsitesapp.data.model.map.HsLocationComplete
+import com.ua.historicalsitesapp.data.model.suggestions.LocationAddSuggestion
 import com.ua.historicalsitesapp.data.model.suggestions.LocationEditSuggestion
 import com.ua.historicalsitesapp.data.model.visits.GetUserVisitedLocationsResponse
 import com.ua.historicalsitesapp.data.model.visits.VisitAddRequest
@@ -23,6 +24,7 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
+import java.util.Base64
 import kotlinx.coroutines.runBlocking
 
 class MainPageViewModel(context: Context) : ViewModel() {
@@ -95,14 +97,39 @@ class MainPageViewModel(context: Context) : ViewModel() {
       longDesc: String
   ): Boolean {
     val client = getUserClient()
-    val visitInfo = LocationEditSuggestion(name, shortDesc, longDesc)
+    val editSuggestion = LocationEditSuggestion(name, shortDesc, longDesc)
     return runBlocking {
       val response =
-          client.post(
-              ServerConfig.SERVER_URL + "/suggestions/location_edit_suggestions/" + locationId) {
-                contentType(ContentType.Application.Json)
-                setBody(visitInfo)
-              }
+          client.post(ServerConfig.SERVER_URL + "/suggestions/locations/edit/" + locationId) {
+            contentType(ContentType.Application.Json)
+            setBody(editSuggestion)
+          }
+      return@runBlocking response.status.value == 200
+    }
+  }
+
+  fun sendLocationAddRequest(
+      name: String,
+      lat: Double,
+      long: Double,
+      shortDesc: String,
+      image: ByteArray
+  ): Boolean {
+    val client = getUserClient()
+    val addSuggestion =
+        LocationAddSuggestion(
+            name = name,
+            latitude = lat,
+            longitude = long,
+            shortDescription = shortDesc,
+            wikipediaLink = null,
+            image = Base64.getEncoder().encodeToString(image))
+    return runBlocking {
+      val response =
+          client.post(ServerConfig.SERVER_URL + "/suggestions/locations/add") {
+            contentType(ContentType.Application.Json)
+            setBody(addSuggestion)
+          }
       return@runBlocking response.status.value == 200
     }
   }

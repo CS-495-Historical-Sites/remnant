@@ -28,6 +28,7 @@ import com.ua.historicalsitesapp.util.hasLocationPermission
 import com.ua.historicalsitesapp.viewmodels.MainPageViewModel
 
 class MainPageActivity : ComponentActivity() {
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
@@ -70,6 +71,7 @@ fun HomeScreen(modifier: Modifier) {
       color = MaterialTheme.colorScheme.background,
   ) {
     val context = LocalContext.current
+
     var hasPermission by remember { mutableStateOf(hasLocationPermission(context)) }
 
     LaunchedEffect(Unit) {
@@ -80,7 +82,6 @@ fun HomeScreen(modifier: Modifier) {
     if (hasPermission) {
       Box(modifier = Modifier.fillMaxSize()) {
         val view = MainPageViewModel(context)
-
         GoogleMapsScreen(view)
       }
     } else {
