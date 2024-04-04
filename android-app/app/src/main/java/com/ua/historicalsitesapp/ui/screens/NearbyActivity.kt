@@ -53,7 +53,6 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.model.LatLng
 import com.ua.historicalsitesapp.data.model.map.*
-import com.ua.historicalsitesapp.data.wikidata.constructWikidataImageLink
 import com.ua.historicalsitesapp.ui.components.LocationScreen
 import com.ua.historicalsitesapp.ui.foreignintents.createGoogleMapsDirectionsIntent
 import com.ua.historicalsitesapp.util.hasLocationPermission
@@ -164,7 +163,7 @@ fun SearchBar(searchQuery: MutableState<String>, onSearch: (String) -> Unit) {
 
 @Composable
 fun HomeMainContent(locationInfo: HsLocation, distance: Double) {
-  val imageLink = constructWikidataImageLink(locationInfo.wikidataImageName, 40)
+  val imageLink = locationInfo.imageLink
   val cornerRadius = 8.dp
   val context = LocalContext.current
 
