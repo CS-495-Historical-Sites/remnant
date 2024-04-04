@@ -14,7 +14,7 @@ user_blueprint = Blueprint(
 @jwt_required()
 @user_required
 def get_profile_info(user: User):
-    user_info: dict = {"email": user.email, "username": user.username, "interested_eras": user.interested_eras}
+    user_info: dict = {"email": user.email, "username": user.username, "answers": user.answers}
     return jsonify(user_info), 200
 
 
