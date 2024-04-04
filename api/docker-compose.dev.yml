@@ -26,8 +26,8 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
     healthcheck:
       test: ["CMD-SHELL", "pg_isready --dbname=${POSTGRES_DB} --username=${POSTGRES_USER}"]
-      interval: 2s
-      timeout: 15s
-      retries: 5
+      interval: 30s
+      timeout: 240s
+      retries: 50
     volumes:
       - ./pgdata:/var/lib/postgresql/data
