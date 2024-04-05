@@ -1,4 +1,4 @@
-name: Prettier
+name: Prettier Code Formatter
 
 on:
   push:
@@ -7,15 +7,20 @@ on:
     branches: [ "main" ]
 
 jobs:
-  lint:
+  format-code:
+    name: Format web app
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./website
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
         with:
           node-version: '14'
-      - run: npm install
-      - run: npx prettier --check .
+      - name: Install Dependencies
+        run: npm install
+      - name: Check Formatting with Prettier
+        run: npx prettier --check .
