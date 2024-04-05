@@ -42,5 +42,5 @@ jobs:
 
       - name: Sync output to S3
         run: |
-          aws s3 sync ./site/ s3://remnant-admin-website --delete
+          aws s3 sync ./dist/ s3://remnant-admin-website --delete
           aws cloudfront create-invalidation --distribution-id E3SJJYIIYILRVL --paths "/*"

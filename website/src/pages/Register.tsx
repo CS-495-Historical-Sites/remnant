@@ -1,11 +1,9 @@
 // third party
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
 
 // materialui
 import TextField from "@mui/material/TextField";
-import Alert from "@mui/material/Alert";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";

@@ -1,4 +1,4 @@
-name: Lint
+name: Check API Formatting
 
 on:
   push:

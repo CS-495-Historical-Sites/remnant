@@ -12,7 +12,7 @@ import useToken from "./hooks/useToken";
 import AddSuggestionPage from "./pages/AddSuggestionPage";
 
 function App() {
-  const { token, setToken, removeToken } = useToken();
+  const { token, setToken } = useToken();
   return (
     <div className="App">
       <BrowserRouter>
