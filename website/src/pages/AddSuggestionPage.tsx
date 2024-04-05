@@ -8,7 +8,6 @@ import {
   Box,
 } from "@mui/material";
 
-
 import LocationSuggestion from "../models/LocationSuggestion";
 import { UpdateLocationSuggestion } from "../remnantAPI/UpdateLocationSuggestions";
 import { GetLocationAddSuggestion } from "../remnantAPI/GetLocationSuggestions";
