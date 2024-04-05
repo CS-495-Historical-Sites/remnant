@@ -16,7 +16,12 @@ from src.appl.generators import generate_email_confirmation_token
 from src.appl.postmark import send_welcome_email
 from src.appl.models import RegistrationRequest, LoginRequest
 from src.appl.remnant_db import user_queries, token_queries
-from src.appl.validation import check_valid_password, check_valid_email, check_valid_username, check_types
+from src.appl.validation import (
+    check_valid_password,
+    check_valid_email,
+    check_valid_username,
+    check_types,
+)
 
 
 def user_required(f):
@@ -75,7 +80,11 @@ def register():
 
     # checking for valid credentials
     # no point in checking the database if the credentials are not valid
-    if not check_valid_email(email) or not check_valid_password(non_hash_password) or not check_valid_username(username):
+    if (
+        not check_valid_email(email)
+        or not check_valid_password(non_hash_password)
+        or not check_valid_username(username)
+    ):
         return jsonify({"message": "Invalid credentials entered"}), 422
 
     registration_info = RegistrationRequest(

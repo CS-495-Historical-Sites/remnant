@@ -162,8 +162,8 @@ class User(db.Model):
         username: str,
         email: str,
         supplied_password: str,
-        answers=None,
         confirmation_token: str,
+        answers=None,
         is_admin=False,
     ):
         self.username = username

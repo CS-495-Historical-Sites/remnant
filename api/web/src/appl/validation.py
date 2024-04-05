@@ -34,7 +34,7 @@ def check_valid_password(password):
 
 
 def check_valid_username(username):
-    if not re.match(r'^[A-Za-z0-9._]+$', username):
+    if not re.match(r"^[A-Za-z0-9._]+$", username):
         return False
 
     return len(username) < 15

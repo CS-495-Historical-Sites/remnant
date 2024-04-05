@@ -160,6 +160,7 @@ class LoginRepository(
         KeyGenParameterSpec.Builder(
                 secretKeyAlias, KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT)
             .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+            .setKeySize(256)
             .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
             .build()
 
@@ -193,7 +194,7 @@ class LoginRepository(
   ): String {
     val cipher = Cipher.getInstance("AES/GCM/NoPadding")
     val iv = runBlocking { getInitBuffer(forProp) }
-    val spec = GCMParameterSpec(128, iv)
+    val spec = GCMParameterSpec(256, iv)
     cipher.init(Cipher.DECRYPT_MODE, getSecretKey(), spec)
     val decoded = cipher.doFinal(encrypted)
     return String(decoded, Charsets.UTF_8)
