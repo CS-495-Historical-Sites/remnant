@@ -15,6 +15,7 @@ def short_location_repr(l: Location) -> ShortLocationDescription:
         "latitude": l.latitude,
         "longitude": l.longitude,
         "short_description": l.short_description,
+        "image_link": l.image_link,
     }
 
 
