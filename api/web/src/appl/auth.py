@@ -12,7 +12,6 @@ from flask_jwt_extended import (
 from sqlalchemy.exc import DatabaseError
 
 from src.appl import LOGGER, Config
-from src.appl.generators import generate_email_confirmation_token
 from src.appl.postmark import send_welcome_email
 from src.appl.models import RegistrationRequest, LoginRequest
 from src.appl.remnant_db import user_queries, token_queries
