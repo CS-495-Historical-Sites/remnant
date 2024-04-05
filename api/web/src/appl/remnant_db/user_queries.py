@@ -24,10 +24,12 @@ def create_user(registration_info: RegistrationRequest) -> User:
 
 
 def create_admin(registration_info: RegistrationRequest) -> None:
+    email_confirmation_token = generate_email_confirmation_token()
     user = User(
         username=registration_info.username,
         email=registration_info.email,
         supplied_password=registration_info.password,
+        confirmation_token=email_confirmation_token,
         is_admin=True,
     )
     db.session.add(user)

@@ -4,7 +4,6 @@ from src.appl.models import (
     LocationEditSuggestion,
     ShortLocationDescription,
     LongLocationDescription,
-    LocationAddSuggestion,
 )
 
 

@@ -3,12 +3,12 @@ package com.ua.historicalsitesapp.viewmodels
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import com.ua.historicalsitesapp.data.model.auth.LoggedInUser
+import com.ua.historicalsitesapp.data.model.userinfo.UserProfileUpdateRequest
 import com.ua.historicalsitesapp.data.repository.auth.LoginDataSource
 import com.ua.historicalsitesapp.data.repository.auth.LoginRepositoryProvider
-import com.ua.historicalsitesapp.data.model.userinfo.UserProfileUpdateRequest
+import com.ua.historicalsitesapp.util.ServerConfig
 import com.ua.historicalsitesapp.util.constructUserClient
 import io.ktor.client.HttpClient
-import com.ua.historicalsitesapp.util.ServerConfig
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
@@ -27,7 +27,6 @@ class UserProfileViewModel(context: Context) : ViewModel() {
     val user = getUser()
     return constructUserClient(user)
   }
-
 
   fun submitRegistrationQuestionnaire(answers: Map<String, Set<String>>): Boolean {
     val client = getUserClient()

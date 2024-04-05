@@ -1,7 +1,6 @@
 from src.appl.models import (
     LocationEditSuggestion,
     LocationAddSuggestion,
-    SuggestionApproval,
 )
 
 

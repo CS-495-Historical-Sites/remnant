@@ -3,7 +3,7 @@ from typing import Dict
 import requests
 
 # local
-from src.appl import db, LOGGER
+from src.appl import LOGGER
 from src.appl.config import Config
 from src.appl.models import User
 
@@ -53,7 +53,7 @@ def send_welcome_email(user: User) -> bool:
     )
 
     # Send the email
-    response = requests.post(url, headers=headers, json=body)
+    response = requests.post(url, headers=headers, json=body, timeout=5)
     if response.status_code != 200:
         LOGGER.error(
             "Failed to send welcome email to %s: %s", user.email, response.text

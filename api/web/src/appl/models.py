@@ -1,12 +1,11 @@
 from dataclasses import dataclass
 from datetime import datetime
 from typing import TypedDict
-from typing import Set
 
-from sqlalchemy import Connection, MetaData, UniqueConstraint, event
-from sqlalchemy.orm import Session
-from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy import MetaData, UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB
+from werkzeug.security import generate_password_hash, check_password_hash
+
 from src.appl import db
 
 
@@ -162,8 +161,8 @@ class User(db.Model):
         username: str,
         email: str,
         supplied_password: str,
-        answers=None,
         confirmation_token: str,
+        answers=None,
         is_admin=False,
     ):
         self.username = username
