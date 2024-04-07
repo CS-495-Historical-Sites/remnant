@@ -1,6 +1,8 @@
 package com.ua.historicalsitesapp.ui.components
 
 import android.Manifest
+import android.app.Activity
+import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -12,11 +14,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
 import com.ua.historicalsitesapp.util.hasLocationPermission
+import com.ua.historicalsitesapp.util.hasNotificationPermission
 
 @Composable
 fun LocationScreen(onPermissionGranted: () -> Unit) {
@@ -33,8 +40,29 @@ fun LocationScreen(onPermissionGranted: () -> Unit) {
           },
       )
 
-  Column(
-      modifier = Modifier.fillMaxSize().padding(16.dp),
+    var hasNotificationPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        hasNotificationPermission(context)
+    } else {
+        true
+    }
+
+    val permissionLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission(),
+            onResult = {isGranted -> hasNotificationPermission = isGranted})
+
+    if (!hasNotificationPermission) {
+        LaunchedEffect(Unit) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+    }
+
+    Column(
+      modifier = Modifier
+          .fillMaxSize()
+          .padding(16.dp),
       verticalArrangement = Arrangement.Center,
       horizontalAlignment = Alignment.CenterHorizontally,
   ) {

@@ -1,13 +1,9 @@
 package com.ua.historicalsitesapp.ui.screens
 
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -59,7 +55,6 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
 import com.example.compose.HistoricalSitesAppTheme
 import com.ua.historicalsitesapp.data.model.auth.RegistrationResult
 import com.ua.historicalsitesapp.ui.theme.Typography
@@ -72,35 +67,6 @@ class RegistrationActivity : ComponentActivity() {
     setContent {
       HistoricalSitesAppTheme {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-          val context = LocalContext.current
-          var hasNotificationPermission by remember {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-              mutableStateOf(
-                  ContextCompat.checkSelfPermission(
-                      context, android.Manifest.permission.POST_NOTIFICATIONS) ==
-                      PackageManager.PERMISSION_GRANTED)
-            } else mutableStateOf(true)
-          }
-
-          val permissionLauncher =
-              rememberLauncherForActivityResult(
-                  contract = ActivityResultContracts.RequestPermission(),
-                  onResult = { isGranted -> hasNotificationPermission = isGranted })
-
-          Column(
-              modifier = Modifier.fillMaxSize().padding(16.dp),
-              verticalArrangement = Arrangement.Top,
-              horizontalAlignment = Alignment.CenterHorizontally) {
-                Button(
-                    onClick = {
-                      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
-                      }
-                    }) {
-                      Text(text = "Enable Notifications")
-                    }
-              }
-
           RegistrationMenu()
         }
       }
