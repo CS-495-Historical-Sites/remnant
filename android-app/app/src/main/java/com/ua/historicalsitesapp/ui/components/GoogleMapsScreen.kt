@@ -181,6 +181,9 @@ fun GoogleMapsScreen(
       }
 
       val geofenceLocations = view.getHistoricalLocationNearPoint(coordinates, 0.5f)
+      if (geofenceLocations.isEmpty()) {
+        return@addOnSuccessListener
+      }
       var count = 0
       for (location in geofenceLocations) {
         if (count < 100) {
