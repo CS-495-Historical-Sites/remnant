@@ -5,8 +5,6 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.core.content.ContextCompat
 
 fun hasLocationPermission(context: Context): Boolean {
@@ -18,9 +16,6 @@ fun hasLocationPermission(context: Context): Boolean {
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 fun hasNotificationPermission(context: Context): Boolean {
-    return ContextCompat.checkSelfPermission(
-        context,
-        Manifest.permission.POST_NOTIFICATIONS
-    ) == PackageManager.PERMISSION_GRANTED
+  return ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) ==
+      PackageManager.PERMISSION_GRANTED
 }
-
