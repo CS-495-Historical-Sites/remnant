@@ -8,7 +8,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -226,7 +225,6 @@ fun UserProfilePage(modifier: Modifier = Modifier) {
     val currentContext = LocalContext.current
     val view = AuthViewModel(currentContext)
     val userView = UserProfileViewModel(currentContext)
-    val userProfileViewModel = UserProfileViewModel(currentContext)
     var username by remember { mutableStateOf("") }
     var fetchedUsername by remember { mutableStateOf("") }
     val email by remember { mutableStateOf("") }
@@ -249,7 +247,7 @@ fun UserProfilePage(modifier: Modifier = Modifier) {
             fetchedEmail = fetchedEmail,
             onUsernameChange = { username = it },
             onSaveClick = {
-                userProfileViewModel.updateUsername(username)
+                userView.updateUsername(username)
 
             }
         )
@@ -257,7 +255,9 @@ fun UserProfilePage(modifier: Modifier = Modifier) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(vertical = 48.dp, horizontal = 16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally // Center horizontally
         ) {
             LogoutButton(
                 onClick = { showLogoutConfirmation.value = true },
@@ -311,6 +311,7 @@ fun UserProfilePage(modifier: Modifier = Modifier) {
         }
     }
 }
+
 
 
 
