@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -62,57 +63,105 @@ class UserProfileActivity : ComponentActivity() {
         }
     }
 }
-
+// Do email on user profile page
+// Maybe do notifications like an on/off button like those switch bars user location
+// Questionnaire on user profile page
 @Composable
 fun UsernameTextField(
     initialValue: String,
     fetchedUsername: String,
-    onUserNameChange: (String) -> Unit
+    onUserNameChange: (String) -> Unit,
+    onUsernameClick: () -> Unit,
+    isEditing: Boolean
 ) {
-    var text by remember { mutableStateOf(fetchedUsername) }
+    var text by remember { mutableStateOf(initialValue) }
 
-    OutlinedTextField(
-        value = text,
-        onValueChange = {
-            text = it
-            onUserNameChange(it)
+    Box(
+        modifier = Modifier.clickable {
+            onUsernameClick()
         },
-        label = { Text(fetchedUsername) }, // Use fetched username as the label
-        maxLines = 1,
-        singleLine = true,
-        keyboardOptions = KeyboardOptions.Default,
-        shape = RoundedCornerShape(12.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = MaterialTheme.colorScheme.secondary
-        )
+        content = {
+            if (isEditing) {
+                OutlinedTextField(
+                    value = text,
+                    onValueChange = { newText ->
+                        text = newText
+                        onUserNameChange(newText)
+                    },
+                    label = { Text("Change Username?") },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions.Default,
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.secondary
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                )
+            } else {
+                Text(
+                    text = fetchedUsername,
+                    style = TextStyle(
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Start
+                    ),
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+        }
     )
 }
+
 
 @Composable
 private fun SaveButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    isVisible: Boolean
+) {
+    if (isVisible) {
+        Button(
+            onClick = onClick,
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+            shape = RoundedCornerShape(12.dp),
+            modifier = modifier.fillMaxWidth().height(56.dp),
+        ) {
+            Text(
+                "Save",
+                style = Typography.labelLarge,
+            )
+        }
+    }
+}
+
+@Composable
+fun LogoutButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Button(
         onClick = onClick,
-        colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-        shape = RoundedCornerShape(12.dp),
-        modifier = modifier.fillMaxWidth().height(56.dp),
-    ) {
-        Text(
-            "Save",
-            style = Typography.labelLarge,
-        )
-    }
+        modifier = Modifier.width(200.dp),
+        shape = RoundedCornerShape(50.dp),
+        colors =
+        ButtonDefaults.buttonColors(
+            contentColor = Color.White,
+            containerColor = Color.Black,
+        ),
+        content = { Text("Logout") },
+    )
 }
 
 @Composable
 fun UserProfileCard(
     modifier: Modifier = Modifier,
     fetchedUsername: String,
+    fetchedEmail: String,
     onUsernameChange: (String) -> Unit,
     onSaveClick: () -> Unit
 ) {
+    var isEditing by remember { mutableStateOf(false) }
+
     Box(
         modifier = modifier.fillMaxSize(),
     ) {
@@ -134,15 +183,34 @@ fun UserProfileCard(
                     horizontalAlignment = Alignment.Start,
                     modifier = Modifier.padding(start = 8.dp)
                 ) {
+                    // Username
                     UsernameTextField(
                         initialValue = "Initial Value", // You can set an initial value here if needed
                         fetchedUsername = fetchedUsername,
-                        onUserNameChange = onUsernameChange
+                        onUserNameChange = onUsernameChange,
+                        onUsernameClick = { isEditing = true }, // Update isEditing state when username is clicked
+                        isEditing = isEditing // When save button is clicked disable the text box
                     )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    SaveButton(onSaveClick, modifier = Modifier.fillMaxWidth())
+                    // Save button
+                    SaveButton(
+                        onClick = {
+                            onSaveClick()
+                            isEditing = false // Set isEditing to false after save button is clicked
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        isVisible = isEditing
+                    )
+                    // Email
+                    Text(
+                        text = fetchedEmail,
+                        style = TextStyle(
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Normal,
+                            textAlign = TextAlign.Start
+                        ),
+                        modifier = Modifier.padding(start = 16.dp, top = 8.dp)
+                    )
                 }
-
             }
         }
     }
@@ -161,8 +229,12 @@ fun UserProfilePage(modifier: Modifier = Modifier) {
     val userProfileViewModel = UserProfileViewModel(currentContext)
     var username by remember { mutableStateOf("") }
     var fetchedUsername by remember { mutableStateOf("") }
+    val email by remember { mutableStateOf("") }
+    var fetchedEmail by remember { mutableStateOf("") }
+
     LaunchedEffect(Unit) {
-        fetchedUsername = userView.getUsername(username).toString()
+        fetchedUsername = userView.getUsername(username).username
+        fetchedEmail = userView.getEmail(email).email
     }
     Column(
         modifier = Modifier
@@ -174,6 +246,7 @@ fun UserProfilePage(modifier: Modifier = Modifier) {
         UserProfileCard(
             modifier = Modifier.weight(1f),
             fetchedUsername = fetchedUsername,
+            fetchedEmail = fetchedEmail,
             onUsernameChange = { username = it },
             onSaveClick = {
                 userProfileViewModel.updateUsername(username)
@@ -241,20 +314,4 @@ fun UserProfilePage(modifier: Modifier = Modifier) {
 
 
 
-@Composable
-fun LogoutButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Button(
-        onClick = onClick,
-        modifier = Modifier.width(200.dp),
-        shape = RoundedCornerShape(50.dp),
-        colors =
-        ButtonDefaults.buttonColors(
-            contentColor = Color.White,
-            containerColor = Color.Black,
-        ),
-        content = { Text("Logout") },
-    )
-}
+
