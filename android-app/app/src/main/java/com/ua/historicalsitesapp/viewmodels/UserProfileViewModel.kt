@@ -12,17 +12,16 @@ import com.ua.historicalsitesapp.util.ServerConfig
 import com.ua.historicalsitesapp.util.constructUserClient
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.request.patch
 import io.ktor.client.request.*
+import io.ktor.client.request.patch
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import kotlinx.coroutines.runBlocking
 
-
 class UserProfileViewModel(context: Context) : ViewModel() {
   private val loginRepository =
-    LoginRepositoryProvider.provideLoginRepository(LoginDataSource(), context)
+      LoginRepositoryProvider.provideLoginRepository(LoginDataSource(), context)
 
   private fun getUser(): LoggedInUser {
     return loginRepository.user ?: throw Exception("MainPageViewModel could not retrieve user")
@@ -38,10 +37,10 @@ class UserProfileViewModel(context: Context) : ViewModel() {
     val allAnswers = UserProfileUpdateRequest(answers)
     return runBlocking {
       val response =
-        client.patch(ServerConfig.SERVER_URL + "/user/privateinfo") {
-          contentType(ContentType.Application.Json)
-          setBody(allAnswers)
-        }
+          client.patch(ServerConfig.SERVER_URL + "/user/privateinfo") {
+            contentType(ContentType.Application.Json)
+            setBody(allAnswers)
+          }
       return@runBlocking response.status.value == 200
     }
   }
@@ -49,7 +48,8 @@ class UserProfileViewModel(context: Context) : ViewModel() {
   fun getUsername(username: String): UserProfileInfo {
     val client = getUserClient()
     return runBlocking {
-      val response: UserProfileInfo = client.get(ServerConfig.SERVER_URL + "/user/privateinfo" + username) {}.body()
+      val response: UserProfileInfo =
+          client.get(ServerConfig.SERVER_URL + "/user/privateinfo" + username) {}.body()
       return@runBlocking response
     }
   }
@@ -57,8 +57,9 @@ class UserProfileViewModel(context: Context) : ViewModel() {
   fun getEmail(email: String): UserProfileInfo {
     val client = getUserClient()
     return runBlocking {
-        val response: UserProfileInfo = client.get(ServerConfig.SERVER_URL + "/user/privateinfo" + email) {}.body()
-        return@runBlocking response
+      val response: UserProfileInfo =
+          client.get(ServerConfig.SERVER_URL + "/user/privateinfo" + email) {}.body()
+      return@runBlocking response
     }
   }
 
@@ -67,10 +68,10 @@ class UserProfileViewModel(context: Context) : ViewModel() {
     val newUsername = UserProfileUsernameRequest(username)
     return runBlocking {
       val response =
-        client.patch(ServerConfig.SERVER_URL + "/user/privateinfo") {
-          contentType(ContentType.Application.Json)
-          setBody(newUsername)
-        }
+          client.patch(ServerConfig.SERVER_URL + "/user/privateinfo") {
+            contentType(ContentType.Application.Json)
+            setBody(newUsername)
+          }
       return@runBlocking response.status.value == 200
     }
   }
