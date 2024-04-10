@@ -214,8 +214,10 @@ fun UserProfilePage(modifier: Modifier = Modifier) {
   var fetchedEmail by remember { mutableStateOf("") }
 
   LaunchedEffect(Unit) {
-    fetchedUsername = userView.getUsername(username).username
-    fetchedEmail = userView.getEmail(email).email
+    val fetchedUserInfo = userView.getProfileInfo()
+
+    fetchedUsername = fetchedUserInfo.username
+    fetchedEmail = fetchedUserInfo.email
   }
   Column(
       modifier = Modifier.fillMaxSize().padding(16.dp),
