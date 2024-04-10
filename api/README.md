@@ -4,6 +4,10 @@
 - Docker Compose
 - Ansible (for AWS EC2 configuration)
 
+## Setup
+
+You must create a `.env` file, even if it is empty in the `api` directory.
+
 ### S3 Setup
 
 Currently, this only needed for uploading a photo during location suggestion creation.

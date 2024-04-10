@@ -47,20 +47,20 @@ import com.ua.historicalsitesapp.viewmodels.AuthViewModel
 import com.ua.historicalsitesapp.viewmodels.UserProfileViewModel
 
 class UserProfileActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            HistoricalSitesAppTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background,
-                ) {
-                    UserProfilePage()
-                }
-            }
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setContent {
+      HistoricalSitesAppTheme {
+        // A surface container using the 'background' color from the theme
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background,
+        ) {
+          UserProfilePage()
         }
+      }
     }
+  }
 }
 // Do email on user profile page
 // Maybe do notifications like an on/off button like those switch bars user location
@@ -73,64 +73,52 @@ fun UsernameTextField(
     onUsernameClick: () -> Unit,
     isEditing: Boolean
 ) {
-    var text by remember { mutableStateOf(initialValue) }
+  var text by remember { mutableStateOf(initialValue) }
 
-    Box(
-        modifier = Modifier.clickable {
-            onUsernameClick()
-        },
-        content = {
-            if (isEditing) {
-                OutlinedTextField(
-                    value = text,
-                    onValueChange = { newText ->
-                        text = newText
-                        onUserNameChange(newText)
-                    },
-                    label = { Text("Change Username?") },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions.Default,
-                    shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MaterialTheme.colorScheme.secondary
-                    ),
-                    modifier = Modifier.fillMaxWidth()
-                )
-            } else {
-                Text(
-                    text = fetchedUsername,
-                    style = TextStyle(
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Start
-                    ),
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
+  Box(
+      modifier = Modifier.clickable { onUsernameClick() },
+      content = {
+        if (isEditing) {
+          OutlinedTextField(
+              value = text,
+              onValueChange = { newText ->
+                text = newText
+                onUserNameChange(newText)
+              },
+              label = { Text("Change Username?") },
+              singleLine = true,
+              keyboardOptions = KeyboardOptions.Default,
+              shape = RoundedCornerShape(12.dp),
+              colors =
+                  OutlinedTextFieldDefaults.colors(
+                      focusedBorderColor = MaterialTheme.colorScheme.secondary),
+              modifier = Modifier.fillMaxWidth())
+        } else {
+          Text(
+              text = fetchedUsername,
+              style =
+                  TextStyle(
+                      fontSize = 20.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Start),
+              modifier = Modifier.padding(16.dp))
         }
-    )
+      })
 }
 
-
 @Composable
-private fun SaveButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    isVisible: Boolean
-) {
-    if (isVisible) {
-        Button(
-            onClick = onClick,
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-            shape = RoundedCornerShape(12.dp),
-            modifier = modifier.fillMaxWidth().height(56.dp),
-        ) {
-            Text(
-                "Save",
-                style = Typography.labelLarge,
-            )
-        }
+private fun SaveButton(onClick: () -> Unit, modifier: Modifier = Modifier, isVisible: Boolean) {
+  if (isVisible) {
+    Button(
+        onClick = onClick,
+        colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+        shape = RoundedCornerShape(12.dp),
+        modifier = modifier.fillMaxWidth().height(56.dp),
+    ) {
+      Text(
+          "Save",
+          style = Typography.labelLarge,
+      )
     }
+  }
 }
 
 @Composable
@@ -138,17 +126,17 @@ fun LogoutButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Button(
-        onClick = onClick,
-        modifier = Modifier.width(200.dp),
-        shape = RoundedCornerShape(50.dp),
-        colors =
-        ButtonDefaults.buttonColors(
-            contentColor = Color.White,
-            containerColor = Color.Black,
-        ),
-        content = { Text("Logout") },
-    )
+  Button(
+      onClick = onClick,
+      modifier = Modifier.width(200.dp),
+      shape = RoundedCornerShape(50.dp),
+      colors =
+          ButtonDefaults.buttonColors(
+              contentColor = Color.White,
+              containerColor = Color.Black,
+          ),
+      content = { Text("Logout") },
+  )
 }
 
 @Composable
@@ -159,160 +147,142 @@ fun UserProfileCard(
     onUsernameChange: (String) -> Unit,
     onSaveClick: () -> Unit
 ) {
-    var isEditing by remember { mutableStateOf(false) }
+  var isEditing by remember { mutableStateOf(false) }
 
+  Box(
+      modifier = modifier.fillMaxSize(),
+  ) {
     Box(
-        modifier = modifier.fillMaxSize(),
-    ) {
-        Box(
-            modifier = Modifier
-                .size(width = 300.dp, height = 400.dp)
+        modifier =
+            Modifier.size(width = 300.dp, height = 400.dp)
                 .clip(shape = RoundedCornerShape(16.dp))
                 .align(Alignment.TopStart),
-        ) {
-            Column(
-                modifier = modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.Start,
-                verticalArrangement = Arrangement.Top,
-            ) {
-                Spacer(modifier = Modifier.height(16.dp))
+    ) {
+      Column(
+          modifier = modifier.fillMaxSize(),
+          horizontalAlignment = Alignment.Start,
+          verticalArrangement = Arrangement.Top,
+      ) {
+        Spacer(modifier = Modifier.height(16.dp))
 
-                Column( // Username and Save button
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.Start,
-                    modifier = Modifier.padding(start = 8.dp)
-                ) {
-                    // Username
-                    UsernameTextField(
-                        initialValue = "Initial Value", // You can set an initial value here if needed
-                        fetchedUsername = fetchedUsername,
-                        onUserNameChange = onUsernameChange,
-                        onUsernameClick = { isEditing = true }, // Update isEditing state when username is clicked
-                        isEditing = isEditing // When save button is clicked disable the text box
-                    )
-                    // Save button
-                    SaveButton(
-                        onClick = {
-                            onSaveClick()
-                            isEditing = false // Set isEditing to false after save button is clicked
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        isVisible = isEditing
-                    )
-                    // Email
-                    Text(
-                        text = fetchedEmail,
-                        style = TextStyle(
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Normal,
-                            textAlign = TextAlign.Start
-                        ),
-                        modifier = Modifier.padding(start = 16.dp, top = 8.dp)
-                    )
-                }
+        Column( // Username and Save button
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.Start,
+            modifier = Modifier.padding(start = 8.dp)) {
+              // Username
+              UsernameTextField(
+                  initialValue = "Initial Value", // You can set an initial value here if needed
+                  fetchedUsername = fetchedUsername,
+                  onUserNameChange = onUsernameChange,
+                  onUsernameClick = {
+                    isEditing = true
+                  }, // Update isEditing state when username is clicked
+                  isEditing = isEditing // When save button is clicked disable the text box
+                  )
+              // Save button
+              SaveButton(
+                  onClick = {
+                    onSaveClick()
+                    isEditing = false // Set isEditing to false after save button is clicked
+                  },
+                  modifier = Modifier.fillMaxWidth(),
+                  isVisible = isEditing)
+              // Email
+              Text(
+                  text = fetchedEmail,
+                  style =
+                      TextStyle(
+                          fontSize = 20.sp,
+                          fontWeight = FontWeight.Normal,
+                          textAlign = TextAlign.Start),
+                  modifier = Modifier.padding(start = 16.dp, top = 8.dp))
             }
-        }
+      }
     }
+  }
 }
-
-
-
-
 
 @Composable
 fun UserProfilePage(modifier: Modifier = Modifier) {
-    val showLogoutConfirmation = remember { mutableStateOf(false) }
-    val currentContext = LocalContext.current
-    val view = AuthViewModel(currentContext)
-    val userView = UserProfileViewModel(currentContext)
-    var username by remember { mutableStateOf("") }
-    var fetchedUsername by remember { mutableStateOf("") }
-    val email by remember { mutableStateOf("") }
-    var fetchedEmail by remember { mutableStateOf("") }
+  val showLogoutConfirmation = remember { mutableStateOf(false) }
+  val currentContext = LocalContext.current
+  val view = AuthViewModel(currentContext)
+  val userView = UserProfileViewModel(currentContext)
+  var username by remember { mutableStateOf("") }
+  var fetchedUsername by remember { mutableStateOf("") }
+  val email by remember { mutableStateOf("") }
+  var fetchedEmail by remember { mutableStateOf("") }
 
-    LaunchedEffect(Unit) {
-        fetchedUsername = userView.getUsername(username).username
-        fetchedEmail = userView.getEmail(email).email
-    }
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+  LaunchedEffect(Unit) {
+    fetchedUsername = userView.getUsername(username).username
+    fetchedEmail = userView.getEmail(email).email
+  }
+  Column(
+      modifier = Modifier.fillMaxSize().padding(16.dp),
+      verticalArrangement = Arrangement.Top,
+      horizontalAlignment = Alignment.CenterHorizontally) {
         UserProfileCard(
             modifier = Modifier.weight(1f),
             fetchedUsername = fetchedUsername,
             fetchedEmail = fetchedEmail,
             onUsernameChange = { username = it },
-            onSaveClick = {
-                userView.updateUsername(username)
-
-            }
-        )
+            onSaveClick = { userView.updateUsername(username) })
 
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 48.dp, horizontal = 16.dp),
+            modifier = Modifier.fillMaxWidth().padding(vertical = 48.dp, horizontal = 16.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally // Center horizontally
-        ) {
-            LogoutButton(
-                onClick = { showLogoutConfirmation.value = true },
-                modifier = Modifier.fillMaxWidth()
-            )
+            ) {
+              LogoutButton(
+                  onClick = { showLogoutConfirmation.value = true },
+                  modifier = Modifier.fillMaxWidth())
 
-            Spacer(modifier = Modifier.height(16.dp))
+              Spacer(modifier = Modifier.height(16.dp))
 
-            if (showLogoutConfirmation.value) {
+              if (showLogoutConfirmation.value) {
                 AlertDialog(
                     onDismissRequest = { showLogoutConfirmation.value = false },
                     title = {
-                        Text(
-                            text = "Confirm",
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.padding(top = 16.dp, bottom = 8.dp),
-                        )
+                      Text(
+                          text = "Confirm",
+                          textAlign = TextAlign.Center,
+                          modifier = Modifier.padding(top = 16.dp, bottom = 8.dp),
+                      )
                     },
                     text = { Text("Are you sure you want to logout?") },
                     confirmButton = {
-                        Button(
-                            onClick = {
-                                showLogoutConfirmation.value = false
-                                val logoutResult = view.performLogout()
-                                if (logoutResult) {
-                                    val intent = Intent(currentContext, LoginActivity::class.java)
-                                    currentContext.startActivity(intent)
-                                }
-                            },
-                            colors = ButtonDefaults.buttonColors(
-                                contentColor = Color.White,
-                                containerColor = Color.Black,
-                            ),
-                        ) {
-                            Text("Logout")
-                        }
+                      Button(
+                          onClick = {
+                            showLogoutConfirmation.value = false
+                            val logoutResult = view.performLogout()
+                            if (logoutResult) {
+                              val intent = Intent(currentContext, LoginActivity::class.java)
+                              currentContext.startActivity(intent)
+                            }
+                          },
+                          colors =
+                              ButtonDefaults.buttonColors(
+                                  contentColor = Color.White,
+                                  containerColor = Color.Black,
+                              ),
+                      ) {
+                        Text("Logout")
+                      }
                     },
                     dismissButton = {
-                        Button(
-                            onClick = { showLogoutConfirmation.value = false },
-                            colors = ButtonDefaults.buttonColors(
-                                contentColor = Color.White,
-                                containerColor = Color.Black,
-                            ),
-                        ) {
-                            Text("Cancel")
-                        }
+                      Button(
+                          onClick = { showLogoutConfirmation.value = false },
+                          colors =
+                              ButtonDefaults.buttonColors(
+                                  contentColor = Color.White,
+                                  containerColor = Color.Black,
+                              ),
+                      ) {
+                        Text("Cancel")
+                      }
                     },
                 )
+              }
             }
-        }
-    }
+      }
 }
-
-
-
-
-
