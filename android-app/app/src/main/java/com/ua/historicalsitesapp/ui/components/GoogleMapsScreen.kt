@@ -84,7 +84,7 @@ private fun CustomRendererClustering(
           screenHeight.value.toInt(),
       )
 
-  algorithm.maxDistanceBetweenClusteredItems = 200
+  algorithm.maxDistanceBetweenClusteredItems = 100
 
   clusterManager?.setAlgorithm(
       algorithm,
