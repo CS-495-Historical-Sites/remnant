@@ -20,4 +20,6 @@ There is no previous registration on the device.
 7. The user enters the same email and password used in the registration.
 8. The user clicks on the login button.
 9. A toast message is displayed indicating that the login was successful.
-10. The user is redirected to the home screen.
+10. The questionare appears.
+11. The user can navigate through the questionare.
+12. The user is redirected to the home screen.
