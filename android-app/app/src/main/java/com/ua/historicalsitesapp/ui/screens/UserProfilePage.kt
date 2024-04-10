@@ -210,7 +210,6 @@ fun UserProfilePage(modifier: Modifier = Modifier) {
   val userView = UserProfileViewModel(currentContext)
   var username by remember { mutableStateOf("") }
   var fetchedUsername by remember { mutableStateOf("") }
-  val email by remember { mutableStateOf("") }
   var fetchedEmail by remember { mutableStateOf("") }
 
   LaunchedEffect(Unit) {
