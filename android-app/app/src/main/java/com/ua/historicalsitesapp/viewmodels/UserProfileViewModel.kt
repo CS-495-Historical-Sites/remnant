@@ -45,21 +45,15 @@ class UserProfileViewModel(context: Context) : ViewModel() {
     }
   }
 
-  fun getUsername(username: String): UserProfileInfo {
+  fun getProfileInfo(): UserProfileInfo {
     val client = getUserClient()
     return runBlocking {
-      val response: UserProfileInfo =
-          client.get(ServerConfig.SERVER_URL + "/user/privateinfo" + username) {}.body()
-      return@runBlocking response
-    }
-  }
+      val response = client.get(ServerConfig.SERVER_URL + "/user/privateinfo")
+      if (response.status.value == 200) {
+        return@runBlocking response.body()
+      }
 
-  fun getEmail(email: String): UserProfileInfo {
-    val client = getUserClient()
-    return runBlocking {
-      val response: UserProfileInfo =
-          client.get(ServerConfig.SERVER_URL + "/user/privateinfo" + email) {}.body()
-      return@runBlocking response
+      throw Exception("getProfileInfo() failed")
     }
   }
 

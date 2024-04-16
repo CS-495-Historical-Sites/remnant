@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -98,7 +99,7 @@ fun UsernameTextField(
               text = fetchedUsername,
               style =
                   TextStyle(
-                      fontSize = 20.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Start),
+                      fontSize = 24.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Start),
               modifier = Modifier.padding(16.dp))
         }
       })
@@ -140,66 +141,97 @@ fun LogoutButton(
 }
 
 @Composable
+fun Chip(text: String) {
+    Surface(
+        color = Color(android.graphics.Color.parseColor("#ADC178")), // Change the color to light green
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.padding(4.dp)
+            .padding(horizontal = 8.dp, vertical = 4.dp)
+    ) {
+        Text(
+            text = text,
+            style = TextStyle(fontSize = 14.sp),
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+        )
+    }
+}
+
+
+@Composable
 fun UserProfileCard(
     modifier: Modifier = Modifier,
     fetchedUsername: String,
     fetchedEmail: String,
+    fetchedAnswers: Map<String, Set<String>>?,
     onUsernameChange: (String) -> Unit,
     onSaveClick: () -> Unit
 ) {
-  var isEditing by remember { mutableStateOf(false) }
+    var isEditing by remember { mutableStateOf(false) }
 
-  Box(
-      modifier = modifier.fillMaxSize(),
-  ) {
     Box(
-        modifier =
+        modifier = modifier.fillMaxSize(),
+    ) {
+        Box(
+            modifier =
             Modifier.size(width = 300.dp, height = 400.dp)
                 .clip(shape = RoundedCornerShape(16.dp))
                 .align(Alignment.TopStart),
-    ) {
-      Column(
-          modifier = modifier.fillMaxSize(),
-          horizontalAlignment = Alignment.Start,
-          verticalArrangement = Arrangement.Top,
-      ) {
-        Spacer(modifier = Modifier.height(16.dp))
+        ) {
+            Column(
+                modifier = modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.Start,
+                verticalArrangement = Arrangement.Top,
+            ) {
+                Spacer(modifier = Modifier.height(16.dp))
 
-        Column( // Username and Save button
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.Start,
-            modifier = Modifier.padding(start = 8.dp)) {
-              // Username
-              UsernameTextField(
-                  initialValue = "Initial Value", // You can set an initial value here if needed
-                  fetchedUsername = fetchedUsername,
-                  onUserNameChange = onUsernameChange,
-                  onUsernameClick = {
-                    isEditing = true
-                  }, // Update isEditing state when username is clicked
-                  isEditing = isEditing // When save button is clicked disable the text box
-                  )
-              // Save button
-              SaveButton(
-                  onClick = {
-                    onSaveClick()
-                    isEditing = false // Set isEditing to false after save button is clicked
-                  },
-                  modifier = Modifier.fillMaxWidth(),
-                  isVisible = isEditing)
-              // Email
-              Text(
-                  text = fetchedEmail,
-                  style =
-                      TextStyle(
-                          fontSize = 20.sp,
-                          fontWeight = FontWeight.Normal,
-                          textAlign = TextAlign.Start),
-                  modifier = Modifier.padding(start = 16.dp, top = 8.dp))
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.Start,
+                    modifier = Modifier.padding(start = 8.dp)
+                ) {
+                    // Username
+                    UsernameTextField(
+                        initialValue = "Initial Value", // You can set an initial value here if needed
+                        fetchedUsername = fetchedUsername,
+                        onUserNameChange = onUsernameChange,
+                        onUsernameClick = {
+                            isEditing = true
+                        }, // Update isEditing state when username is clicked
+                        isEditing = isEditing // When save button is clicked disable the text box
+                    )
+                    // Save button
+                    SaveButton(
+                        onClick = {
+                            onSaveClick()
+                            isEditing = false // Set isEditing to false after save button is clicked
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        isVisible = isEditing
+                    )
+                    // Email
+                    Text(
+                        text = fetchedEmail,
+                        style = TextStyle(
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Normal,
+                            textAlign = TextAlign.Start
+                        ),
+                        modifier = Modifier.padding(start = 16.dp, top = 8.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Display questions and answers
+                    fetchedAnswers?.forEach { (question, answers) ->
+                        Text(text = question, style = TextStyle(fontSize = 16.sp))
+                        answers.forEach { answer ->
+                            Chip(text = answer)
+                        }
+                    }
+                }
             }
-      }
+        }
     }
-  }
 }
 
 @Composable
@@ -210,12 +242,15 @@ fun UserProfilePage(modifier: Modifier = Modifier) {
   val userView = UserProfileViewModel(currentContext)
   var username by remember { mutableStateOf("") }
   var fetchedUsername by remember { mutableStateOf("") }
-  val email by remember { mutableStateOf("") }
   var fetchedEmail by remember { mutableStateOf("") }
+  var fetchedAnswers by remember {mutableStateOf<Map<String, Set<String>>?>(null) }
 
   LaunchedEffect(Unit) {
-    fetchedUsername = userView.getUsername(username).username
-    fetchedEmail = userView.getEmail(email).email
+      val fetchedUserInfo = userView.getProfileInfo()
+
+      fetchedUsername = fetchedUserInfo.username
+      fetchedEmail = fetchedUserInfo.email
+      fetchedAnswers = fetchedUserInfo.answers
   }
   Column(
       modifier = Modifier.fillMaxSize().padding(16.dp),
@@ -225,6 +260,7 @@ fun UserProfilePage(modifier: Modifier = Modifier) {
             modifier = Modifier.weight(1f),
             fetchedUsername = fetchedUsername,
             fetchedEmail = fetchedEmail,
+            fetchedAnswers = fetchedAnswers,
             onUsernameChange = { username = it },
             onSaveClick = { userView.updateUsername(username) })
 

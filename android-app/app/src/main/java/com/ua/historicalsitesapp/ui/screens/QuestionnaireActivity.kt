@@ -16,6 +16,7 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -55,51 +56,56 @@ class QuestionnaireActivity : ComponentActivity() {
 
 @Composable
 fun QuestionnaireMenu(onQuestionnaireCompleted: (Map<String, Set<String>>) -> Unit) {
-  val context = LocalContext.current
-  var currentQuestionIndex by remember { mutableIntStateOf(0) }
-  var selectedOptions by remember { mutableStateOf<Set<String>>(emptySet()) }
+    val context = LocalContext.current
+    var currentQuestionIndex by remember { mutableIntStateOf(0) }
 
-  val questions =
-      listOf(
-          "Preferred Historical Period:" to
-              listOf(
-                  "Ancient Civilization",
-                  "Middle Ages",
-                  "Renaissance",
-                  "Industrial Revolution",
-                  "Modern Era"),
-          "Preferred Historical Genre in Literature:" to
-              listOf("Historical Fiction", "Biography", "Non-Fiction History"),
-          "What type of historical sites are you most interested in exploring?" to
-              listOf(
-                  "Ancient Landmarks and Ruins",
-                  "Cities with Rich Historical Architecture",
-                  "Natural Sites with Historical Significance",
-                  "Museums and Exhibits",
-                  "Diverse Cultural Heritage Areas"))
+    val questions =
+        listOf(
+            "Preferred Historical Period:" to
+                    listOf(
+                        "Ancient Civilization",
+                        "Middle Ages",
+                        "Renaissance",
+                        "Industrial Revolution",
+                        "Modern Era"),
+            "Preferred Historical Genre in Literature:" to
+                    listOf(
+                        "Historical Fiction",
+                        "Biography",
+                        "Non-Fiction History"),
+            "What type of historical sites are you most interested in exploring?" to
+                    listOf(
+                        "Ancient Landmarks and Ruins",
+                        "Cities with Rich Historical Architecture",
+                        "Natural Sites with Historical Significance",
+                        "Museums and Exhibits",
+                        "Diverse Cultural Heritage Areas"))
 
-  val allAnswers = remember { mutableStateMapOf<String, Set<String>>() }
-  QuestionnaireCard(
-      currentQuestionIndex = currentQuestionIndex,
-      question = questions[currentQuestionIndex].first,
-      options = questions[currentQuestionIndex].second,
-      selectedOptions = selectedOptions,
-      onAnswer = { options, question ->
-        selectedOptions = options
-        // Save the answer for the current question
-        allAnswers[question] = options
-      },
-      onNext = {
-        if (currentQuestionIndex + 1 >= questions.size) {
-          // When questionnaire is completed, pass all answers to the callback
-          onQuestionnaireCompleted(allAnswers)
-          val intent = Intent(context, MainPageActivity::class.java)
-          context.startActivity(intent)
-        } else {
-          currentQuestionIndex++
+    val allAnswers = remember { mutableStateMapOf<String, Set<String>>() }
+    val selectedOptionsMap = remember { mutableStateMapOf<Int, Set<String>>() }
+
+    QuestionnaireCard(
+        currentQuestionIndex = currentQuestionIndex,
+        question = questions[currentQuestionIndex].first,
+        options = questions[currentQuestionIndex].second,
+        selectedOptions = selectedOptionsMap[currentQuestionIndex] ?: emptySet(),
+        onAnswer = { options, question ->
+            selectedOptionsMap[currentQuestionIndex] = options.toSet()
+            allAnswers[question] = options.toSet()
+        },
+        onNext = {
+            if (currentQuestionIndex + 1 >= questions.size) {
+                // When questionnaire is completed, pass all answers to the callback
+                onQuestionnaireCompleted(allAnswers)
+                val intent = Intent(context, MainPageActivity::class.java)
+                context.startActivity(intent)
+            } else {
+                currentQuestionIndex++
+            }
         }
-      })
+    )
 }
+
 
 // Sets up the chip ui
 @OptIn(ExperimentalMaterial3Api::class)
@@ -147,10 +153,10 @@ fun QuestionnaireCard(
           }
         }
 
-    Divider(
-        color = Color.Gray.copy(alpha = 0.4f),
-        thickness = 1.dp,
-        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp))
+      HorizontalDivider(
+          modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp), thickness = 1.dp,
+          color = Color.Gray.copy(alpha = 0.4f)
+      )
 
     Button(onClick = { onNext() }, modifier = Modifier.fillMaxWidth()) {
       val questionsSize = 3
