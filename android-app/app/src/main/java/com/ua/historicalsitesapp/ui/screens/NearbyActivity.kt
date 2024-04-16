@@ -58,6 +58,8 @@ import com.ua.historicalsitesapp.ui.foreignintents.createGoogleMapsDirectionsInt
 import com.ua.historicalsitesapp.util.hasLocationPermission
 import com.ua.historicalsitesapp.viewmodels.MainPageViewModel
 import kotlin.math.*
+import android.widget.Toast
+import android.view.Gravity
 
 class FeedPageActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -113,10 +115,10 @@ fun HomeAppBar(
               onClick = { showMenu = !showMenu },
               modifier =
                   Modifier.border(
-                      border = BorderStroke(1.dp, Color.White), // Define the border width and color
+                      border = BorderStroke(1.dp, Color.White),
                       shape =
                           RoundedCornerShape(
-                              4.dp) // Define the corner radius for the rounded square
+                              4.dp)
                       )) {
                 Icon(
                     imageVector = Icons.Default.Sort,
@@ -148,9 +150,9 @@ fun SearchBar(searchQuery: MutableState<String>, onSearch: (String) -> Unit) {
         searchQuery.value = it
         onSearch(it)
       },
-      modifier = Modifier.fillMaxWidth().heightIn(min = 42.dp, max = 50.dp).padding(2.dp),
-      textStyle = TextStyle(fontSize = 11.sp),
-      placeholder = { Text("Search locations", fontSize = 11.sp) },
+      modifier = Modifier.fillMaxWidth().heightIn(min = 8.dp, max = 65.dp).padding(horizontal = 4.dp, vertical = 5.dp),
+      textStyle = TextStyle(fontSize = 16.sp),
+      placeholder = { Text("Search locations", fontSize = 16.sp) },
       maxLines = 1,
       singleLine = true,
       shape = RoundedCornerShape(24.dp),
@@ -162,7 +164,7 @@ fun SearchBar(searchQuery: MutableState<String>, onSearch: (String) -> Unit) {
 }
 
 @Composable
-fun HomeMainContent(locationInfo: HsLocation, distance: Double) {
+fun HomeMainContent(locationInfo: HsLocation, distance: Double, view: MainPageViewModel) {
   val imageLink = locationInfo.imageLink
   val cornerRadius = 8.dp
   val context = LocalContext.current
@@ -204,7 +206,13 @@ fun HomeMainContent(locationInfo: HsLocation, distance: Double) {
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically) {
               Box(
-                  modifier = Modifier.weight(1f).clickable(onClick = {}).height(40.dp),
+                  modifier = Modifier.weight(1f).clickable(
+                      onClick = {
+                          view.markLocationAsVisited(locationInfo.id)
+                          val toast = Toast.makeText(context, "Location added to Liked Locations", Toast.LENGTH_SHORT)
+                          toast.setGravity(Gravity.CENTER, 0, 0) // Position at the center of the screen
+                          toast.show()
+                      }).height(40.dp),
                   contentAlignment = Alignment.Center) {
                     Icon(imageVector = Icons.Rounded.Favorite, contentDescription = null)
                   }
@@ -249,34 +257,8 @@ fun FeedPage(view: MainPageViewModel, context: Context) {
   val isLoading = remember { mutableStateOf(true) }
   val loadMoreCount = 20
 
-  //    fun loadMoreLocations() {
-  //        val currentCount = displayedLocations.value.size
-  //        val nextCount = min(currentCount + loadMoreCount, allLocations.value.size)
-  //        displayedLocations.value = allLocations.value.subList(0, nextCount)
-  //    }
   val filteredLocations =
       allLocations.value.filter { it.first.name.contains(searchQuery.value, ignoreCase = true) }
-  //    fun loadMoreLocations() {
-  //        val currentCount = displayedLocations.value.size
-  //        val locationsToDisplay = if (searchQuery.value.isEmpty()) {
-  //            allLocations.value
-  //        } else {
-  //            filteredLocations
-  //        }
-  //        val nextCount = min(currentCount + loadMoreCount, locationsToDisplay.size)
-  //        displayedLocations.value = locationsToDisplay.take(nextCount)
-  //    }
-
-  //    fun loadMoreLocations(loadMore: Boolean = false) {
-  //        val currentCount = if (loadMore) displayedLocations.value.size else 0
-  //        val locationsToDisplay = if (searchQuery.value.isEmpty()) {
-  //            allLocations.value
-  //        } else {
-  //            filteredLocations
-  //        }
-  //        val nextCount = min(currentCount + loadMoreCount, locationsToDisplay.size)
-  //        displayedLocations.value = locationsToDisplay.take(nextCount)
-  //    }
 
   fun loadMoreLocations(loadMore: Boolean = false) {
     val currentCount = if (loadMore) displayedLocations.value.size else 0
@@ -361,7 +343,7 @@ fun FeedPage(view: MainPageViewModel, context: Context) {
         displayedLocations.value.let { locationsWithDistances ->
           LazyColumn(modifier = Modifier.padding(4.dp).fillMaxSize()) {
             items(locationsWithDistances) { (location, distance) ->
-              HomeMainContent(location, distance)
+              HomeMainContent(location, distance, view)
             }
             item {
               Box(
