@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
@@ -58,8 +60,6 @@ import com.ua.historicalsitesapp.ui.foreignintents.createGoogleMapsDirectionsInt
 import com.ua.historicalsitesapp.util.hasLocationPermission
 import com.ua.historicalsitesapp.viewmodels.MainPageViewModel
 import kotlin.math.*
-import android.widget.Toast
-import android.view.Gravity
 
 class FeedPageActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -115,11 +115,7 @@ fun HomeAppBar(
               onClick = { showMenu = !showMenu },
               modifier =
                   Modifier.border(
-                      border = BorderStroke(1.dp, Color.White),
-                      shape =
-                          RoundedCornerShape(
-                              4.dp)
-                      )) {
+                      border = BorderStroke(1.dp, Color.White), shape = RoundedCornerShape(4.dp))) {
                 Icon(
                     imageVector = Icons.Default.Sort,
                     contentDescription = "Filter",
@@ -150,7 +146,10 @@ fun SearchBar(searchQuery: MutableState<String>, onSearch: (String) -> Unit) {
         searchQuery.value = it
         onSearch(it)
       },
-      modifier = Modifier.fillMaxWidth().heightIn(min = 8.dp, max = 65.dp).padding(horizontal = 4.dp, vertical = 5.dp),
+      modifier =
+          Modifier.fillMaxWidth()
+              .heightIn(min = 8.dp, max = 65.dp)
+              .padding(horizontal = 4.dp, vertical = 5.dp),
       textStyle = TextStyle(fontSize = 16.sp),
       placeholder = { Text("Search locations", fontSize = 16.sp) },
       maxLines = 1,
@@ -206,13 +205,21 @@ fun HomeMainContent(locationInfo: HsLocation, distance: Double, view: MainPageVi
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically) {
               Box(
-                  modifier = Modifier.weight(1f).clickable(
-                      onClick = {
-                          view.markLocationAsVisited(locationInfo.id)
-                          val toast = Toast.makeText(context, "Location added to Liked Locations", Toast.LENGTH_SHORT)
-                          toast.setGravity(Gravity.CENTER, 0, 0) // Position at the center of the screen
-                          toast.show()
-                      }).height(40.dp),
+                  modifier =
+                      Modifier.weight(1f)
+                          .clickable(
+                              onClick = {
+                                view.markLocationAsVisited(locationInfo.id)
+                                val toast =
+                                    Toast.makeText(
+                                        context,
+                                        "Location added to Liked Locations",
+                                        Toast.LENGTH_SHORT)
+                                toast.setGravity(
+                                    Gravity.CENTER, 0, 0) // Position at the center of the screen
+                                toast.show()
+                              })
+                          .height(40.dp),
                   contentAlignment = Alignment.Center) {
                     Icon(imageVector = Icons.Rounded.Favorite, contentDescription = null)
                   }
