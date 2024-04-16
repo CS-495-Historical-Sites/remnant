@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
@@ -20,8 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material.icons.rounded.Directions
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material3.*
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -59,14 +60,13 @@ import com.ua.historicalsitesapp.ui.foreignintents.createGoogleMapsDirectionsInt
 import com.ua.historicalsitesapp.util.hasLocationPermission
 import com.ua.historicalsitesapp.viewmodels.MainPageViewModel
 import kotlin.math.*
-import android.widget.Toast
-import android.view.Gravity
 
 class FeedPageActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContent {
       HistoricalSitesAppTheme {
+        // A surface container using the 'background' color from the theme
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
           CheckScreen(Modifier.fillMaxSize())
         }
@@ -103,9 +103,9 @@ fun HomeAppBar(
         },
         colors =
             TopAppBarDefaults.topAppBarColors(
-                containerColor = Color.Black,
-                titleContentColor = Color.White,
-                actionIconContentColor = Color.White
+                containerColor = Color.Black, // App Bar background color
+                titleContentColor = Color.White, // App Bar title text color
+                actionIconContentColor = Color.White // App Bar action icon color
                 ),
         actions = {
           var showMenu by remember { mutableStateOf(false) }
@@ -115,11 +115,7 @@ fun HomeAppBar(
               onClick = { showMenu = !showMenu },
               modifier =
                   Modifier.border(
-                      border = BorderStroke(1.dp, Color.White),
-                      shape =
-                          RoundedCornerShape(
-                              4.dp)
-                      )) {
+                      border = BorderStroke(1.dp, Color.White), shape = RoundedCornerShape(4.dp))) {
                 Icon(
                     imageVector = Icons.Default.Sort,
                     contentDescription = "Filter",
@@ -150,7 +146,10 @@ fun SearchBar(searchQuery: MutableState<String>, onSearch: (String) -> Unit) {
         searchQuery.value = it
         onSearch(it)
       },
-      modifier = Modifier.fillMaxWidth().heightIn(min = 8.dp, max = 65.dp).padding(horizontal = 4.dp, vertical = 5.dp),
+      modifier =
+          Modifier.fillMaxWidth()
+              .heightIn(min = 8.dp, max = 65.dp)
+              .padding(horizontal = 4.dp, vertical = 5.dp),
       textStyle = TextStyle(fontSize = 16.sp),
       placeholder = { Text("Search locations", fontSize = 16.sp) },
       maxLines = 1,
@@ -168,39 +167,6 @@ fun HomeMainContent(locationInfo: HsLocation, distance: Double, view: MainPageVi
   val imageLink = locationInfo.imageLink
   val cornerRadius = 8.dp
   val context = LocalContext.current
-  var isLiked by remember { mutableStateOf(locationInfo.isLiked) }
-  var userHasInteracted by remember { mutableStateOf(false) }
-
-  LaunchedEffect(isLiked, userHasInteracted) {
-      if (userHasInteracted) {
-          Log.d("LikedLocations", "Attempting to use launched effect for ${locationInfo.name}")
-          val success = if (isLiked) {
-              view.markLocationAsVisited(locationInfo.id)
-          } else {
-              view.removeLocationFromVisited(locationInfo.id)
-          }
-
-          if (success) {
-              Log.d("LikedLocations", "${locationInfo.name} succeeded")
-              Toast.makeText(
-                  context,
-                  if (isLiked) "Location added to Liked Locations" else "Location removed from Liked Locations",
-                  Toast.LENGTH_SHORT
-              ).apply {
-                  setGravity(Gravity.CENTER, 0, 0)
-                  show()
-              }
-          } else {
-              Log.d("LikedLocations", "${locationInfo.name} failed")
-              Toast.makeText(context, "Failed to update", Toast.LENGTH_SHORT)
-                  .apply {
-                      setGravity(Gravity.CENTER, 0, 0)
-                      show()
-              }
-          }
-      }
-      userHasInteracted = false
-  }
 
   Surface(modifier = Modifier.padding(top = 6.dp, bottom = 6.dp)) {
     Column {
@@ -239,14 +205,23 @@ fun HomeMainContent(locationInfo: HsLocation, distance: Double, view: MainPageVi
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically) {
               Box(
-                  modifier = Modifier.weight(1f).clickable(
-                      onClick = {
-                        userHasInteracted = true
-                        isLiked = !isLiked
-                      }).height(40.dp),
+                  modifier =
+                      Modifier.weight(1f)
+                          .clickable(
+                              onClick = {
+                                view.markLocationAsVisited(locationInfo.id)
+                                val toast =
+                                    Toast.makeText(
+                                        context,
+                                        "Location added to Liked Locations",
+                                        Toast.LENGTH_SHORT)
+                                toast.setGravity(
+                                    Gravity.CENTER, 0, 0) // Position at the center of the screen
+                                toast.show()
+                              })
+                          .height(40.dp),
                   contentAlignment = Alignment.Center) {
-                    Icon(imageVector = if (isLiked) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                        contentDescription = null)
+                    Icon(imageVector = Icons.Rounded.Favorite, contentDescription = null)
                   }
 
               Divider(
@@ -392,9 +367,9 @@ fun FeedPage(view: MainPageViewModel, context: Context) {
                                 "Load More",
                                 color = Color.White,
                             )
+                          }
+                    }
                   }
-                }
-              }
             }
           }
         }
@@ -404,7 +379,7 @@ fun FeedPage(view: MainPageViewModel, context: Context) {
 }
 
 fun calculateDistanceInMiles(lat1: Double, lon1: Double, lat2: Float, lon2: Float): Double {
-  val earthRadius = 3958.8
+  val earthRadius = 3958.8 // Earth radius in miles
 
   val dLat = Math.toRadians((lat2 - lat1))
   val dLon = Math.toRadians((lon2 - lon1))
