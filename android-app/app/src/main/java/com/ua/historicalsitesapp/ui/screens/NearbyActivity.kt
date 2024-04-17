@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
@@ -120,6 +122,7 @@ fun HomeAppBar(
                           RoundedCornerShape(
                               4.dp)
                       )) {
+
                 Icon(
                     imageVector = Icons.Default.Sort,
                     contentDescription = "Filter",
@@ -151,6 +154,7 @@ fun SearchBar(searchQuery: MutableState<String>, onSearch: (String) -> Unit) {
         onSearch(it)
       },
       modifier = Modifier.fillMaxWidth().heightIn(min = 8.dp, max = 65.dp).padding(horizontal = 4.dp, vertical = 5.dp),
+
       textStyle = TextStyle(fontSize = 16.sp),
       placeholder = { Text("Search locations", fontSize = 16.sp) },
       maxLines = 1,
@@ -244,6 +248,7 @@ fun HomeMainContent(locationInfo: HsLocation, distance: Double, view: MainPageVi
                         userHasInteracted = true
                         isLiked = !isLiked
                       }).height(40.dp),
+
                   contentAlignment = Alignment.Center) {
                     Icon(imageVector = if (isLiked) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                         contentDescription = null)
