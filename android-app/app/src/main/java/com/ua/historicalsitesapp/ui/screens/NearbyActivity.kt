@@ -107,9 +107,9 @@ fun HomeAppBar(
         },
         colors =
             TopAppBarDefaults.topAppBarColors(
-                containerColor = Color.Black, // App Bar background color
-                titleContentColor = Color.White, // App Bar title text color
-                actionIconContentColor = Color.White // App Bar action icon color
+                containerColor = Color.Black,
+                titleContentColor = Color.White,
+                actionIconContentColor = Color.White
                 ),
         actions = {
           var showMenu by remember { mutableStateOf(false) }
@@ -185,7 +185,7 @@ fun HomeMainContent(locationInfo: HsLocation, distance: Double, view: MainPageVi
           }
 
           if (success) {
-              Log.d("LikedLocations", "${locationInfo.name} succeededLoca")
+              Log.d("LikedLocations", "${locationInfo.name} succeeded")
               Toast.makeText(
                   context,
                   if (isLiked) "Location added to Liked Locations" else "Location removed from Liked Locations",
@@ -408,7 +408,7 @@ fun FeedPage(view: MainPageViewModel, context: Context) {
 }
 
 fun calculateDistanceInMiles(lat1: Double, lon1: Double, lat2: Float, lon2: Float): Double {
-  val earthRadius = 3958.8 // Earth radius in miles
+  val earthRadius = 3958.8
 
   val dLat = Math.toRadians((lat2 - lat1))
   val dLon = Math.toRadians((lon2 - lon1))
