@@ -11,7 +11,7 @@ from flask_jwt_extended import (
 )
 from sqlalchemy.exc import DatabaseError
 
-from src.appl import LOGGER, Config
+from src.appl import LOGGER, Config, db
 from src.appl.postmark import send_welcome_email
 from src.appl.models import RegistrationRequest, LoginRequest
 from src.appl.remnant_db import user_queries, token_queries
@@ -159,6 +159,17 @@ def refresh():
     identity = get_jwt_identity()
     access_token = create_access_token(identity=identity)
     return jsonify(access_token=access_token), 200
+
+
+@auth_blueprint.route("/api/confirmation/<string:token>", methods=["POST"])  # type: ignore
+def confirm_email(token):
+    user = user_queries.get_user_by_confirmation_token(token)
+    if user is None:
+        return jsonify({"message": "User not found"}), 400
+
+    user.has_confirmed_email = True
+    db.session.commit()
+    return jsonify({"message": "Email confirmed"}), 200
 
 
 @auth_blueprint.route("/api/user/logout", methods=["DELETE", "OPTIONS"])
