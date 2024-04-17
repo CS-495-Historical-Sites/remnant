@@ -61,16 +61,12 @@ import com.ua.historicalsitesapp.viewmodels.MainPageViewModel
 import kotlin.math.*
 import android.widget.Toast
 import android.view.Gravity
-import kotlinx.coroutines.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 class FeedPageActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContent {
       HistoricalSitesAppTheme {
-        // A surface container using the 'background' color from the theme
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
           CheckScreen(Modifier.fillMaxSize())
         }
