@@ -2,7 +2,6 @@ from src.appl import db
 from src.appl.models import Location
 
 
-
 class TestVisitedLocations:
 
     def test_get_specific_locoation(self, client):
