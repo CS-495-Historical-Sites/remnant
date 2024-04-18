@@ -34,7 +34,7 @@ export const ConfirmationEmailLandingPage: React.ComponentType = () => {
         setError("Invalid confirmation token or server error");
         return;
       }
-
+      // @ts-ignore
       const result = await response.json();
       setConfirmedSuccessful(true);
     } catch (error) {
