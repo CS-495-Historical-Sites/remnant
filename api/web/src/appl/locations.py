@@ -30,20 +30,25 @@ def get_all_locations(user: User):
             400,
         )
 
-    if latitude and longitude and kilometer_radius:
+    try:
         latitude = float(latitude)
         longitude = float(longitude)
         kilometer_radius = float(kilometer_radius)
-        near_locations_tuple = location_queries.get_nearby_location_data(
-            latitude, longitude, kilometer_radius, user_info
+    except ValueError:
+        return (
+            jsonify(
+                {"message": "lat, long, and kilometer_radius must be float values"}
+            ),
+            400,
         )
+    near_locations_tuple = location_queries.get_nearby_location_data(
+        latitude, longitude, kilometer_radius, user_info
+    )
         # near_locations_data creates a tuple like <Location 3445, False>
         # the tuple contains a location row from the Location table and a boolean value to determine if it has been liked or not
-        LOGGER.debug(len(near_locations_tuple))
-        return jsonify([short_location_repr(l) for l in near_locations_tuple]), 200
+    LOGGER.debug(len(near_locations_tuple))
+    return jsonify([short_location_repr(l) for l in near_locations_tuple]), 200
 
-    all_locations = location_queries.get_all_locations()
-    return jsonify([short_location_repr(l) for l in all_locations]), 200
 
 
 @location_blueprint.route("/api/locations/<location_id>", methods=["GET"])
