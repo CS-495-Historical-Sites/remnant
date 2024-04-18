@@ -21,12 +21,14 @@ def commit():
     db.session.commit()
 
 
+
 def get_all_locations() -> list[Location]:
     return Location.query.all()
 
 
 def get_nearby_location_data(
     lat: float, long: float, kilometer_radius: float, user_id: int
+
 ) -> list[Location]:
     # 1 degree of latitude in kilometers, ~111km
     delta_lat = kilometer_radius / 111

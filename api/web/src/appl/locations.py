@@ -20,15 +20,12 @@ def get_all_locations(user: User):
     longitude = request.args.get("long")
     kilometer_radius = request.args.get("kilometer_radius")
 
-    if any([latitude, longitude, kilometer_radius]) and not all(
-        [latitude, longitude, kilometer_radius]
-    ):
+    if not all([latitude, longitude, kilometer_radius]):
         return (
-            jsonify(
-                {"message": "Must give all of (lat, long, kilometer_radius) or none"}
-            ),
+            jsonify({"message": "Must give all of (lat, long, kilometer_radius)"}),
             400,
         )
+
 
     try:
         latitude = float(latitude)
@@ -41,6 +38,7 @@ def get_all_locations(user: User):
             ),
             400,
         )
+
     near_locations_tuple = location_queries.get_nearby_location_data(
         latitude, longitude, kilometer_radius, user_info
     )
@@ -48,6 +46,7 @@ def get_all_locations(user: User):
         # the tuple contains a location row from the Location table and a boolean value to determine if it has been liked or not
     LOGGER.debug(len(near_locations_tuple))
     return jsonify([short_location_repr(l) for l in near_locations_tuple]), 200
+
 
 
 
