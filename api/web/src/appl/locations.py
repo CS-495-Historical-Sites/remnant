@@ -17,27 +17,28 @@ def get_all_locations():
     longitude = request.args.get("long")
     kilometer_radius = request.args.get("kilometer_radius")
 
-    if any([latitude, longitude, kilometer_radius]) and not all(
-        [latitude, longitude, kilometer_radius]
-    ):
+    if not all([latitude, longitude, kilometer_radius]):
+        return (
+            jsonify({"message": "Must give all of (lat, long, kilometer_radius)"}),
+            400,
+        )
+    try:
+        latitude = float(latitude)
+        longitude = float(longitude)
+        kilometer_radius = float(kilometer_radius)
+    except ValueError:
         return (
             jsonify(
-                {"message": "Must give all of (lat, long, kilometer_radius) or none"}
+                {"message": "lat, long, and kilometer_radius must be float values"}
             ),
             400,
         )
 
-    if latitude and longitude and kilometer_radius:
-        latitude = float(latitude)
-        longitude = float(longitude)
-        kilometer_radius = float(kilometer_radius)
-        near_locations = location_queries.get_locations_near(
-            latitude, longitude, kilometer_radius
-        )
-        return jsonify([short_location_repr(l) for l in near_locations]), 200
+    near_locations = location_queries.get_locations_near(
+        latitude, longitude, kilometer_radius
+    )
 
-    all_locations = location_queries.get_all_locations()
-    return jsonify([short_location_repr(l) for l in all_locations]), 200
+    return jsonify([short_location_repr(l) for l in near_locations]), 200
 
 
 @location_blueprint.route("/api/locations/<location_id>", methods=["GET"])

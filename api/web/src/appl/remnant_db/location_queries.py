@@ -18,10 +18,6 @@ def commit():
     db.session.commit()
 
 
-def get_all_locations() -> list[Location]:
-    return Location.query.all()
-
-
 def get_locations_near(
     lat: float, long: float, kilometer_radius: float
 ) -> list[Location]:
