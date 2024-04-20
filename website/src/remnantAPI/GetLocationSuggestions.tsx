@@ -1,12 +1,14 @@
 import LocationSuggestion from "../models/LocationSuggestion";
 import LocationEditSuggestion from "../models/LocationSuggestion";
 
+import { API_BASE_URL } from "../ServerUtil";
+
 export const GetAddLocationSuggestions = async (
   token: string,
   setToken: (token: string) => void,
 ): Promise<LocationSuggestion[]> => {
   const response = await fetch(
-    `http://localhost:8080/api/suggestions/locations/add`,
+    `${API_BASE_URL}/api/suggestions/locations/add`,
     {
       method: "GET",
       headers: {

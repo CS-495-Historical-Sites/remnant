@@ -2,6 +2,7 @@
 
 - Clone project
 - Open with Android Studio IDE
+- Set `ANDROID_HOME` variable within Android Studio or create a file named `local.properties` and add `sdk.dir=<your_android_sdk_location>`
 - Install an emulation device
 - Press "run"
     - This version of the project will send requests to our server hosted in AWS, so you do not need

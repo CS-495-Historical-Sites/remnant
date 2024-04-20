@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
@@ -20,7 +22,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material.icons.rounded.Directions
-import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.*
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -59,12 +62,12 @@ import com.ua.historicalsitesapp.util.hasLocationPermission
 import com.ua.historicalsitesapp.viewmodels.MainPageViewModel
 import kotlin.math.*
 
+
 class FeedPageActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContent {
       HistoricalSitesAppTheme {
-        // A surface container using the 'background' color from the theme
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
           CheckScreen(Modifier.fillMaxSize())
         }
@@ -101,9 +104,9 @@ fun HomeAppBar(
         },
         colors =
             TopAppBarDefaults.topAppBarColors(
-                containerColor = Color.Black, // App Bar background color
-                titleContentColor = Color.White, // App Bar title text color
-                actionIconContentColor = Color.White // App Bar action icon color
+                containerColor = Color.Black,
+                titleContentColor = Color.White,
+                actionIconContentColor = Color.White
                 ),
         actions = {
           var showMenu by remember { mutableStateOf(false) }
@@ -113,11 +116,12 @@ fun HomeAppBar(
               onClick = { showMenu = !showMenu },
               modifier =
                   Modifier.border(
-                      border = BorderStroke(1.dp, Color.White), // Define the border width and color
+                      border = BorderStroke(1.dp, Color.White),
                       shape =
                           RoundedCornerShape(
-                              4.dp) // Define the corner radius for the rounded square
+                              4.dp)
                       )) {
+
                 Icon(
                     imageVector = Icons.Default.Sort,
                     contentDescription = "Filter",
@@ -148,9 +152,10 @@ fun SearchBar(searchQuery: MutableState<String>, onSearch: (String) -> Unit) {
         searchQuery.value = it
         onSearch(it)
       },
-      modifier = Modifier.fillMaxWidth().heightIn(min = 42.dp, max = 50.dp).padding(2.dp),
-      textStyle = TextStyle(fontSize = 11.sp),
-      placeholder = { Text("Search locations", fontSize = 11.sp) },
+      modifier = Modifier.fillMaxWidth().heightIn(min = 8.dp, max = 65.dp).padding(horizontal = 4.dp, vertical = 5.dp),
+
+      textStyle = TextStyle(fontSize = 16.sp),
+      placeholder = { Text("Search locations", fontSize = 16.sp) },
       maxLines = 1,
       singleLine = true,
       shape = RoundedCornerShape(24.dp),
@@ -162,10 +167,43 @@ fun SearchBar(searchQuery: MutableState<String>, onSearch: (String) -> Unit) {
 }
 
 @Composable
-fun HomeMainContent(locationInfo: HsLocation, distance: Double) {
+fun HomeMainContent(locationInfo: HsLocation, distance: Double, view: MainPageViewModel) {
   val imageLink = locationInfo.imageLink
   val cornerRadius = 8.dp
   val context = LocalContext.current
+  var isLiked by remember { mutableStateOf(locationInfo.isLiked) }
+  var userHasInteracted by remember { mutableStateOf(false) }
+
+  LaunchedEffect(isLiked, userHasInteracted) {
+      if (userHasInteracted) {
+          Log.d("LikedLocations", "Attempting to use launched effect for ${locationInfo.name}")
+          val success = if (isLiked) {
+              view.markLocationAsVisited(locationInfo.id)
+          } else {
+              view.removeLocationFromVisited(locationInfo.id)
+          }
+
+          if (success) {
+              Log.d("LikedLocations", "${locationInfo.name} succeeded")
+              Toast.makeText(
+                  context,
+                  if (isLiked) "Location added to Liked Locations" else "Location removed from Liked Locations",
+                  Toast.LENGTH_SHORT
+              ).apply {
+                  setGravity(Gravity.CENTER, 0, 0)
+                  show()
+              }
+          } else {
+              Log.d("LikedLocations", "${locationInfo.name} failed")
+              Toast.makeText(context, "Failed to update", Toast.LENGTH_SHORT)
+                  .apply {
+                      setGravity(Gravity.CENTER, 0, 0)
+                      show()
+              }
+          }
+      }
+      userHasInteracted = false
+  }
 
   Surface(modifier = Modifier.padding(top = 6.dp, bottom = 6.dp)) {
     Column {
@@ -204,9 +242,15 @@ fun HomeMainContent(locationInfo: HsLocation, distance: Double) {
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically) {
               Box(
-                  modifier = Modifier.weight(1f).clickable(onClick = {}).height(40.dp),
+                  modifier = Modifier.weight(1f).clickable(
+                      onClick = {
+                        userHasInteracted = true
+                        isLiked = !isLiked
+                      }).height(40.dp),
+
                   contentAlignment = Alignment.Center) {
-                    Icon(imageVector = Icons.Rounded.Favorite, contentDescription = null)
+                    Icon(imageVector = if (isLiked) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                        contentDescription = null)
                   }
 
               Divider(
@@ -249,34 +293,8 @@ fun FeedPage(view: MainPageViewModel, context: Context) {
   val isLoading = remember { mutableStateOf(true) }
   val loadMoreCount = 20
 
-  //    fun loadMoreLocations() {
-  //        val currentCount = displayedLocations.value.size
-  //        val nextCount = min(currentCount + loadMoreCount, allLocations.value.size)
-  //        displayedLocations.value = allLocations.value.subList(0, nextCount)
-  //    }
   val filteredLocations =
       allLocations.value.filter { it.first.name.contains(searchQuery.value, ignoreCase = true) }
-  //    fun loadMoreLocations() {
-  //        val currentCount = displayedLocations.value.size
-  //        val locationsToDisplay = if (searchQuery.value.isEmpty()) {
-  //            allLocations.value
-  //        } else {
-  //            filteredLocations
-  //        }
-  //        val nextCount = min(currentCount + loadMoreCount, locationsToDisplay.size)
-  //        displayedLocations.value = locationsToDisplay.take(nextCount)
-  //    }
-
-  //    fun loadMoreLocations(loadMore: Boolean = false) {
-  //        val currentCount = if (loadMore) displayedLocations.value.size else 0
-  //        val locationsToDisplay = if (searchQuery.value.isEmpty()) {
-  //            allLocations.value
-  //        } else {
-  //            filteredLocations
-  //        }
-  //        val nextCount = min(currentCount + loadMoreCount, locationsToDisplay.size)
-  //        displayedLocations.value = locationsToDisplay.take(nextCount)
-  //    }
 
   fun loadMoreLocations(loadMore: Boolean = false) {
     val currentCount = if (loadMore) displayedLocations.value.size else 0
@@ -361,7 +379,7 @@ fun FeedPage(view: MainPageViewModel, context: Context) {
         displayedLocations.value.let { locationsWithDistances ->
           LazyColumn(modifier = Modifier.padding(4.dp).fillMaxSize()) {
             items(locationsWithDistances) { (location, distance) ->
-              HomeMainContent(location, distance)
+              HomeMainContent(location, distance, view)
             }
             item {
               Box(
@@ -378,9 +396,9 @@ fun FeedPage(view: MainPageViewModel, context: Context) {
                                 "Load More",
                                 color = Color.White,
                             )
-                          }
-                    }
                   }
+                }
+              }
             }
           }
         }
@@ -390,7 +408,7 @@ fun FeedPage(view: MainPageViewModel, context: Context) {
 }
 
 fun calculateDistanceInMiles(lat1: Double, lon1: Double, lat2: Float, lon2: Float): Double {
-  val earthRadius = 3958.8 // Earth radius in miles
+  val earthRadius = 3958.8
 
   val dLat = Math.toRadians((lat2 - lat1))
   val dLon = Math.toRadians((lon2 - lon1))
