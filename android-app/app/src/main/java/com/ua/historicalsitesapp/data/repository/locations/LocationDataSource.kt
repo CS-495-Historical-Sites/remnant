@@ -40,9 +40,9 @@ class LocationDataSource {
     val client = constructUserClient(user)
 
     return runBlocking {
-      val response: HsLocationComplete =
-          client.get(ServerConfig.SERVER_URL + "/locations/" + locationId) {}.body()
-      return@runBlocking response
+      return@runBlocking client
+          .get(ServerConfig.SERVER_URL + "/locations/" + locationId) {}
+          .body<HsLocationComplete>()
     }
   }
 }
