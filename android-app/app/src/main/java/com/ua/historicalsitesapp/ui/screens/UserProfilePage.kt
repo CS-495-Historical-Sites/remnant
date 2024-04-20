@@ -205,6 +205,7 @@ fun UserProfileCard(
 
 @Composable
 fun UserProfilePage(modifier: Modifier = Modifier) {
+
   val showLogoutConfirmation = remember { mutableStateOf(false) }
   val currentContext = LocalContext.current
   val view = AuthViewModel(currentContext)
@@ -214,10 +215,9 @@ fun UserProfilePage(modifier: Modifier = Modifier) {
   var fetchedEmail by remember { mutableStateOf("") }
   val context = LocalContext.current
   LaunchedEffect(Unit) {
-    this.withLogoutOnFailure(context, userView) {
-      val fetchedUserInfo = userView.getProfileInfo()
-      fetchedUsername = fetchedUserInfo.username
-      fetchedEmail = fetchedUserInfo.email
+    withLogoutOnFailure(context, userView, { userView.getProfileInfo() }) {
+      fetchedUsername = it.username
+      fetchedEmail = it.email
     }
   }
   Column(

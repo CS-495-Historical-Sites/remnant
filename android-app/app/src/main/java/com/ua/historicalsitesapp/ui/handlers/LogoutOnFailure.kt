@@ -5,16 +5,6 @@ import android.content.Intent
 import com.ua.historicalsitesapp.ui.screens.LoginActivity
 import com.ua.historicalsitesapp.viewmodels.RemnantUnauthorizedAccessException
 import com.ua.historicalsitesapp.viewmodels.UserProfileViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-
-fun CoroutineScope.withLogoutOnFailure(
-    context: Context,
-    userProfileViewModel: UserProfileViewModel,
-    operation: suspend () -> Unit
-) {
-  launch { withLogoutOnFailure(context, userProfileViewModel, operation) }
-}
 
 fun <T> withLogoutOnFailure(
     context: Context,
