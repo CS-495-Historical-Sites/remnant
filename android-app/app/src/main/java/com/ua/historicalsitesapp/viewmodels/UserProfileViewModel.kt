@@ -23,6 +23,10 @@ class UserProfileViewModel(context: Context) : ViewModel() {
   private val loginRepository =
       LoginRepositoryProvider.provideLoginRepository(LoginDataSource(), context)
 
+  fun logout() {
+    loginRepository.logout()
+  }
+
   private fun getUser(): LoggedInUser {
     return loginRepository.user ?: throw Exception("MainPageViewModel could not retrieve user")
   }

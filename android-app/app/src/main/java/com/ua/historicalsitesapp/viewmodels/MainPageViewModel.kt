@@ -64,8 +64,6 @@ class MainPageViewModel(context: Context) : ViewModel() {
     }
   }
 
-
-
   fun markLocationAsVisited(locationId: Int): Boolean {
     val client = getUserClient()
     val visitInfo = VisitAddRequest(locationId)
