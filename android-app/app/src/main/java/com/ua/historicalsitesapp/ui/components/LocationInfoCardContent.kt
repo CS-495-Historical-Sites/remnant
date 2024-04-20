@@ -38,6 +38,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.ua.historicalsitesapp.data.model.map.HsLocationComplete
 import com.ua.historicalsitesapp.ui.foreignintents.createGoogleMapsDirectionsIntent
 import com.ua.historicalsitesapp.ui.theme.Typography
@@ -124,7 +125,7 @@ private fun TitleBox(locationName: String, onEditClick: () -> Unit) {
 }
 
 @Composable
-private fun ImageBox(imageLink: String) {
+fun ImageBox(imageLink: String) {
   var isImageLoading by remember { mutableStateOf(true) }
   Box(
       modifier = Modifier.width(600.dp).then(Modifier.height(300.dp)),
@@ -144,6 +145,8 @@ private fun ImageBox(imageLink: String) {
     }
   }
 }
+
+
 
 @Composable
 private fun LocationActionItems(location: HsLocationComplete) {

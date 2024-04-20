@@ -230,7 +230,7 @@ fun HomeMainContent(locationInfo: HsLocation, distance: Double, view: MainPageVi
             }
           }
 
-      Divider(modifier = Modifier.padding(horizontal = 6.dp), color = Color.Gray)
+        HorizontalDivider(modifier = Modifier.padding(horizontal = 6.dp), color = Color.Gray)
 
       Box(modifier = Modifier.fillMaxWidth()) {
         Row(
