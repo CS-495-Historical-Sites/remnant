@@ -1,9 +1,9 @@
 from math import cos, pi
 
+from sqlalchemy.sql import exists, and_
+
 from src.appl import db
 from src.appl.models import Location, Visit
-from sqlalchemy.sql import exists, and_, select
-from src.appl import LOGGER
 
 
 def create_location(location: Location, suspend_commit=False) -> None:

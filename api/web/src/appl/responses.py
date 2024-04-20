@@ -5,7 +5,6 @@ from src.appl.models import (
     ShortLocationDescription,
     LongLocationDescription,
 )
-from src.appl import LOGGER
 
 
 def short_location_repr(location_tuple) -> ShortLocationDescription:
