@@ -46,6 +46,8 @@ def init_db_with_sources_file(app):
             long_desc = location["long_description"]
             coordinates = location["coordinates"]
 
+            categories_list = [c["kind"] for c in location["assosiated_categories"]]
+
             image_name = location["wikidata_image_name"]
             image_name = f"https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/{image_name}"
             if not coordinates:
@@ -53,12 +55,13 @@ def init_db_with_sources_file(app):
                 continue
 
             loc = Location(
-                name,
-                coordinates["latitude"],
-                coordinates["longtitude"],
-                image_name,
-                short_desc,
-                long_desc,
+                name=name,
+                latitude=coordinates["latitude"],
+                longitude=coordinates["longtitude"],
+                image_link=image_name,
+                categories=categories_list,
+                short_description=short_desc,
+                long_description=long_desc,
             )
 
             location_queries.create_location(
