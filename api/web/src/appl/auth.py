@@ -121,10 +121,11 @@ def login():
     if not check_types([(email, non_hash_password, str)]):
         return jsonify({"message": "Invalid data submitted"}), 400
 
-    if not check_valid_email(email) or not check_valid_password(non_hash_password):
-        return jsonify({"message": "Invalid credentials entered"}), 422
-
     login_info = LoginRequest(email, non_hash_password)
+
+    LOGGER.debug(f"Failed attempt {user_queries.unsuccesful_login_attempts(email=login_info.email,success=False)}")
+    if user_queries.unsuccesful_login_attempts(email=login_info.email, success=False) > 5:
+        return jsonify({"message": "Too many login attempts. Attempt later."}), 429
 
     LOGGER.debug(f"Attemping to login {login_info.email}")
 
@@ -140,7 +141,7 @@ def login():
 
     access_token = create_access_token(identity=user.email)
     refresh_token = create_refresh_token(identity=user.email)
-    is_first_login = user_queries.successful_login_attempts(email=login_info.email) == 1
+    is_first_login = user_queries.successful_login_attempts(email=login_info.email, success=True) == 1
 
     return (
         jsonify(

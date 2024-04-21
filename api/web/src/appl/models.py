@@ -138,9 +138,10 @@ class LoginAttempt(db.Model):
     attempt_time = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     success = db.Column(db.Boolean, nullable=False)
 
-    def __init__(self, email, success):
+    def __init__(self, email, success, attempt_time):
         self.email = email
         self.success = success
+        self.attempt_time = attempt_time
 
 
 class User(db.Model):
