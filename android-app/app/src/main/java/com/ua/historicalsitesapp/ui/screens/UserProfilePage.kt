@@ -42,6 +42,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.compose.HistoricalSitesAppTheme
+import com.ua.historicalsitesapp.ui.handlers.withLogoutOnFailure
 import com.ua.historicalsitesapp.ui.theme.Typography
 import com.ua.historicalsitesapp.viewmodels.AuthViewModel
 import com.ua.historicalsitesapp.viewmodels.UserProfileViewModel
@@ -204,6 +205,7 @@ fun UserProfileCard(
 
 @Composable
 fun UserProfilePage(modifier: Modifier = Modifier) {
+
   val showLogoutConfirmation = remember { mutableStateOf(false) }
   val currentContext = LocalContext.current
   val view = AuthViewModel(currentContext)
@@ -211,12 +213,12 @@ fun UserProfilePage(modifier: Modifier = Modifier) {
   var username by remember { mutableStateOf("") }
   var fetchedUsername by remember { mutableStateOf("") }
   var fetchedEmail by remember { mutableStateOf("") }
-
+  val context = LocalContext.current
   LaunchedEffect(Unit) {
-    val fetchedUserInfo = userView.getProfileInfo()
-
-    fetchedUsername = fetchedUserInfo.username
-    fetchedEmail = fetchedUserInfo.email
+    withLogoutOnFailure(context, userView, { userView.getProfileInfo() }) {
+      fetchedUsername = it.username
+      fetchedEmail = it.email
+    }
   }
   Column(
       modifier = Modifier.fillMaxSize().padding(16.dp),

@@ -20,10 +20,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Sort
-import androidx.compose.material.icons.rounded.Directions
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.rounded.Directions
 import androidx.compose.material3.*
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -61,7 +61,6 @@ import com.ua.historicalsitesapp.ui.foreignintents.createGoogleMapsDirectionsInt
 import com.ua.historicalsitesapp.util.hasLocationPermission
 import com.ua.historicalsitesapp.viewmodels.MainPageViewModel
 import kotlin.math.*
-
 
 class FeedPageActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -106,8 +105,7 @@ fun HomeAppBar(
             TopAppBarDefaults.topAppBarColors(
                 containerColor = Color.Black,
                 titleContentColor = Color.White,
-                actionIconContentColor = Color.White
-                ),
+                actionIconContentColor = Color.White),
         actions = {
           var showMenu by remember { mutableStateOf(false) }
           val radiusOptions = listOf(5, 10, 20)
@@ -116,12 +114,7 @@ fun HomeAppBar(
               onClick = { showMenu = !showMenu },
               modifier =
                   Modifier.border(
-                      border = BorderStroke(1.dp, Color.White),
-                      shape =
-                          RoundedCornerShape(
-                              4.dp)
-                      )) {
-
+                      border = BorderStroke(1.dp, Color.White), shape = RoundedCornerShape(4.dp))) {
                 Icon(
                     imageVector = Icons.Default.Sort,
                     contentDescription = "Filter",
@@ -152,8 +145,10 @@ fun SearchBar(searchQuery: MutableState<String>, onSearch: (String) -> Unit) {
         searchQuery.value = it
         onSearch(it)
       },
-      modifier = Modifier.fillMaxWidth().heightIn(min = 8.dp, max = 65.dp).padding(horizontal = 4.dp, vertical = 5.dp),
-
+      modifier =
+          Modifier.fillMaxWidth()
+              .heightIn(min = 8.dp, max = 65.dp)
+              .padding(horizontal = 4.dp, vertical = 5.dp),
       textStyle = TextStyle(fontSize = 16.sp),
       placeholder = { Text("Search locations", fontSize = 16.sp) },
       maxLines = 1,
@@ -175,34 +170,35 @@ fun HomeMainContent(locationInfo: HsLocation, distance: Double, view: MainPageVi
   var userHasInteracted by remember { mutableStateOf(false) }
 
   LaunchedEffect(isLiked, userHasInteracted) {
-      if (userHasInteracted) {
-          Log.d("LikedLocations", "Attempting to use launched effect for ${locationInfo.name}")
-          val success = if (isLiked) {
-              view.markLocationAsVisited(locationInfo.id)
+    if (userHasInteracted) {
+      Log.d("LikedLocations", "Attempting to use launched effect for ${locationInfo.name}")
+      val success =
+          if (isLiked) {
+            view.markLocationAsVisited(locationInfo.id)
           } else {
-              view.removeLocationFromVisited(locationInfo.id)
+            view.removeLocationFromVisited(locationInfo.id)
           }
 
-          if (success) {
-              Log.d("LikedLocations", "${locationInfo.name} succeeded")
-              Toast.makeText(
-                  context,
-                  if (isLiked) "Location added to Liked Locations" else "Location removed from Liked Locations",
-                  Toast.LENGTH_SHORT
-              ).apply {
-                  setGravity(Gravity.CENTER, 0, 0)
-                  show()
-              }
-          } else {
-              Log.d("LikedLocations", "${locationInfo.name} failed")
-              Toast.makeText(context, "Failed to update", Toast.LENGTH_SHORT)
-                  .apply {
-                      setGravity(Gravity.CENTER, 0, 0)
-                      show()
-              }
-          }
+      if (success) {
+        Log.d("LikedLocations", "${locationInfo.name} succeeded")
+        Toast.makeText(
+                context,
+                if (isLiked) "Location added to Liked Locations"
+                else "Location removed from Liked Locations",
+                Toast.LENGTH_SHORT)
+            .apply {
+              setGravity(Gravity.CENTER, 0, 0)
+              show()
+            }
+      } else {
+        Log.d("LikedLocations", "${locationInfo.name} failed")
+        Toast.makeText(context, "Failed to update", Toast.LENGTH_SHORT).apply {
+          setGravity(Gravity.CENTER, 0, 0)
+          show()
+        }
       }
-      userHasInteracted = false
+    }
+    userHasInteracted = false
   }
 
   Surface(modifier = Modifier.padding(top = 6.dp, bottom = 6.dp)) {
@@ -242,14 +238,18 @@ fun HomeMainContent(locationInfo: HsLocation, distance: Double, view: MainPageVi
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically) {
               Box(
-                  modifier = Modifier.weight(1f).clickable(
-                      onClick = {
-                        userHasInteracted = true
-                        isLiked = !isLiked
-                      }).height(40.dp),
-
+                  modifier =
+                      Modifier.weight(1f)
+                          .clickable(
+                              onClick = {
+                                userHasInteracted = true
+                                isLiked = !isLiked
+                              })
+                          .height(40.dp),
                   contentAlignment = Alignment.Center) {
-                    Icon(imageVector = if (isLiked) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                    Icon(
+                        imageVector =
+                            if (isLiked) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                         contentDescription = null)
                   }
 
@@ -396,9 +396,9 @@ fun FeedPage(view: MainPageViewModel, context: Context) {
                                 "Load More",
                                 color = Color.White,
                             )
+                          }
+                    }
                   }
-                }
-              }
             }
           }
         }

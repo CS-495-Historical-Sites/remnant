@@ -1,10 +1,11 @@
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required
 from src.appl import LOGGER
 from src.appl.remnant_db import location_queries
 from src.appl.responses import short_location_repr, long_location_repr
 from src.appl.auth import user_required
 from src.appl.models import User
+
 location_blueprint = Blueprint(
     "location_blueprint",
     __name__,
@@ -26,7 +27,6 @@ def get_all_locations(user: User):
             400,
         )
 
-
     try:
         latitude = float(latitude)
         longitude = float(longitude)
@@ -42,12 +42,10 @@ def get_all_locations(user: User):
     near_locations_tuple = location_queries.get_nearby_location_data(
         latitude, longitude, kilometer_radius, user_info
     )
-        # near_locations_data creates a tuple like <Location 3445, False>
-        # the tuple contains a location row from the Location table and a boolean value to determine if it has been liked or not
+    # near_locations_data creates a tuple like <Location 3445, False>
+    # the tuple contains a location row from the Location table and a boolean value to determine if it has been liked or not
     LOGGER.debug(len(near_locations_tuple))
     return jsonify([short_location_repr(l) for l in near_locations_tuple]), 200
-
-
 
 
 @location_blueprint.route("/api/locations/<location_id>", methods=["GET"])

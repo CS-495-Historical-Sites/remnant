@@ -117,8 +117,12 @@ class Visit(db.Model):
     __tablename__ = "user_visited_locations"
     metadata = program_metadata
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index = True)
-    location_id = db.Column(db.Integer, db.ForeignKey("location.id"), nullable=False, index = True)
+    user_id = db.Column(
+        db.Integer, db.ForeignKey("user.id"), nullable=False, index=True
+    )
+    location_id = db.Column(
+        db.Integer, db.ForeignKey("location.id"), nullable=False, index=True
+    )
     visit_time = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
     # to prevent duplicate rows no row can share the same user_id and location_id

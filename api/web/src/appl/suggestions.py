@@ -2,6 +2,8 @@
 import base64
 from flask import jsonify, Blueprint, request
 from flask_jwt_extended import jwt_required
+import filetype
+
 
 from src.appl import db, LOGGER
 from src.appl.models import (
@@ -46,6 +48,17 @@ def add_location_suggestion(user: User):
 
     if not check_types([(name, short_desc, str), (wikipedia_link, (str, type(None)))]):
         return jsonify({"message": "Invalid data submitted"}), 400
+
+    if image is not None:
+        image_type = filetype.image_match(image)
+        # if image is not an image, return an error
+        if image_type is None:
+            return jsonify({"message": "Invalid image type"}), 400
+
+        # if image is too large, return an error
+        megabyte = 1024 * 1024
+        if len(image) > 10 * megabyte:
+            return jsonify({"message": "Image too large"}), 400
 
     suggestion_req = LocationAddSuggestionRequest(
         latitude, longitude, name, short_desc, wikipedia_link

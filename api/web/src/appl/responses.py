@@ -5,7 +5,6 @@ from src.appl.models import (
     ShortLocationDescription,
     LongLocationDescription,
 )
-from src.appl import LOGGER
 
 
 def short_location_repr(location_tuple) -> ShortLocationDescription:
@@ -17,7 +16,7 @@ def short_location_repr(location_tuple) -> ShortLocationDescription:
         "longitude": location.longitude,
         "short_description": location.short_description,
         "image_link": location.image_link,
-        "is_liked": is_liked
+        "is_liked": is_liked,
     }
 
 
