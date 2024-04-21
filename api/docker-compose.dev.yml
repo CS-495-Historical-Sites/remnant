@@ -15,7 +15,6 @@ services:
     
     env_file: 
       - .env.dev 
-      - .env
 
   postgres:
     image: postgres

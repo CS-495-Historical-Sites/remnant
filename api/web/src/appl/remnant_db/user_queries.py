@@ -58,5 +58,5 @@ def successful_login_attempts(email: str, success: bool):
     return LoginAttempt.query.filter_by(email=email, success=success).count()
 
 
-def unsuccesful_login_attempts(email: str, success: bool):
-    return LoginAttempt.query.filter(LoginAttempt.attempt_time > (datetime.utcnow() - timedelta(minutes=-1))).count()
+def unsuccesful_login_attempts(email: str, success: bool, mins: int):
+    return LoginAttempt.query.filter(LoginAttempt.email==email, LoginAttempt.success==success, LoginAttempt.attempt_time > datetime.utcnow() - timedelta(minutes=mins)).count()

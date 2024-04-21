@@ -123,8 +123,7 @@ def login():
 
     login_info = LoginRequest(email, non_hash_password)
 
-    LOGGER.debug(f"Failed attempt {user_queries.unsuccesful_login_attempts(email=login_info.email,success=False)}")
-    if user_queries.unsuccesful_login_attempts(email=login_info.email, success=False) > 5:
+    if user_queries.unsuccesful_login_attempts(email=login_info.email, success=False, mins=5) > 4:
         return jsonify({"message": "Too many login attempts. Attempt later."}), 429
 
     LOGGER.debug(f"Attemping to login {login_info.email}")
