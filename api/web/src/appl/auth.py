@@ -99,10 +99,10 @@ def register():
         user_queries.create_admin(registration_info)
     else:
         user = user_queries.create_user(registration_info)
-
-        send_success = send_welcome_email(user)
-        if not send_success:
-            return jsonify({"message": "Failed to send email"}), 500
+        if not Config.TESTING:
+            send_success = send_welcome_email(user)
+            if not send_success:
+                return jsonify({"message": "Failed to send email"}), 500
 
     return jsonify({"email": registration_info.email, "errorString": ""}), 200
 

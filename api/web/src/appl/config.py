@@ -8,6 +8,8 @@ class Config:
     SECRET_KEY = os.environ.get("FLASK_SECRET_KEY")
     LOG_LEVEL = logging.DEBUG
 
+    TESTING = False
+
     __PRODUCT_URL_PROD__ = "https://app.uahistoricalsites.com"
     __PRODUCT_URL_DEV__ = "http://localhost:5173"
 
