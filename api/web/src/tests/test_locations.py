@@ -33,6 +33,7 @@ class TestVisitedLocations:
             "name": "city1",
             "short_description": "description1",
             "image_link": "image_link",
+            "categories": [],
         }
 
     def test_get_specific_location_404(self, client):

@@ -11,26 +11,20 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddBox
 import androidx.compose.material.icons.filled.AddLocation
-import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -54,7 +48,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -80,12 +73,11 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import com.ua.historicalsitesapp.data.model.map.ClusterItem
 import com.ua.historicalsitesapp.geofence.GeofenceBroadcastReceiver
 import com.ua.historicalsitesapp.ui.handlers.withLogoutOnFailure
-import com.ua.historicalsitesapp.ui.screens.SearchBar
 import com.ua.historicalsitesapp.ui.screens.TAG
+import com.ua.historicalsitesapp.ui.theme.Typography
 import com.ua.historicalsitesapp.viewmodels.MainPageViewModel
 import com.ua.historicalsitesapp.viewmodels.UserProfileViewModel
 import kotlinx.coroutines.launch
-import com.ua.historicalsitesapp.ui.theme.Typography
 
 @OptIn(MapsComposeExperimentalApi::class)
 @Composable
@@ -113,17 +105,14 @@ private fun CustomRendererClustering(
   val renderer =
       rememberClusterRenderer(
           clusterContent = { cluster ->
-              ClusterCircleGrouping(
+            ClusterCircleGrouping(
                 modifier = Modifier.size(60.dp),
                 text = "%,d".format(cluster.size),
                 color = Color.DarkGray,
             )
           },
           clusterItemContent = {
-            ClusterCircle(
-                modifier = Modifier.size(60.dp),
-                imageLink = it.imageLink
-            )
+            ClusterCircle(modifier = Modifier.size(60.dp), imageLink = it.imageLink)
           },
           clusterManager = clusterManager,
       )
@@ -197,8 +186,7 @@ fun GoogleMapsScreen(
                       location.name,
                       shortLocationDescription,
                       0f,
-                      location.imageLink
-                  ),
+                      location.imageLink),
               )
             }
           }
@@ -248,7 +236,7 @@ fun GoogleMapsScreen(
   }
   val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
   val scope = rememberCoroutineScope()
-    val searchQuery = remember { mutableStateOf("") }
+  val searchQuery = remember { mutableStateOf("") }
 
   Scaffold(
       topBar = {
@@ -345,39 +333,38 @@ fun GoogleMapsScreen(
                       onLocationInfoBoxClick,
                   )
                 }
-                  val categories = listOf("Food", "Parks", "Museums", "Shops", "Theaters")
-                  Box(
-                      modifier = Modifier
-                          .fillMaxWidth()
-                          .padding(top = 16.dp),
-                      contentAlignment = Alignment.TopCenter
-                  ) {
+                val categories = listOf("Food", "Parks", "Museums", "Shops", "Theaters")
+                Box(
+                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                    contentAlignment = Alignment.TopCenter) {
                       LazyRow(
-                          modifier = Modifier
-                              .padding(horizontal = 16.dp)
-                              .background(Color.Transparent),
-                          horizontalArrangement = Arrangement.spacedBy(8.dp)
-                      ) {
-                          items(categories) { category ->
+                          modifier =
+                              Modifier.padding(horizontal = 16.dp).background(Color.Transparent),
+                          horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            items(categories) { category ->
                               OutlinedButton(
-                                  onClick = { /* Handle filter action for category */ },
+                                  onClick = { /* Handle filter action for category */},
                                   modifier = Modifier.padding(4.dp),
-                                  border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)),
-                                  colors = ButtonDefaults.buttonColors(
-                                      containerColor = Color.White,
-                                      contentColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f),
-                                      disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
-                                      disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                                  )
-                              ) {
-                                  Text(
-                                      text = category,
-                                      style = Typography.labelLarge
-                                  )
-                              }
+                                  border =
+                                      BorderStroke(
+                                          1.dp,
+                                          MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)),
+                                  colors =
+                                      ButtonDefaults.buttonColors(
+                                          containerColor = Color.White,
+                                          contentColor =
+                                              MaterialTheme.colorScheme.primary.copy(alpha = 0.8f),
+                                          disabledContainerColor =
+                                              MaterialTheme.colorScheme.onSurface.copy(
+                                                  alpha = 0.3f),
+                                          disabledContentColor =
+                                              MaterialTheme.colorScheme.onSurface.copy(
+                                                  alpha = 0.6f))) {
+                                    Text(text = category, style = Typography.labelLarge)
+                                  }
+                            }
                           }
-                      }
-                  }
+                    }
               }
             }
       }
