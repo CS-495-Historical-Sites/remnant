@@ -123,7 +123,7 @@ def login():
 
     login_info = LoginRequest(email, non_hash_password)
 
-    if user_queries.unsuccesful_login_attempts(email=login_info.email, success=False, mins=5) > 4:
+    if user_queries.unsuccesful_login_attempts(email=login_info.email, mins=5) > 4:
         return jsonify({"message": "Too many login attempts. Attempt later."}), 429
 
     LOGGER.debug(f"Attemping to login {login_info.email}")
@@ -136,7 +136,7 @@ def login():
             422,
         )
 
-    user_queries.log_login_attempt(email=login_info.email, success=True)
+    user_queries.log_login_attempt(email=login_info.email)
 
     access_token = create_access_token(identity=user.email)
     refresh_token = create_refresh_token(identity=user.email)
