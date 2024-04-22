@@ -96,6 +96,7 @@ dependencies {
   implementation("androidx.compose.ui:ui-android:1.6.2")
   implementation("androidx.compose.runtime:runtime-saveable-android:1.6.2")
   implementation("io.coil-kt:coil-base:2.5.0")
+  implementation("androidx.compose.animation:animation-core-android:1.6.2")
   implementation("androidx.compose.ui:ui-graphics-android:1.6.2")
   implementation("androidx.compose.ui:ui-text-android:1.6.2")
   implementation("androidx.compose.ui:ui-unit-android:1.6.2")
