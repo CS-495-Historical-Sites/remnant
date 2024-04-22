@@ -54,6 +54,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -79,6 +80,7 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import com.ua.historicalsitesapp.data.model.map.ClusterItem
 import com.ua.historicalsitesapp.geofence.GeofenceBroadcastReceiver
 import com.ua.historicalsitesapp.ui.handlers.withLogoutOnFailure
+import com.ua.historicalsitesapp.ui.screens.SearchBar
 import com.ua.historicalsitesapp.ui.screens.TAG
 import com.ua.historicalsitesapp.viewmodels.MainPageViewModel
 import com.ua.historicalsitesapp.viewmodels.UserProfileViewModel
@@ -102,7 +104,7 @@ private fun CustomRendererClustering(
           screenHeight.value.toInt(),
       )
 
-  algorithm.maxDistanceBetweenClusteredItems = 100
+  algorithm.maxDistanceBetweenClusteredItems = 300
 
   clusterManager?.setAlgorithm(
       algorithm,
@@ -111,17 +113,16 @@ private fun CustomRendererClustering(
   val renderer =
       rememberClusterRenderer(
           clusterContent = { cluster ->
-            ClusterCircle(
-                modifier = Modifier.size(40.dp),
+              ClusterCircleGrouping(
+                modifier = Modifier.size(60.dp),
                 text = "%,d".format(cluster.size),
                 color = Color.DarkGray,
             )
           },
           clusterItemContent = {
             ClusterCircle(
-                modifier = Modifier.size(18.dp),
-                text = "",
-                color = Color.Magenta,
+                modifier = Modifier.size(60.dp),
+                imageLink = it.imageLink
             )
           },
           clusterManager = clusterManager,
@@ -196,6 +197,7 @@ fun GoogleMapsScreen(
                       location.name,
                       shortLocationDescription,
                       0f,
+                      location.imageLink
                   ),
               )
             }
@@ -246,6 +248,7 @@ fun GoogleMapsScreen(
   }
   val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
   val scope = rememberCoroutineScope()
+    val searchQuery = remember { mutableStateOf("") }
 
   Scaffold(
       topBar = {
@@ -324,6 +327,7 @@ fun GoogleMapsScreen(
                         isPlacingLocation = false
                       })
                 }
+
                 GoogleMap(
                     modifier = Modifier.fillMaxSize(),
                     googleMapOptionsFactory = { GoogleMapOptions().mapId("ed053e0f6a3454e8") },
@@ -335,6 +339,7 @@ fun GoogleMapsScreen(
                   if (isPlacingLocation) {
                     LocationSuggestionMarker(state = cameraPositionState.position)
                   }
+
                   CustomRendererClustering(
                       items = items,
                       onLocationInfoBoxClick,
