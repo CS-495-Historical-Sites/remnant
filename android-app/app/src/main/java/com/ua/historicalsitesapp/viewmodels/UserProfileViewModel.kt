@@ -23,6 +23,10 @@ class UserProfileViewModel(context: Context) : ViewModel() {
   private val loginRepository =
       LoginRepositoryProvider.provideLoginRepository(LoginDataSource(), context)
 
+  fun logout() {
+    loginRepository.logout()
+  }
+
   private fun getUser(): LoggedInUser {
     return loginRepository.user ?: throw Exception("MainPageViewModel could not retrieve user")
   }
@@ -49,6 +53,7 @@ class UserProfileViewModel(context: Context) : ViewModel() {
     val client = getUserClient()
     return runBlocking {
       val response = client.get(ServerConfig.SERVER_URL + "/user/privateinfo")
+
       if (response.status.value == 200) {
         return@runBlocking response.body()
       }

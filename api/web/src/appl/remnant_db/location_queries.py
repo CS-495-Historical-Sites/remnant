@@ -1,7 +1,9 @@
 from math import cos, pi
 
+from sqlalchemy.sql import exists, and_
+
 from src.appl import db
-from src.appl.models import Location
+from src.appl.models import Location, Visit
 
 
 def create_location(location: Location, suspend_commit=False) -> None:
@@ -22,8 +24,8 @@ def get_all_locations() -> list[Location]:
     return Location.query.all()
 
 
-def get_locations_near(
-    lat: float, long: float, kilometer_radius: float
+def get_nearby_location_data(
+    lat: float, long: float, kilometer_radius: float, user_id: int
 ) -> list[Location]:
     # 1 degree of latitude in kilometers, ~111km
     delta_lat = kilometer_radius / 111
@@ -37,11 +39,19 @@ def get_locations_near(
     min_long = long - delta_long
     max_long = long + delta_long
 
-    nearby_locations = Location.query.filter(
-        (Location.latitude >= min_lat),
-        (Location.latitude <= max_lat),
-        (Location.longitude >= min_long),
-        (Location.longitude <= max_long),
-    ).all()
+    liked_subquery = (
+        exists()
+        .where(and_(Visit.user_id == user_id, Visit.location_id == Location.id))
+        .label("is_liked")
+    )
 
-    return nearby_locations
+    locations = (
+        db.session.query(Location, liked_subquery)
+        .filter(
+            Location.latitude.between(min_lat, max_lat),
+            Location.longitude.between(min_long, max_long),
+        )
+        .all()
+    )
+
+    return locations

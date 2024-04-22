@@ -43,7 +43,9 @@ class LoginRepository(
   }
 
   fun logout(): Boolean {
+
     if (user == null) {
+      runBlocking { clearCachedTokens() }
       return false
       // or true idk
     }
@@ -60,6 +62,12 @@ class LoginRepository(
         true
       }
       else -> {
+
+        runBlocking {
+          clearCachedTokens()
+          user = null
+        }
+
         false
       }
     }

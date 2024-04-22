@@ -7,14 +7,16 @@ from src.appl.models import (
 )
 
 
-def short_location_repr(l: Location) -> ShortLocationDescription:
+def short_location_repr(location_tuple) -> ShortLocationDescription:
+    location, is_liked = location_tuple
     return {
-        "id": l.id,
-        "name": l.name,
-        "latitude": l.latitude,
-        "longitude": l.longitude,
-        "short_description": l.short_description,
-        "image_link": l.image_link,
+        "id": location.id,
+        "name": location.name,
+        "latitude": location.latitude,
+        "longitude": location.longitude,
+        "short_description": location.short_description,
+        "image_link": location.image_link,
+        "is_liked": is_liked,
     }
 
 

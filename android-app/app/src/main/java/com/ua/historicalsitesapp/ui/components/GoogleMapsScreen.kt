@@ -63,8 +63,10 @@ import com.google.maps.android.compose.clustering.rememberClusterRenderer
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.ua.historicalsitesapp.data.model.map.ClusterItem
 import com.ua.historicalsitesapp.geofence.GeofenceBroadcastReceiver
+import com.ua.historicalsitesapp.ui.handlers.withLogoutOnFailure
 import com.ua.historicalsitesapp.ui.screens.TAG
 import com.ua.historicalsitesapp.viewmodels.MainPageViewModel
+import com.ua.historicalsitesapp.viewmodels.UserProfileViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(MapsComposeExperimentalApi::class)
@@ -84,7 +86,7 @@ private fun CustomRendererClustering(
           screenHeight.value.toInt(),
       )
 
-  algorithm.maxDistanceBetweenClusteredItems = 200
+  algorithm.maxDistanceBetweenClusteredItems = 100
 
   clusterManager?.setAlgorithm(
       algorithm,
@@ -153,6 +155,7 @@ fun GoogleMapsScreen(
     selectedLocation = item
   }
   val context = LocalContext.current
+  val usersView = UserProfileViewModel(context)
   val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
 
   val cameraPositionState = rememberCameraPositionState { CameraPosition.NULL }
@@ -163,57 +166,66 @@ fun GoogleMapsScreen(
       val coordinates = LatLng(usersLocation.latitude, usersLocation.longitude)
       val cameraPosition = CameraPosition.fromLatLngZoom(coordinates, 15F)
       cameraPositionState.move(CameraUpdateFactory.newCameraPosition(cameraPosition))
+      withLogoutOnFailure(
+          context, usersView, { view.getHistoricalLocationNearPoint(coordinates, 50.0f) }) {
+              historicalLocations ->
+            for (location in historicalLocations) {
+              val locationId = location.id
+              val position = LatLng(location.latitude.toDouble(), location.longitude.toDouble())
+              val shortLocationDescription = location.shortDescription ?: ""
+              items.add(
+                  ClusterItem(
+                      locationId,
+                      position,
+                      location.name,
+                      shortLocationDescription,
+                      0f,
+                  ),
+              )
+            }
+          }
+      withLogoutOnFailure(
+          context, usersView, { view.getHistoricalLocationNearPoint(coordinates, 0.5f) }) {
+              geofenceLocations ->
+            if (geofenceLocations.isEmpty()) {
+              return@withLogoutOnFailure
+            }
+            var count = 0
+            for (location in geofenceLocations) {
+              if (count < 100) {
+                geofenceList.add(
+                    Geofence.Builder()
+                        .setRequestId(location.name)
+                        .setCircularRegion(
+                            location.latitude.toDouble(), location.longitude.toDouble(), 100f)
+                        .setNotificationResponsiveness(1000)
+                        .setExpirationDuration(Geofence.NEVER_EXPIRE)
+                        .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL)
+                        .setLoiteringDelay(2500)
+                        .build())
+              }
+              count += 1
+            }
 
-      val historicalLocations = view.getHistoricalLocationNearPoint(coordinates, 50.0f)
-      for (location in historicalLocations) {
-        val locationId = location.id
-        val position = LatLng(location.latitude.toDouble(), location.longitude.toDouble())
-        val shortLocationDescription = location.shortDescription ?: ""
-        items.add(
-            ClusterItem(
-                locationId,
-                position,
-                location.name,
-                shortLocationDescription,
-                0f,
-            ),
-        )
-      }
+            val geofencingClient: GeofencingClient = getGeofencingClient(context)
+            val geofencingPendingIntent: PendingIntent by lazy {
+              val intent = Intent(context, GeofenceBroadcastReceiver::class.java)
+              PendingIntent.getBroadcast(
+                  context,
+                  0,
+                  intent,
+                  PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+            }
 
-      val geofenceLocations = view.getHistoricalLocationNearPoint(coordinates, 0.5f)
-      if (geofenceLocations.isEmpty()) {
-        return@addOnSuccessListener
-      }
-      var count = 0
-      for (location in geofenceLocations) {
-        if (count < 100) {
-          geofenceList.add(
-              Geofence.Builder()
-                  .setRequestId(location.name)
-                  .setCircularRegion(
-                      location.latitude.toDouble(), location.longitude.toDouble(), 100f)
-                  .setNotificationResponsiveness(1000)
-                  .setExpirationDuration(Geofence.NEVER_EXPIRE)
-                  .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL)
-                  .setLoiteringDelay(2500)
-                  .build())
-        }
-        count += 1
-      }
-
-      val geofencingClient: GeofencingClient = getGeofencingClient(context)
-      val geofencingPendingIntent: PendingIntent by lazy {
-        val intent = Intent(context, GeofenceBroadcastReceiver::class.java)
-        PendingIntent.getBroadcast(
-            context, 0, intent, PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
-      }
-
-      geofencingClient.addGeofences(getGeofencingRequest(), geofencingPendingIntent).run {
-        addOnSuccessListener { Log.d("Geofence", "Successfully add geofences") }
-        addOnFailureListener {
-          Log.d("Geofence", "Request: ${getGeofencingRequest()}, Intent: $geofencingPendingIntent")
-        }
-      }
+            geofencingClient.addGeofences(getGeofencingRequest(), geofencingPendingIntent).run {
+              addOnSuccessListener { Log.d("Geofence", "Successfully add geofences") }
+              addOnFailureListener {
+                Log.d(
+                    "Geofence",
+                    "Request: ${getGeofencingRequest()}, Intent: $geofencingPendingIntent")
+              }
+            }
+          }
     }
   }
   val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
