@@ -236,7 +236,6 @@ fun GoogleMapsScreen(
   }
   val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
   val scope = rememberCoroutineScope()
-  val searchQuery = remember { mutableStateOf("") }
 
   Scaffold(
       topBar = {
@@ -333,7 +332,22 @@ fun GoogleMapsScreen(
                       onLocationInfoBoxClick,
                   )
                 }
-                val categories = listOf("Food", "Parks", "Museums", "Shops", "Theaters")
+
+                val categories =
+                    listOf(
+                        "Heritage",
+                        "Maritime History",
+                        "Development",
+                        "Innovation",
+                        "Military",
+                        "History",
+                        "Infrastructure",
+                        "Recreation",
+                        "Diversity",
+                        "Architecture",
+                        "Prehistoric",
+                        "Settlement")
+
                 Box(
                     modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
                     contentAlignment = Alignment.TopCenter) {
