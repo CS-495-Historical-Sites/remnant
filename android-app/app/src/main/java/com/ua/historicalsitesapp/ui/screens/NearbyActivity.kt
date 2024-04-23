@@ -8,6 +8,7 @@ import android.view.Gravity
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -61,6 +62,13 @@ import com.ua.historicalsitesapp.ui.foreignintents.createGoogleMapsDirectionsInt
 import com.ua.historicalsitesapp.util.hasLocationPermission
 import com.ua.historicalsitesapp.viewmodels.MainPageViewModel
 import kotlin.math.*
+import androidx.compose.ui.text.style.TextOverflow
+
+import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.ui.text.font.FontStyle
+
 
 class FeedPageActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -108,7 +116,7 @@ fun HomeAppBar(
                 actionIconContentColor = Color.White),
         actions = {
           var showMenu by remember { mutableStateOf(false) }
-          val radiusOptions = listOf(5, 10, 20)
+          val radiusOptions = listOf(5, 10, 25, 50)
 
           IconButton(
               onClick = { showMenu = !showMenu },
@@ -168,6 +176,12 @@ fun HomeMainContent(locationInfo: HsLocation, distance: Double, view: MainPageVi
   val context = LocalContext.current
   var isLiked by remember { mutableStateOf(locationInfo.isLiked) }
   var userHasInteracted by remember { mutableStateOf(false) }
+  var isExpanded by remember { mutableStateOf(false) }
+  val longDescription = locationInfo.longDescription ?: ""
+  val words = longDescription.split("\\s+".toRegex())  // Split by any whitespace
+  val wordCount = words.filter { it.isNotEmpty() }.size
+  val needExpansion = wordCount > 60  // Example threshold
+    Log.d("Expansion", "${locationInfo.name} description length = ${longDescription.length} expansion = ${needExpansion}")
 
   LaunchedEffect(isLiked, userHasInteracted) {
     if (userHasInteracted) {
@@ -205,7 +219,7 @@ fun HomeMainContent(locationInfo: HsLocation, distance: Double, view: MainPageVi
     Column {
       Row(
           Modifier.fillMaxWidth().padding(start = 6.dp, end = 6.dp, bottom = 8.dp),
-          verticalAlignment = Alignment.CenterVertically) {
+          verticalAlignment = Alignment.Top) {
             Column(Modifier.weight(2f).padding(end = 16.dp)) {
               AsyncImage(
                   model = imageLink,
@@ -220,13 +234,43 @@ fun HomeMainContent(locationInfo: HsLocation, distance: Double, view: MainPageVi
                   contentScale = ContentScale.Crop)
             }
 
-            Column(Modifier.weight(6f).padding(bottom = 40.dp)) {
-              Text(text = locationInfo.name, fontWeight = FontWeight.Normal, fontSize = 15.sp)
+            Column(Modifier.weight(4f).animateContentSize()) {
+              Text(text = locationInfo.name,
+                  fontWeight = FontWeight.Normal,
+                  fontSize = 20.sp,
+                  lineHeight = 22.sp)
+
               val formattedDistance = String.format("%.1f", distance)
               Text(
                   text = "$formattedDistance Miles away",
                   fontWeight = FontWeight.Normal,
-                  fontSize = 10.sp)
+                  fontStyle = FontStyle.Italic,
+                  fontSize = 12.sp,
+                  lineHeight = 20.sp)
+                if(locationInfo.longDescription != null) {
+                    Text(
+                        text = locationInfo.longDescription,
+                        fontWeight = FontWeight.Normal,
+                        lineHeight = 11.sp,
+                        fontSize = 9.sp,
+                        maxLines = if (isExpanded || !needExpansion) Int.MAX_VALUE else 7,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    if (needExpansion) {
+                        IconButton(
+                            onClick = { isExpanded = !isExpanded },
+                            modifier = Modifier
+                                .size(22.dp)
+                                .padding(0.dp)
+                        ) {
+                            Icon(
+                                imageVector = if (isExpanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+                                contentDescription = if (isExpanded) "Collapse" else "Expand",
+                                modifier = Modifier.size(11.dp)
+                            )
+                        }
+                    }
+                }
             }
           }
 

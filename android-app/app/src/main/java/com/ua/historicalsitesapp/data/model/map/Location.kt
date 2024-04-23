@@ -11,6 +11,7 @@ data class HsLocation(
     val longitude: Float,
     @SerialName("is_liked") val isLiked: Boolean,
     @SerialName("short_description") val shortDescription: String?,
+    @SerialName("long_description") val longDescription: String?,
     @SerialName("image_link") val imageLink: String,
 )
 
