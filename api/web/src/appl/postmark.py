@@ -15,7 +15,7 @@ def compose_welcome_body(
     confirmation_token: str,
 ) -> Dict:
     """Compose the body of the email."""
-
+    final_url = f"{Config.PRODUCT_URL}/confirmation/{confirmation_token}"
     data = {
         "From": Config.EMAIL_ADDRESS,
         "To": email_to,
@@ -24,7 +24,7 @@ def compose_welcome_body(
             "product_url": Config.PRODUCT_URL,
             "product_name": Config.PRODUCT_NAME,
             "username": username,
-            "action_url": f"some action url with confirmation token: {confirmation_token}",
+            "action_url": final_url,
             "company_name": Config.COMPANY_NAME,
             "company_address": Config.COMPANY_ADDRESS,
         },

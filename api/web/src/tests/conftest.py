@@ -7,7 +7,7 @@ from src.appl.models import program_metadata
 def app():
     flask_app = init_app(testing=True)
 
-    flask_app.config.update({"TESTING": True})
+    flask_app.config["TESTING"] = True
 
     with flask_app.app_context():
         yield flask_app
