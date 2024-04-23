@@ -1,3 +1,5 @@
+import { API_BASE_URL } from "../ServerUtil";
+
 export const UpdateLocationSuggestion = async (
   suggestionId: string,
   token: string,
@@ -5,7 +7,7 @@ export const UpdateLocationSuggestion = async (
   status: string,
 ): Promise<Response> => {
   return await fetch(
-    `http://localhost:8080/api/suggestions/locations/${type}/${suggestionId}/approval`,
+    `${API_BASE_URL}/api/suggestions/locations/${type}/${suggestionId}/approval`,
     {
       method: "PATCH",
 

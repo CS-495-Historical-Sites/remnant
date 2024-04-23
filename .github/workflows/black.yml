@@ -1,4 +1,4 @@
-name: Lint
+name: Check API Formatting
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  lint:
+  run-black-check:
     runs-on: ubuntu-latest
     defaults:
       run:

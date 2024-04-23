@@ -11,12 +11,16 @@ from flask_jwt_extended import (
 )
 from sqlalchemy.exc import DatabaseError
 
-from src.appl import LOGGER, Config
-from src.appl.generators import generate_email_confirmation_token
+from src.appl import LOGGER, Config, db
 from src.appl.postmark import send_welcome_email
 from src.appl.models import RegistrationRequest, LoginRequest
 from src.appl.remnant_db import user_queries, token_queries
-from src.appl.validation import check_valid_password, check_valid_email, check_types
+from src.appl.validation import (
+    check_valid_password,
+    check_valid_email,
+    check_valid_username,
+    check_types,
+)
 
 
 def user_required(f):
@@ -25,7 +29,7 @@ def user_required(f):
         user_identity = get_jwt_identity()
         user = user_queries.get_user(user_identity)
         if user is None:
-            return jsonify({"message": "User not found"}), 400
+            return jsonify({"message": "User not found"}), 401
         return f(user, *args, **kwargs)
 
     return decorated_function
@@ -37,7 +41,7 @@ def admin_required(f):
         user_identity = get_jwt_identity()
         user = user_queries.get_admin(user_identity)
         if user is None:
-            return jsonify({"message": "User not found"}), 400
+            return jsonify({"message": "User not found"}), 401
         return f(user, *args, **kwargs)
 
     return decorated_function
@@ -75,7 +79,11 @@ def register():
 
     # checking for valid credentials
     # no point in checking the database if the credentials are not valid
-    if not check_valid_email(email) or not check_valid_password(non_hash_password):
+    if (
+        not check_valid_email(email)
+        or not check_valid_password(non_hash_password)
+        or not check_valid_username(username)
+    ):
         return jsonify({"message": "Invalid credentials entered"}), 422
 
     registration_info = RegistrationRequest(
@@ -151,6 +159,17 @@ def refresh():
     identity = get_jwt_identity()
     access_token = create_access_token(identity=identity)
     return jsonify(access_token=access_token), 200
+
+
+@auth_blueprint.route("/api/confirmation/<string:token>", methods=["POST"])  # type: ignore
+def confirm_email(token):
+    user = user_queries.get_user_by_confirmation_token(token)
+    if user is None:
+        return jsonify({"message": "User not found"}), 400
+
+    user.has_confirmed_email = True
+    db.session.commit()
+    return jsonify({"message": "Email confirmed"}), 200
 
 
 @auth_blueprint.route("/api/user/logout", methods=["DELETE", "OPTIONS"])

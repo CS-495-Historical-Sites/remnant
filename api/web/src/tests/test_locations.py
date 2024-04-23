@@ -1,21 +1,8 @@
 from src.appl import db
 from src.appl.models import Location
 
-from src.tests import helpers
-
 
 class TestVisitedLocations:
-
-    def test_get_all_locations(self, client):
-        headers, _ = helpers.register_user(client)
-        added_locations = helpers.fill_with_locations(client)
-
-        get_all_locations = client.get(
-            "/api/locations",
-            headers=headers,
-        )
-        assert get_all_locations.status_code == 200
-        assert len(get_all_locations.json) == added_locations
 
     def test_get_specific_locoation(self, client):
         locations = [
@@ -24,6 +11,7 @@ class TestVisitedLocations:
                 45.0283,
                 143.2030,
                 "image_link",
+                [],
                 "description1",
                 "longdecription0",
             ),
@@ -45,6 +33,7 @@ class TestVisitedLocations:
             "name": "city1",
             "short_description": "description1",
             "image_link": "image_link",
+            "categories": [],
         }
 
     def test_get_specific_location_404(self, client):
@@ -54,6 +43,7 @@ class TestVisitedLocations:
                 45.0283,
                 143.2030,
                 "image_link",
+                [],
                 "description1",
                 "longdecription0",
             ),

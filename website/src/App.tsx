@@ -10,9 +10,9 @@ import SuggestionsView from "./pages/SuggestionView";
 import EditSuggestionPage from "./pages/EditSuggestionPage";
 import useToken from "./hooks/useToken";
 import AddSuggestionPage from "./pages/AddSuggestionPage";
-
+import ConfirmationEmailLandingPage from "./pages/PasswordConfirmation";
 function App() {
-  const { token, setToken, removeToken } = useToken();
+  const { token, setToken } = useToken();
   return (
     <div className="App">
       <BrowserRouter>
@@ -64,6 +64,12 @@ function App() {
               element={<Login setToken={setToken} />}
             />
           )}
+          {
+            <Route
+              path="/confirmation/:confirmation_token"
+              element={<ConfirmationEmailLandingPage />}
+            />
+          }
         </Routes>
       </BrowserRouter>
     </div>

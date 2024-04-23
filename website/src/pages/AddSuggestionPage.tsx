@@ -6,14 +6,8 @@ import {
   Paper,
   CircularProgress,
   Box,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
 } from "@mui/material";
 
-import LocationDetails from "../models/Location";
 import LocationSuggestion from "../models/LocationSuggestion";
 import { UpdateLocationSuggestion } from "../remnantAPI/UpdateLocationSuggestions";
 import { GetLocationAddSuggestion } from "../remnantAPI/GetLocationSuggestions";

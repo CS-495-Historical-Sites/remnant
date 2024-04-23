@@ -6,6 +6,7 @@ import com.ua.historicalsitesapp.data.model.map.HsLocation
 import com.ua.historicalsitesapp.data.model.map.HsLocationComplete
 import com.ua.historicalsitesapp.util.ServerConfig
 import com.ua.historicalsitesapp.util.constructUserClient
+import com.ua.historicalsitesapp.viewmodels.RemnantUnauthorizedAccessException
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
@@ -24,15 +25,17 @@ class LocationDataSource {
     val longitude = point.longitude
 
     return runBlocking {
-      val response: List<HsLocation> =
-          client
-              .get(ServerConfig.SERVER_URL + "/locations") {
-                parameter("lat", latitude)
-                parameter("long", longitude)
-                parameter("kilometer_radius", kilometerRadius)
-              }
-              .body()
-      return@runBlocking response
+      val response =
+          client.get(ServerConfig.SERVER_URL + "/locations") {
+            parameter("lat", latitude)
+            parameter("long", longitude)
+            parameter("kilometer_radius", kilometerRadius)
+          }
+      if (response.status.value == 401) {
+        throw RemnantUnauthorizedAccessException("getLocationsNearPoint()")
+      }
+
+      return@runBlocking response.body<List<HsLocation>>()
     }
   }
 
@@ -40,9 +43,9 @@ class LocationDataSource {
     val client = constructUserClient(user)
 
     return runBlocking {
-      val response: HsLocationComplete =
-          client.get(ServerConfig.SERVER_URL + "/locations/" + locationId) {}.body()
-      return@runBlocking response
+      return@runBlocking client
+          .get(ServerConfig.SERVER_URL + "/locations/" + locationId) {}
+          .body<HsLocationComplete>()
     }
   }
 }

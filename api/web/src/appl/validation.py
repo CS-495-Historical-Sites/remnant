@@ -31,3 +31,10 @@ def check_valid_password(password):
     return bool(re.fullmatch(password_regex, password)) and (
         (len(password)) >= 8 and (len(password) < 25)
     )
+
+
+def check_valid_username(username):
+    if not re.match(r"^[A-Za-z0-9._]+$", username):
+        return False
+
+    return len(username) < 15

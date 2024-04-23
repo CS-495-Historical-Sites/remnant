@@ -2,9 +2,8 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import TypedDict
 
-
-from sqlalchemy import Connection, MetaData, UniqueConstraint, event
-from sqlalchemy.orm import Session
+from sqlalchemy import MetaData, UniqueConstraint
+from sqlalchemy.dialects.postgresql import JSONB
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from src.appl import db
@@ -48,6 +47,7 @@ class ShortLocationDescription(TypedDict):
     latitude: float
     longitude: float
     short_description: str
+    is_liked: bool
 
 
 class LongLocationDescription(TypedDict):
@@ -76,6 +76,7 @@ class Location(db.Model):
     long_description = db.Column(db.Text, nullable=True)
     version = db.Column(db.Integer, default=1, nullable=False)
     image_link = db.Column(db.Text, nullable=False)
+    categories = db.Column(db.ARRAY(db.String), nullable=True)
 
     # pylint: disable=too-many-arguments
     def __init__(
@@ -84,12 +85,14 @@ class Location(db.Model):
         latitude,
         longitude,
         image_link,
+        categories: list[str],
         short_description=None,
         long_description=None,
     ):
         self.name = name
         self.latitude = latitude
         self.longitude = longitude
+        self.categories = categories
         self.short_description = short_description
         self.long_description = long_description
         self.image_link = image_link
@@ -104,6 +107,7 @@ class Location(db.Model):
             long_description=self.long_description,
             image_link=self.image_link,
             version=self.version,
+            categories=self.categories,
         )
         db.session.add(history)
 
@@ -117,8 +121,12 @@ class Visit(db.Model):
     __tablename__ = "user_visited_locations"
     metadata = program_metadata
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    location_id = db.Column(db.Integer, db.ForeignKey("location.id"), nullable=False)
+    user_id = db.Column(
+        db.Integer, db.ForeignKey("user.id"), nullable=False, index=True
+    )
+    location_id = db.Column(
+        db.Integer, db.ForeignKey("location.id"), nullable=False, index=True
+    )
     visit_time = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
     # to prevent duplicate rows no row can share the same user_id and location_id
@@ -151,6 +159,7 @@ class User(db.Model):
     username = db.Column(db.String(120), index=False, unique=False)
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(256), nullable=False)
+    answers = db.Column(JSONB, nullable=True)
     email_confirmation_token = db.Column(db.String(256), nullable=False)
 
     is_admin = db.Column(db.Boolean, default=False)
@@ -162,11 +171,13 @@ class User(db.Model):
         email: str,
         supplied_password: str,
         confirmation_token: str,
+        answers=None,
         is_admin=False,
     ):
         self.username = username
         self.email = email
         self.password_hash = generate_password_hash(supplied_password)
+        self.answers = answers
         self.email_confirmation_token = confirmation_token
         self.is_admin = is_admin
 
@@ -273,6 +284,7 @@ class LocationHistory(db.Model):
     image_link = db.Column(db.Text, nullable=True)
     version = db.Column(db.Integer, nullable=False)
     modified_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    categories = db.Column(db.ARRAY(db.String), nullable=True)
 
     # Foreign key relationship
     location = db.relationship(

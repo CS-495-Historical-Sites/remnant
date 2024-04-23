@@ -9,25 +9,21 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddBox
 import androidx.compose.material.icons.filled.AddLocation
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
@@ -63,8 +59,10 @@ import com.google.maps.android.compose.clustering.rememberClusterRenderer
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.ua.historicalsitesapp.data.model.map.ClusterItem
 import com.ua.historicalsitesapp.geofence.GeofenceBroadcastReceiver
+import com.ua.historicalsitesapp.ui.handlers.withLogoutOnFailure
 import com.ua.historicalsitesapp.ui.screens.TAG
 import com.ua.historicalsitesapp.viewmodels.MainPageViewModel
+import com.ua.historicalsitesapp.viewmodels.UserProfileViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(MapsComposeExperimentalApi::class)
@@ -84,7 +82,7 @@ private fun CustomRendererClustering(
           screenHeight.value.toInt(),
       )
 
-  algorithm.maxDistanceBetweenClusteredItems = 200
+  algorithm.maxDistanceBetweenClusteredItems = 100
 
   clusterManager?.setAlgorithm(
       algorithm,
@@ -93,18 +91,14 @@ private fun CustomRendererClustering(
   val renderer =
       rememberClusterRenderer(
           clusterContent = { cluster ->
-            ClusterCircle(
-                modifier = Modifier.size(40.dp),
+            ClusterCircleGrouping(
+                modifier = Modifier.size(60.dp),
                 text = "%,d".format(cluster.size),
                 color = Color.DarkGray,
             )
           },
           clusterItemContent = {
-            ClusterCircle(
-                modifier = Modifier.size(18.dp),
-                text = "",
-                color = Color.Magenta,
-            )
+            ClusterCircle(modifier = Modifier.size(60.dp), imageLink = it.imageLink)
           },
           clusterManager = clusterManager,
       )
@@ -153,6 +147,7 @@ fun GoogleMapsScreen(
     selectedLocation = item
   }
   val context = LocalContext.current
+  val usersView = UserProfileViewModel(context)
   val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
 
   val cameraPositionState = rememberCameraPositionState { CameraPosition.NULL }
@@ -163,79 +158,73 @@ fun GoogleMapsScreen(
       val coordinates = LatLng(usersLocation.latitude, usersLocation.longitude)
       val cameraPosition = CameraPosition.fromLatLngZoom(coordinates, 15F)
       cameraPositionState.move(CameraUpdateFactory.newCameraPosition(cameraPosition))
+      withLogoutOnFailure(
+          context, usersView, { view.getHistoricalLocationNearPoint(coordinates, 50.0f) }) {
+              historicalLocations ->
+            for (location in historicalLocations) {
+              val locationId = location.id
+              val position = LatLng(location.latitude.toDouble(), location.longitude.toDouble())
+              val shortLocationDescription = location.shortDescription ?: ""
+              items.add(
+                  ClusterItem(
+                      locationId,
+                      position,
+                      location.name,
+                      shortLocationDescription,
+                      0f,
+                      location.imageLink),
+              )
+            }
+          }
+      withLogoutOnFailure(
+          context, usersView, { view.getHistoricalLocationNearPoint(coordinates, 0.5f) }) {
+              geofenceLocations ->
+            if (geofenceLocations.isEmpty()) {
+              return@withLogoutOnFailure
+            }
+            var count = 0
+            for (location in geofenceLocations) {
+              if (count < 100) {
+                geofenceList.add(
+                    Geofence.Builder()
+                        .setRequestId(location.name)
+                        .setCircularRegion(
+                            location.latitude.toDouble(), location.longitude.toDouble(), 100f)
+                        .setNotificationResponsiveness(1000)
+                        .setExpirationDuration(Geofence.NEVER_EXPIRE)
+                        .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL)
+                        .setLoiteringDelay(2500)
+                        .build())
+              }
+              count += 1
+            }
 
-      val historicalLocations = view.getHistoricalLocationNearPoint(coordinates, 50.0f)
-      for (location in historicalLocations) {
-        val locationId = location.id
-        val position = LatLng(location.latitude.toDouble(), location.longitude.toDouble())
-        val shortLocationDescription = location.shortDescription ?: ""
-        items.add(
-            ClusterItem(
-                locationId,
-                position,
-                location.name,
-                shortLocationDescription,
-                0f,
-            ),
-        )
-      }
+            val geofencingClient: GeofencingClient = getGeofencingClient(context)
+            val geofencingPendingIntent: PendingIntent by lazy {
+              val intent = Intent(context, GeofenceBroadcastReceiver::class.java)
+              PendingIntent.getBroadcast(
+                  context,
+                  0,
+                  intent,
+                  PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+            }
 
-      val geofenceLocations = view.getHistoricalLocationNearPoint(coordinates, 0.5f)
-      var count = 0
-      for (location in geofenceLocations) {
-        if (count < 100) {
-          geofenceList.add(
-              Geofence.Builder()
-                  .setRequestId(location.name)
-                  .setCircularRegion(
-                      location.latitude.toDouble(), location.longitude.toDouble(), 100f)
-                  .setNotificationResponsiveness(1000)
-                  .setExpirationDuration(Geofence.NEVER_EXPIRE)
-                  .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL)
-                  .setLoiteringDelay(2500)
-                  .build())
-        }
-        count += 1
-      }
-
-      val geofencingClient: GeofencingClient = getGeofencingClient(context)
-      val geofencingPendingIntent: PendingIntent by lazy {
-        val intent = Intent(context, GeofenceBroadcastReceiver::class.java)
-        PendingIntent.getBroadcast(
-            context, 0, intent, PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
-      }
-
-      geofencingClient.addGeofences(getGeofencingRequest(), geofencingPendingIntent).run {
-        addOnSuccessListener { Log.d("Geofence", "Successfully add geofences") }
-        addOnFailureListener {
-          Log.d("Geofence", "Request: ${getGeofencingRequest()}, Intent: $geofencingPendingIntent")
-        }
-      }
+            geofencingClient.addGeofences(getGeofencingRequest(), geofencingPendingIntent).run {
+              addOnSuccessListener { Log.d("Geofence", "Successfully add geofences") }
+              addOnFailureListener {
+                Log.d(
+                    "Geofence",
+                    "Request: ${getGeofencingRequest()}, Intent: $geofencingPendingIntent")
+              }
+            }
+          }
     }
   }
   val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
   val scope = rememberCoroutineScope()
 
   Scaffold(
-      topBar = {
-        CenterAlignedTopAppBar(
-            title = {},
-            navigationIcon = {
-              IconButton(
-                  onClick = {
-                    scope.launch { drawerState.apply { if (isClosed) open() else close() } }
-                  }) {
-                    Icon(imageVector = Icons.Filled.Menu, contentDescription = "Open menu")
-                  }
-            },
-            actions = {},
-            colors =
-                TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xfffce4ec),
-                    titleContentColor = Color.DarkGray,
-                    navigationIconContentColor = Color.DarkGray,
-                    actionIconContentColor = MaterialTheme.colorScheme.onSecondary))
-      },
+      topBar = { MapAppBar(scope = scope, drawerState = drawerState) },
       floatingActionButton = {
         if (isPlacingLocation) {
           ExtendedFloatingActionButton(
@@ -293,6 +282,7 @@ fun GoogleMapsScreen(
                         isPlacingLocation = false
                       })
                 }
+
                 GoogleMap(
                     modifier = Modifier.fillMaxSize(),
                     googleMapOptionsFactory = { GoogleMapOptions().mapId("ed053e0f6a3454e8") },
@@ -304,11 +294,14 @@ fun GoogleMapsScreen(
                   if (isPlacingLocation) {
                     LocationSuggestionMarker(state = cameraPositionState.position)
                   }
+
                   CustomRendererClustering(
                       items = items,
                       onLocationInfoBoxClick,
                   )
                 }
+
+                CategoriesRow(mainPageViewModel = view)
               }
             }
       }
