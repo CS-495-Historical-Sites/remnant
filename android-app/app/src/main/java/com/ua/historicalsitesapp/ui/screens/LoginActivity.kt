@@ -55,7 +55,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.compose.HistoricalSitesAppTheme
 import com.ua.historicalsitesapp.ui.theme.Typography
-import com.ua.historicalsitesapp.util.Result
+import com.ua.historicalsitesapp.util.LoginResult
 import com.ua.historicalsitesapp.viewmodels.AuthViewModel
 import kotlinx.coroutines.delay
 
@@ -248,7 +248,7 @@ private fun LoginMenu(modifier: Modifier = Modifier) {
       onLoginClick = onLoginClick@{
             val loginResult = view.performLogin(email, password)
 
-            if (loginResult is Result.Success) {
+            if (loginResult is LoginResult.Success) {
               if (!loginResult.data.hasConfirmedEmail) {
                 isErrorLocal = true
                 // Optionally, add a message about email confirmation requirement
@@ -258,8 +258,8 @@ private fun LoginMenu(modifier: Modifier = Modifier) {
               if (loginResult.data.isFirstLogin) {
                 firstLogin = true
               }
-            } else {
-              isErrorLocal = true
+            } else if (loginResult is LoginResult.Error.MessageError) {
+              val message = loginResult.message
             }
           },
       loginSuccess = showSuccessSnackbar,
