@@ -12,10 +12,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Button
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -24,7 +24,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -57,7 +56,6 @@ class QuestionnaireActivity : ComponentActivity() {
 fun QuestionnaireMenu(onQuestionnaireCompleted: (Map<String, Set<String>>) -> Unit) {
   val context = LocalContext.current
   var currentQuestionIndex by remember { mutableIntStateOf(0) }
-  var selectedOptions by remember { mutableStateOf<Set<String>>(emptySet()) }
 
   val questions =
       listOf(
@@ -79,15 +77,16 @@ fun QuestionnaireMenu(onQuestionnaireCompleted: (Map<String, Set<String>>) -> Un
                   "Diverse Cultural Heritage Areas"))
 
   val allAnswers = remember { mutableStateMapOf<String, Set<String>>() }
+  val selectedOptionsMap = remember { mutableStateMapOf<Int, Set<String>>() }
+
   QuestionnaireCard(
       currentQuestionIndex = currentQuestionIndex,
       question = questions[currentQuestionIndex].first,
       options = questions[currentQuestionIndex].second,
-      selectedOptions = selectedOptions,
+      selectedOptions = selectedOptionsMap[currentQuestionIndex] ?: emptySet(),
       onAnswer = { options, question ->
-        selectedOptions = options
-        // Save the answer for the current question
-        allAnswers[question] = options
+        selectedOptionsMap[currentQuestionIndex] = options.toSet()
+        allAnswers[question] = options.toSet()
       },
       onNext = {
         if (currentQuestionIndex + 1 >= questions.size) {
@@ -147,10 +146,10 @@ fun QuestionnaireCard(
           }
         }
 
-    Divider(
-        color = Color.Gray.copy(alpha = 0.4f),
+    HorizontalDivider(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
         thickness = 1.dp,
-        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp))
+        color = Color.Gray.copy(alpha = 0.4f))
 
     Button(onClick = { onNext() }, modifier = Modifier.fillMaxWidth()) {
       val questionsSize = 3

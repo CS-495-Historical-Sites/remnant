@@ -76,6 +76,7 @@ class Location(db.Model):
     long_description = db.Column(db.Text, nullable=True)
     version = db.Column(db.Integer, default=1, nullable=False)
     image_link = db.Column(db.Text, nullable=False)
+    categories = db.Column(db.ARRAY(db.String), nullable=True)
 
     # pylint: disable=too-many-arguments
     def __init__(
@@ -84,12 +85,14 @@ class Location(db.Model):
         latitude,
         longitude,
         image_link,
+        categories: list[str],
         short_description=None,
         long_description=None,
     ):
         self.name = name
         self.latitude = latitude
         self.longitude = longitude
+        self.categories = categories
         self.short_description = short_description
         self.long_description = long_description
         self.image_link = image_link
@@ -104,6 +107,7 @@ class Location(db.Model):
             long_description=self.long_description,
             image_link=self.image_link,
             version=self.version,
+            categories=self.categories,
         )
         db.session.add(history)
 
@@ -283,6 +287,7 @@ class LocationHistory(db.Model):
     image_link = db.Column(db.Text, nullable=True)
     version = db.Column(db.Integer, nullable=False)
     modified_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    categories = db.Column(db.ARRAY(db.String), nullable=True)
 
     # Foreign key relationship
     location = db.relationship(

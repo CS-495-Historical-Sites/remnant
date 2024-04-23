@@ -30,7 +30,7 @@ def user_required(f):
         user_identity = get_jwt_identity()
         user = user_queries.get_user(user_identity)
         if user is None:
-            return jsonify({"message": "User not found"}), 400
+            return jsonify({"message": "User not found"}), 401
         return f(user, *args, **kwargs)
 
     return decorated_function
@@ -42,7 +42,7 @@ def admin_required(f):
         user_identity = get_jwt_identity()
         user = user_queries.get_admin(user_identity)
         if user is None:
-            return jsonify({"message": "User not found"}), 400
+            return jsonify({"message": "User not found"}), 401
         return f(user, *args, **kwargs)
 
     return decorated_function
