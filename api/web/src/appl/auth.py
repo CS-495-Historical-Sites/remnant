@@ -124,48 +124,53 @@ def login():
 
     login_info = LoginRequest(email, non_hash_password)
 
-    lock = User.query.filter_by(email=login_info.email).first()
-    match lock.lockout:
-        case 0:
-            if user_queries.unsuccesful_login_attempts(email=login_info.email, mins=4, lock=0) > 4:
-                lock.lockout += 1
-                db.session.commit()
-                return jsonify({"message": "Too many failed login attempts. Try again in 5 minutes."}), 429
-        case 1:
-            if user_queries.unsuccesful_login_attempts(email=login_info.email, mins=9, lock=1) > 0:
-                lock.lockout += 1
-                db.session.commit()
-                return jsonify({"message": "Too many failed login attempts. Try again in 10 minutes."}), 429
-        case 2:
-            if user_queries.unsuccesful_login_attempts(email=login_info.email, mins=16, lock=2) > 0:
-                lock.lockout += 1
-                db.session.commit()
-                return jsonify({"message": "Too many failed login attempts. Try again in 15 minutes."}), 429
-        case 3:
-            if user_queries.unsuccesful_login_attempts(email=login_info.email, mins=25, lock=3) > 0:
-                lock.lockout += 1
-                db.session.commit()
-                return jsonify({"message": "Too many failed login attempts. Try again in 25 minutes."}), 429
-        case 4:
-            if user_queries.unsuccesful_login_attempts(email=login_info.email, mins=20160, lock=4) > 0:
-                lock.lockout += 1
-                db.session.commit()
-                return jsonify({"message": "Too many failed login attempts. Please contact an administrator."}), 429
-
+    
+    
     LOGGER.debug(f"Attemping to login {login_info.email}")
 
     user = user_queries.get_user(login_info.email)
     if not user or not user.password_matches_hash(login_info.password):
-        user_queries.log_login_attempt(email=login_info.email, success=False, lock=lock.lockout)
+        lock = LoginAttempt.query.filter_by(email=login_info.email).first()
+        if lock is None:
+            user_queries.log_login_attempt(email=login_info.email, success=False, lock=0)
+            return (
+            jsonify({"message": "Invalid email or password"}),
+            422,
+        )
+        else:
+            user_queries.log_login_attempt(email=login_info.email, success=False, lock=lock.lockout)
+        if lock.lockout == 0:
+            if user_queries.unsuccesful_login_attempts(email=login_info.email, mins=4, lock=0) > 4:
+                lock.lockout += 1
+                db.session.commit()
+                return jsonify({"message": "Too many failed login attempts. Try again in 5 minutes."}), 429
+        if lock.lockout == 1:
+            if user_queries.unsuccesful_login_attempts(email=login_info.email, mins=9, lock=1) > 0:
+                lock.lockout += 1
+                db.session.commit()
+                return jsonify({"message": "Too many failed login attempts. Try again in 10 minutes."}), 429
+        if lock.lockout == 2:
+            if user_queries.unsuccesful_login_attempts(email=login_info.email, mins=16, lock=2) > 0:
+                lock.lockout += 1
+                db.session.commit()
+                return jsonify({"message": "Too many failed login attempts. Try again in 15 minutes."}), 429
+        if lock.lockout == 3:
+            if user_queries.unsuccesful_login_attempts(email=login_info.email, mins=25, lock=3) > 0:
+                lock.lockout += 1
+                db.session.commit()
+                return jsonify({"message": "Too many failed login attempts. Try again in 25 minutes."}), 429
+        if lock.lockout == 4:
+            if user_queries.unsuccesful_login_attempts(email=login_info.email, mins=20160, lock=4) > 0:
+                lock.lockout += 1
+                db.session.commit()
+                return jsonify({"message": "Too many failed login attempts. Please contact an administrator."}), 429
         return (
             jsonify({"message": "Invalid email or password"}),
             422,
         )
     
-    lock.lockout = 0
-    db.session.commit()
 
-    user_queries.log_login_attempt(email=login_info.email, success=True, lock=lock.lockout)
+    user_queries.log_login_attempt(email=login_info.email, success=True, lock=0)
 
     access_token = create_access_token(identity=user.email)
     refresh_token = create_refresh_token(identity=user.email)
