@@ -145,7 +145,7 @@ class LoginAttempt(db.Model):
     email = db.Column(db.String(120), index=True, nullable=False)
     attempt_time = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     success = db.Column(db.Boolean, nullable=False)
-    lockout = db.Column(db.Integer,default=0, nullable=False)
+    lockout = db.Column(db.Integer, default=0, nullable=False)
 
     def __init__(self, email, success, lockout):
         self.email = email
@@ -163,7 +163,7 @@ class User(db.Model):
     password_hash = db.Column(db.String(256), nullable=False)
     answers = db.Column(JSONB, nullable=True)
     email_confirmation_token = db.Column(db.String(256), nullable=False)
-    lockout = db.Column(db.Integer,default=0, nullable=False)
+    lockout = db.Column(db.Integer, default=0, nullable=False)
 
     is_admin = db.Column(db.Boolean, default=False)
     has_confirmed_email = db.Column(db.Boolean, default=False)
