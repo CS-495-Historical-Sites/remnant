@@ -10,6 +10,8 @@ import Button from "@mui/material/Button";
 import Link from "@mui/material/Link";
 
 // local
+import { API_BASE_URL } from "../ServerUtil";
+
 import ErrorSubtitle from "../components/ErrorSubtitle";
 import UserRegistrationInformation from "../models/UserRegistrationInformation";
 
@@ -43,7 +45,7 @@ export const Register: React.FC = () => {
       return;
     }
 
-    const response = await fetch(`http://localhost:8080/api/user/register`, {
+    const response = await fetch(`${API_BASE_URL}/api/user/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

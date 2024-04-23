@@ -1,5 +1,6 @@
 from src.appl import db
 from src.appl.models import LoginAttempt, RegistrationRequest, User
+from datetime import datetime, timedelta
 
 from src.appl.generators import generate_email_confirmation_token
 
@@ -41,17 +42,26 @@ def get_user(email: str) -> User | None:
 
 
 def get_user_by_confirmation_token(token: str) -> User | None:
-    return User.query.filter_by(confirmation_token=token).first()
+    return User.query.filter_by(email_confirmation_token=token).first()
 
 
 def get_admin(email: str) -> User | None:
     return User.query.filter_by(email=email, is_admin=True).first()
 
 
-def log_login_attempt(email: str, success: bool):
-    db.session.add(LoginAttempt(email=email, success=success))
+def log_login_attempt(email: str, success: bool, lock: int):
+    db.session.add(LoginAttempt(email=email, success=success, lockout=lock))
     db.session.commit()
 
 
 def successful_login_attempts(email: str):
-    return LoginAttempt.query.filter_by(email=email).count()
+    return LoginAttempt.query.filter_by(email=email, success=True).count()
+
+
+def unsuccesful_login_attempts(email: str, mins: int, lock: int):
+    return LoginAttempt.query.filter(
+        LoginAttempt.email == email,
+        LoginAttempt.success == False,
+        LoginAttempt.lockout == lock,
+        LoginAttempt.attempt_time > datetime.utcnow() - timedelta(minutes=mins),
+    ).count()

@@ -352,6 +352,7 @@ fun Preferences(
                       modifier = Modifier.padding(vertical = 8.dp)
                   ) // Bottom horizontal divider
               }
+
           }
       }
   }

@@ -32,6 +32,58 @@ def db_contains_locations(db_uri) -> bool:
         return False
 
 
+def collate_categories(initial_categories: str) -> list[str]:
+    groups = {
+        "Heritage": [
+            "ETHNIC_HERITAGE",
+            "ART",
+            "LITERATURE",
+            "RELIGION",
+            "PHILOSOPHY",
+            "PERFORMING_ARTS",
+            "NATIVE_AMERICAN",
+        ],
+        "Maritime History": ["MARITIME_HISTORY"],
+        "Development": [
+            "COMMUNITY_PLANNING_DEVELOPMENT",
+            "LANDSCAPE_ARCHITECTURE",
+            "POLITICS_GOVERNMENT",
+            "LAW",
+        ],
+        "Innovation": [
+            "SCIENCE",
+            "HEALTH_MEDICINE",
+            "ENGINEERING",
+            "INVENTION",
+            "ARCHEOLOGY",
+            "AGRICULTURE",
+            "CONSERVATION",
+        ],
+        "Military": ["MILITARY"],
+        "History": [
+            "SOCIAL_HISTORY",
+            "ECONOMICS",
+            "COMMERCE",
+            "EDUCATION",
+            "COMMUNICATIONS",
+        ],
+        "Infrastructure": ["INDUSTRY", "TRANSPORTATION"],
+        "Recreation": ["ENTERTAINMENT_RECREATION"],
+        "Diversity": ["BLACK", "EUROPEAN", "ASIAN", "PACIFIC_ISLANDER", "HISPANIC"],
+        "Architecture": ["ARCHITECTURE"],
+        "Prehistoric": ["PREHISTORIC"],
+        "Settlement": ["EXPLORATION_SETTLEMENT"],
+    }
+
+    group_names = []
+    for initial_category in initial_categories:
+        for group_name, categories in groups.items():
+            if initial_category in categories:
+                group_names.append(group_name)
+
+    return group_names
+
+
 def init_db_with_sources_file(app):
     from src.appl.models import Location
     from src.appl.remnant_db import location_queries
@@ -46,6 +98,8 @@ def init_db_with_sources_file(app):
             long_desc = location["long_description"]
             coordinates = location["coordinates"]
 
+            categories_list = [c["kind"] for c in location["assosiated_categories"]]
+
             image_name = location["wikidata_image_name"]
             image_name = f"https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/{image_name}"
             if not coordinates:
@@ -53,12 +107,13 @@ def init_db_with_sources_file(app):
                 continue
 
             loc = Location(
-                name,
-                coordinates["latitude"],
-                coordinates["longtitude"],
-                image_name,
-                short_desc,
-                long_desc,
+                name=name,
+                latitude=coordinates["latitude"],
+                longitude=coordinates["longtitude"],
+                image_link=image_name,
+                categories=collate_categories(categories_list),
+                short_description=short_desc,
+                long_description=long_desc,
             )
 
             location_queries.create_location(
@@ -80,7 +135,8 @@ def init_app(testing=False, db_uri=Config.SQLALCHEMY_DATABASE_URI):
     app = Flask(__name__)
     CORS(app)
     jwt = JWTManager(app)
-
+    if testing:
+        Config.TESTING = True
     app.config.from_object(Config)
     app.config["SQLALCHEMY_DATABASE_URI"] = db_uri
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=24)

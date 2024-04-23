@@ -10,6 +10,8 @@ import { Typography, TextField, Link, Box, Button } from "@mui/material";
 import UserLoginInformation from "../models/UserLoginInformation.tsx";
 import ErrorSubtitle from "../components/ErrorSubtitle.tsx";
 
+import { API_BASE_URL } from "../ServerUtil";
+
 interface LoginProps {
   setToken: (token: string) => void;
 }
@@ -40,7 +42,7 @@ export const Login: React.FC<LoginProps> = ({ setToken }) => {
   async function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const response = await fetch(`http://localhost:8080/api/user/login`, {
+    const response = await fetch(`${API_BASE_URL}/api/user/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -11,6 +11,7 @@ class TestVisitedLocations:
                 45.0283,
                 143.2030,
                 "image_link",
+                [],
                 "description1",
                 "longdecription0",
             ),
@@ -32,6 +33,7 @@ class TestVisitedLocations:
             "name": "city1",
             "short_description": "description1",
             "image_link": "image_link",
+            "categories": [],
         }
 
     def test_get_specific_location_404(self, client):
@@ -41,6 +43,7 @@ class TestVisitedLocations:
                 45.0283,
                 143.2030,
                 "image_link",
+                [],
                 "description1",
                 "longdecription0",
             ),

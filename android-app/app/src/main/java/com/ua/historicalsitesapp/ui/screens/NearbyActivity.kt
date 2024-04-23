@@ -8,6 +8,7 @@ import android.view.Gravity
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -20,6 +21,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material.icons.outlined.FavoriteBorder
@@ -47,7 +50,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -93,12 +98,15 @@ fun HomeAppBar(
                 "Remnant",
                 fontFamily = FontFamily.Serif,
                 fontWeight = FontWeight.Bold,
-                fontSize = 20.sp)
+                fontSize = 32.sp,
+                lineHeight = 32.sp)
             Text(
                 "Displaying $displayCount locations out of $totalCount within $radiusInMiles miles",
                 fontFamily = FontFamily.Serif,
                 fontWeight = FontWeight.Bold,
-                fontSize = 10.sp)
+                fontSize = 10.sp,
+                lineHeight = 8.sp,
+            )
           }
         },
         colors =
@@ -108,7 +116,7 @@ fun HomeAppBar(
                 actionIconContentColor = Color.White),
         actions = {
           var showMenu by remember { mutableStateOf(false) }
-          val radiusOptions = listOf(5, 10, 20)
+          val radiusOptions = listOf(5, 10, 25, 50)
 
           IconButton(
               onClick = { showMenu = !showMenu },
@@ -168,6 +176,14 @@ fun HomeMainContent(locationInfo: HsLocation, distance: Double, view: MainPageVi
   val context = LocalContext.current
   var isLiked by remember { mutableStateOf(locationInfo.isLiked) }
   var userHasInteracted by remember { mutableStateOf(false) }
+  var isExpanded by remember { mutableStateOf(false) }
+  val longDescription = locationInfo.longDescription ?: ""
+  val words = longDescription.split("\\s+".toRegex())
+  val wordCount = words.filter { it.isNotEmpty() }.size
+  val needExpansion = wordCount > 30
+  Log.d(
+      "Expansion",
+      "${locationInfo.name} description length = ${longDescription.length} expansion = ${needExpansion}")
 
   LaunchedEffect(isLiked, userHasInteracted) {
     if (userHasInteracted) {
@@ -205,7 +221,7 @@ fun HomeMainContent(locationInfo: HsLocation, distance: Double, view: MainPageVi
     Column {
       Row(
           Modifier.fillMaxWidth().padding(start = 6.dp, end = 6.dp, bottom = 8.dp),
-          verticalAlignment = Alignment.CenterVertically) {
+          verticalAlignment = Alignment.Top) {
             Column(Modifier.weight(2f).padding(end = 16.dp)) {
               AsyncImage(
                   model = imageLink,
@@ -220,17 +236,45 @@ fun HomeMainContent(locationInfo: HsLocation, distance: Double, view: MainPageVi
                   contentScale = ContentScale.Crop)
             }
 
-            Column(Modifier.weight(6f).padding(bottom = 40.dp)) {
-              Text(text = locationInfo.name, fontWeight = FontWeight.Normal, fontSize = 15.sp)
-              val formattedDistance = String.format("%.1f", distance)
+            Column(Modifier.weight(4f).animateContentSize()) {
+              Text(
+                  text = locationInfo.name,
+                  fontWeight = FontWeight.Normal,
+                  fontSize = 20.sp,
+                  lineHeight = 22.sp)
+
+              val formattedDistance = String.format("%.1f", distance + 1.0)
               Text(
                   text = "$formattedDistance Miles away",
                   fontWeight = FontWeight.Normal,
-                  fontSize = 10.sp)
+                  fontStyle = FontStyle.Italic,
+                  fontSize = 12.sp,
+                  lineHeight = 20.sp)
+              if (locationInfo.longDescription != null) {
+                Text(
+                    text = locationInfo.longDescription,
+                    fontWeight = FontWeight.Bold,
+                    lineHeight = 16.sp,
+                    fontSize = 9.sp,
+                    maxLines = if (isExpanded || !needExpansion) Int.MAX_VALUE else 4,
+                    overflow = TextOverflow.Ellipsis)
+                if (needExpansion) {
+                  IconButton(
+                      onClick = { isExpanded = !isExpanded },
+                      modifier = Modifier.size(22.dp).padding(0.dp)) {
+                        Icon(
+                            imageVector =
+                                if (isExpanded) Icons.Filled.ExpandLess
+                                else Icons.Filled.ExpandMore,
+                            contentDescription = if (isExpanded) "Collapse" else "Expand",
+                            modifier = Modifier.size(11.dp))
+                      }
+                }
+              }
             }
           }
 
-      Divider(modifier = Modifier.padding(horizontal = 6.dp), color = Color.Gray)
+      HorizontalDivider(modifier = Modifier.padding(horizontal = 6.dp), color = Color.Gray)
 
       Box(modifier = Modifier.fillMaxWidth()) {
         Row(

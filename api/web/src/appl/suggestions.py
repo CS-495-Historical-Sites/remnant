@@ -241,6 +241,7 @@ def handle_approval_result_for_location_add(admin: User, suggestion_id: str):
             longitude=suggestion.longitude,
             short_description=suggestion.short_description,
             image_link=suggestion.image_url,
+            categories=[],
             long_description="",
         )
         location_queries.create_location(location)
