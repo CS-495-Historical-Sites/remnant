@@ -11,6 +11,7 @@ import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.post
+import io.ktor.serialization.JsonConvertException
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
@@ -26,17 +27,22 @@ fun constructUserClient(user: LoggedInUser): HttpClient {
 
             refreshTokens {
               try {
-                val refreshTokenInfo: LoggedInUser =
-                    client
-                        .post(
-                            urlString = ServerConfig.SERVER_URL + "/refresh",
-                        ) {
-                          markAsRefreshTokenRequest()
-                        }
-                        .body()
+                val refreshTokensResponse =
+                    client.post(
+                        urlString = ServerConfig.SERVER_URL + "/refresh",
+                    ) {
+                      markAsRefreshTokenRequest()
+                    }
+                if (refreshTokensResponse.status.value == 401) {
+                  throw RemnantUnauthorizedAccessException("refreshTokens()")
+                }
+                val refreshTokenInfo: LoggedInUser = refreshTokensResponse.body()
+
                 usertokens = GetBearerTokens(refreshTokenInfo)
                 usertokens
               } catch (e: NoTransformationFoundException) {
+                throw RemnantUnauthorizedAccessException("Couldn't refresh tokens")
+              } catch (e: JsonConvertException) {
                 throw RemnantUnauthorizedAccessException("Couldn't refresh tokens")
               }
             }

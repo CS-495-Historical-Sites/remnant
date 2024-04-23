@@ -55,7 +55,7 @@ class TestLocation:
         image = "link_pictureoftuscaloosa.png"
         short = " i love tuscaloosa"
         long_description = "lsdfkaslkjflasjlfkdjsaldfjlsajfdjsaldfjlsajdfljsaldfjlasjdflkasjdlfjaslfjalsjflsajdfjasldfjalsjdflaskjdflasjdflasjldfjasldjfklasjdfljas"
-        location = Location(loc_name, lat, long, image, short, long_description)
+        location = Location(loc_name, lat, long, image, [], short, long_description)
 
         location_queries.create_location(location)
 
