@@ -135,7 +135,8 @@ def init_app(testing=False, db_uri=Config.SQLALCHEMY_DATABASE_URI):
     app = Flask(__name__)
     CORS(app)
     jwt = JWTManager(app)
-
+    if testing:
+        Config.TESTING = True
     app.config.from_object(Config)
     app.config["SQLALCHEMY_DATABASE_URI"] = db_uri
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=24)

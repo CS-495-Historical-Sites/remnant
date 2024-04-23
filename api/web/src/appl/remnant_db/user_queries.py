@@ -42,7 +42,7 @@ def get_user(email: str) -> User | None:
 
 
 def get_user_by_confirmation_token(token: str) -> User | None:
-    return User.query.filter_by(confirmation_token=token).first()
+    return User.query.filter_by(email_confirmation_token=token).first()
 
 
 def get_admin(email: str) -> User | None:

@@ -2,7 +2,11 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
+<<<<<<< HEAD
       <entry key="Unnamed">
+=======
+      <entry key="app">
+>>>>>>> main
         <State />
       </entry>
     </value>
