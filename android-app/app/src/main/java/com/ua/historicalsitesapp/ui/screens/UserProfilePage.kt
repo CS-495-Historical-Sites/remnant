@@ -10,6 +10,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -56,6 +57,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
@@ -106,8 +108,8 @@ fun TopBar() {
       },
       colors =
           TopAppBarDefaults.topAppBarColors(
-              containerColor = MaterialTheme.colorScheme.primary, // App Bar background color
-              titleContentColor = MaterialTheme.colorScheme.onPrimary, // App Bar title text color
+              containerColor = MaterialTheme.colorScheme.surfaceVariant, // App Bar background color
+              titleContentColor = MaterialTheme.colorScheme.onSurfaceVariant, // App Bar title text color
               actionIconContentColor = Color.White // App Bar action icon color
               ),
   )
@@ -295,54 +297,64 @@ fun Preferences(
     onEditClick: () -> Unit // Callback for when the Edit button is clicked
 ) {
   var preferencesHeight by remember { mutableStateOf(0) }
-  Box(modifier = Modifier.clickable { onPreferencesToggle() }) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier =
-            modifier.onGloballyPositioned {
+  Box(
+      modifier = Modifier
+          .clickable { onPreferencesToggle() }
+          .border(1.dp, MaterialTheme.colorScheme.secondary)
+          .padding(horizontal = 16.dp)
+
+  ) {
+      Row(
+          verticalAlignment = Alignment.CenterVertically,
+          modifier =
+          modifier.onGloballyPositioned {
               preferencesHeight = it.size.height // Grabs the height of this BoxScope
-            }) {
+          }) {
           // Preferences text aligned to the left
           Text(
               text = "Preferences",
               style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
-              modifier = Modifier.weight(1f))
+              modifier = Modifier.weight(1f)
+          )
 
           Spacer(modifier = Modifier.weight(1f))
           // Arrow icon
           Icon(
               imageVector =
-                  if (isPreferencesExpanded) Icons.Default.ArrowDropUp
-                  else Icons.Default.ArrowDropDown,
-              contentDescription = "Expand preferences")
+              if (isPreferencesExpanded) Icons.Default.ArrowDropUp
+              else Icons.Default.ArrowDropDown,
+              contentDescription = "Expand preferences"
+          )
           // Edit Icon
           IconButton(onClick = onEditClick) {
-            Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit", tint = Color.Gray)
+              Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit", tint = Color.Gray)
           }
-        }
-  }
-
-  // Start of animating preferences showing fetchedAnswers
-  AnimatedVisibility(
-      visible = isPreferencesExpanded,
-      enter = slideInVertically { -preferencesHeight + 36 },
-      exit = slideOutVertically { -preferencesHeight + 36 }) {
-        Box(
-            modifier = Modifier.padding(start = 8.dp, top = 8.dp, bottom = 8.dp),
-        ) {
-          // Display questions and answers when dropdown is expanded
-          Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = 8.dp)) // Top horizontal divider
-            fetchedAnswers?.forEach { (question, answers) ->
-              Text(text = question, style = TextStyle(fontSize = 16.sp))
-              answers.forEach { answer -> Chip(text = answer) }
-            }
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = 8.dp)) // Bottom horizontal divider
-          }
-        }
       }
+      Spacer(modifier = Modifier.height(16.dp))
+      // Start of animating preferences showing fetchedAnswers
+      AnimatedVisibility(
+          visible = isPreferencesExpanded,
+          enter = slideInVertically { -preferencesHeight + 36 },
+          exit = slideOutVertically { -preferencesHeight + 108}) {
+          Box(
+              modifier = Modifier.padding(start = 8.dp, top = 24.dp, bottom = 8.dp),
+          ) {
+              // Display questions and answers when dropdown is expanded
+              Column {
+                  HorizontalDivider(
+                      modifier = Modifier.padding(vertical = 16.dp)
+                  ) // Top horizontal divider
+                  fetchedAnswers?.forEach { (question, answers) ->
+                      Text(text = question, style = TextStyle(fontSize = 16.sp))
+                      answers.forEach { answer -> Chip(text = answer) }
+                  }
+                  HorizontalDivider(
+                      modifier = Modifier.padding(vertical = 8.dp)
+                  ) // Bottom horizontal divider
+              }
+          }
+      }
+  }
 }
 
 @Composable
@@ -402,27 +414,31 @@ fun ShowEditConfirm(
 }
 
 @Composable
-fun NightModeSwitch(
+fun DarkModeSwitch(
     modifier: Modifier = Modifier,
-    isNightModeEnabled: Boolean,
+    isDarkModeEnabled: Boolean,
     onToggle: (Boolean) -> Unit
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.clickable { onToggle(!isNightModeEnabled) }
+        modifier = modifier.clickable { onToggle(!isDarkModeEnabled) }
     ) {
         Text(
-            text = "Night Mode",
+            text = "Dark Mode",
             style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
             modifier = Modifier.weight(1f)
         )
         Spacer(modifier = Modifier.weight(1f))
         Switch(
-            checked = isNightModeEnabled,
+            checked = isDarkModeEnabled,
             onCheckedChange = { isChecked -> onToggle(isChecked) },
             colors = SwitchDefaults.colors(
-                checkedThumbColor = MaterialTheme.colorScheme.secondary,
-                uncheckedThumbColor = Color.Gray
+                checkedThumbColor = Color.White,
+                checkedTrackColor = Color.Black,
+                checkedBorderColor = Color.Black,
+                uncheckedThumbColor = Color.Black,
+                uncheckedTrackColor = Color.White,
+                uncheckedBorderColor = Color.Black
             )
         )
     }
@@ -441,70 +457,60 @@ fun UserProfileCard(
     isPreferencesExpanded: Boolean,
     onPreferencesToggle: () -> Unit,
     onEditClick: () -> Unit,
-    isNightModeEnabled: Boolean,
+    isDarkModeEnabled: Boolean,
     onThemeToggle: (Boolean) -> Unit,
     currentContext: Context
 ) {
   var isEditing by remember { mutableStateOf(false) }
   val showEditConfirmation = remember { mutableStateOf(false) }
 
-  Box(
-      modifier = modifier.fillMaxSize(),
-  ) {
-    Box(
-        modifier = modifier.fillMaxSize()
-        //            Modifier
-        //                .size(width = 300.dp, height = 400.dp)
-        //                .clip(shape = RoundedCornerShape(16.dp))
-        //                .align(Alignment.TopStart),
+
+      Column(
+          modifier = modifier.fillMaxSize(),
+          horizontalAlignment = Alignment.Start,
+          verticalArrangement = Arrangement.Top,
+      ) {
+        Spacer(modifier = Modifier.height(16.dp))
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.Start,
         ) {
-          Column(
-              modifier = modifier.fillMaxSize(),
-              horizontalAlignment = Alignment.Start,
-              verticalArrangement = Arrangement.Top,
-          ) {
-            Spacer(modifier = Modifier.height(16.dp))
-            Column(
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.Start,
-            ) {
-              // Username
-              UsernameTextField(
-                  fetchedUsername = fetchedUsername,
-                  onUserNameChange = onUsernameChange,
-                  onTextFieldClicked = { isEditing = true },
-                  onSaveClick = {
-                    isEditing = true
-                  }, // Update isEditing state when username is clicked
-                  isEditing = isEditing // When save button is clicked disable the text box
-                  )
+          // Username
+          UsernameTextField(
+              fetchedUsername = fetchedUsername,
+              onUserNameChange = onUsernameChange,
+              onTextFieldClicked = { isEditing = true },
+              onSaveClick = {
+                isEditing = true
+              }, // Update isEditing state when username is clicked
+              isEditing = isEditing // When save button is clicked disable the text box
+              )
 
-              // Save button
-              SaveButton(
-                  onClick = {
-                    onSaveClick()
-                    isEditing = false // Set isEditing to false after save button is clicked
-                  },
-                  modifier = Modifier.fillMaxWidth(),
-                  isVisible = isEditing)
-              EmailTextField(email = fetchedEmail)
-              Spacer(modifier = Modifier.height(16.dp))
-              // Preferences dropdown
-              Preferences(
-                  onPreferencesToggle = onPreferencesToggle,
-                  isPreferencesExpanded = isPreferencesExpanded,
-                  fetchedAnswers = fetchedAnswers,
-                  onEditClick = { showEditConfirmation.value = true })
-
-              Spacer(modifier = Modifier.height(16.dp))
-                NightModeSwitch(
-                    isNightModeEnabled = isNightModeEnabled,
-                    onToggle = onThemeToggle
-                )
+          // Save button
+          SaveButton(
+              onClick = {
+                onSaveClick()
+                isEditing = false // Set isEditing to false after save button is clicked
+              },
+              modifier = Modifier.fillMaxWidth(),
+              isVisible = isEditing)
+          EmailTextField(email = fetchedEmail)
+          Spacer(modifier = Modifier.height(16.dp))
+          // Preferences dropdown
+            Box(modifier = Modifier.padding(horizontal = 16.dp).clip(RoundedCornerShape(8.dp))) {
+                Preferences(
+                    onPreferencesToggle = onPreferencesToggle,
+                    isPreferencesExpanded = isPreferencesExpanded,
+                    fetchedAnswers = fetchedAnswers,
+                    onEditClick = { showEditConfirmation.value = true })
             }
-          }
+          Spacer(modifier = Modifier.height(16.dp))
+            DarkModeSwitch(
+                isDarkModeEnabled = isDarkModeEnabled,
+                onToggle = onThemeToggle
+            )
         }
-  }
+      }
   if (showEditConfirmation.value) {
     ShowEditConfirm(
         showEditConfirmation = showEditConfirmation,
@@ -529,7 +535,7 @@ fun UserProfilePage(modifier: Modifier = Modifier) {
     var fetchedEmail by remember { mutableStateOf("") }
     var fetchedAnswers by remember { mutableStateOf<Map<String, Set<String>>?>(null) }
     var isPreferencesExpanded by remember { mutableStateOf(false) } // used to toggle up/down arrow for preferences
-    var isNightModeEnabled by remember { mutableStateOf(false) } // Night mode state
+    var isDarkModeEnabled by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         withLogoutOnFailure(currentContext, userView, { userView.getProfileInfo() }) {
@@ -540,33 +546,42 @@ fun UserProfilePage(modifier: Modifier = Modifier) {
     }
 
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState()), // Add verticalScroll modifier
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         TopBar()
         Spacer(modifier = Modifier.height(16.dp))
-        UserProfileCard(
-            modifier = Modifier.weight(1f),
-            fetchedUsername = fetchedUsername,
-            fetchedEmail = fetchedEmail,
-            fetchedAnswers = fetchedAnswers,
-            onUsernameChange = { username = it },
-            onSaveClick = { userView.updateUsername(username) },
-            isPreferencesExpanded = isPreferencesExpanded,
-            onPreferencesToggle = { isPreferencesExpanded = !isPreferencesExpanded },
-            onEditClick = { showEditConfirmation.value = true },
-            isNightModeEnabled = isNightModeEnabled, // Pass night mode state to UserProfileCard
-            onThemeToggle = { isEnabled -> isNightModeEnabled = isEnabled }, // Callback to update night mode state
-            currentContext = currentContext
-        )
+        // Wrap UserProfileCard inside a scrollable Column
+        Column(
+            modifier = Modifier.weight(1f).verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            UserProfileCard(
+                modifier = Modifier.fillMaxWidth(),
+                fetchedUsername = fetchedUsername,
+                fetchedEmail = fetchedEmail,
+                fetchedAnswers = fetchedAnswers,
+                onUsernameChange = { username = it },
+                onSaveClick = { userView.updateUsername(username) },
+                isPreferencesExpanded = isPreferencesExpanded,
+                onPreferencesToggle = { isPreferencesExpanded = !isPreferencesExpanded },
+                onEditClick = { showEditConfirmation.value = true },
+                isDarkModeEnabled = isDarkModeEnabled,
+                onThemeToggle = { isEnabled -> isDarkModeEnabled = isEnabled },
+                currentContext = currentContext
+            )
+        }
 
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 64.dp, horizontal = 16.dp),
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally // Center horizontally
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             LogoutButton(
                 onClick = { showLogoutConfirmation.value = true },
