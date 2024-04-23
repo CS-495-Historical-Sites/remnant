@@ -49,8 +49,8 @@ def get_admin(email: str) -> User | None:
     return User.query.filter_by(email=email, is_admin=True).first()
 
 
-def log_login_attempt(email: str, success: bool):
-    db.session.add(LoginAttempt(email=email, success=success, attempt_time=datetime.utcnow()))
+def log_login_attempt(email: str, success: bool, lock: int):
+    db.session.add(LoginAttempt(email=email, success=success, lockout=lock))
     db.session.commit()
 
 
@@ -58,5 +58,5 @@ def successful_login_attempts(email: str):
     return LoginAttempt.query.filter_by(email=email, success=True).count()
 
 
-def unsuccesful_login_attempts(email: str, mins: int):
-    return LoginAttempt.query.filter(LoginAttempt.email==email, LoginAttempt.success==False, LoginAttempt.attempt_time > datetime.utcnow() - timedelta(minutes=mins)).count()
+def unsuccesful_login_attempts(email: str, mins: int, lock: int):
+    return LoginAttempt.query.filter(LoginAttempt.email==email, LoginAttempt.success==False, LoginAttempt.lockout== lock, LoginAttempt.attempt_time > datetime.utcnow() - timedelta(minutes=mins)).count()
