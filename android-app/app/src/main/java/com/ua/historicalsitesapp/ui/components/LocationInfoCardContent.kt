@@ -124,7 +124,7 @@ private fun TitleBox(locationName: String, onEditClick: () -> Unit) {
 }
 
 @Composable
-private fun ImageBox(imageLink: String) {
+fun ImageBox(imageLink: String) {
   var isImageLoading by remember { mutableStateOf(true) }
   Box(
       modifier = Modifier.width(600.dp).then(Modifier.height(300.dp)),

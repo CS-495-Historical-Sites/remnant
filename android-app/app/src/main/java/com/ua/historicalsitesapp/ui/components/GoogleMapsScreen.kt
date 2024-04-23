@@ -9,25 +9,21 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddBox
 import androidx.compose.material.icons.filled.AddLocation
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
@@ -95,18 +91,14 @@ private fun CustomRendererClustering(
   val renderer =
       rememberClusterRenderer(
           clusterContent = { cluster ->
-            ClusterCircle(
-                modifier = Modifier.size(40.dp),
+            ClusterCircleGrouping(
+                modifier = Modifier.size(60.dp),
                 text = "%,d".format(cluster.size),
                 color = Color.DarkGray,
             )
           },
           clusterItemContent = {
-            ClusterCircle(
-                modifier = Modifier.size(18.dp),
-                text = "",
-                color = Color.Magenta,
-            )
+            ClusterCircle(modifier = Modifier.size(60.dp), imageLink = it.imageLink)
           },
           clusterManager = clusterManager,
       )
@@ -180,7 +172,7 @@ fun GoogleMapsScreen(
                       location.name,
                       shortLocationDescription,
                       0f,
-                  ),
+                      location.imageLink),
               )
             }
           }
@@ -232,25 +224,7 @@ fun GoogleMapsScreen(
   val scope = rememberCoroutineScope()
 
   Scaffold(
-      topBar = {
-        CenterAlignedTopAppBar(
-            title = {},
-            navigationIcon = {
-              IconButton(
-                  onClick = {
-                    scope.launch { drawerState.apply { if (isClosed) open() else close() } }
-                  }) {
-                    Icon(imageVector = Icons.Filled.Menu, contentDescription = "Open menu")
-                  }
-            },
-            actions = {},
-            colors =
-                TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xfffce4ec),
-                    titleContentColor = Color.DarkGray,
-                    navigationIconContentColor = Color.DarkGray,
-                    actionIconContentColor = MaterialTheme.colorScheme.onSecondary))
-      },
+      topBar = { MapAppBar(scope = scope, drawerState = drawerState) },
       floatingActionButton = {
         if (isPlacingLocation) {
           ExtendedFloatingActionButton(
@@ -308,6 +282,7 @@ fun GoogleMapsScreen(
                         isPlacingLocation = false
                       })
                 }
+
                 GoogleMap(
                     modifier = Modifier.fillMaxSize(),
                     googleMapOptionsFactory = { GoogleMapOptions().mapId("ed053e0f6a3454e8") },
@@ -319,11 +294,14 @@ fun GoogleMapsScreen(
                   if (isPlacingLocation) {
                     LocationSuggestionMarker(state = cameraPositionState.position)
                   }
+
                   CustomRendererClustering(
                       items = items,
                       onLocationInfoBoxClick,
                   )
                 }
+
+                CategoriesRow(mainPageViewModel = view)
               }
             }
       }

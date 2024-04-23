@@ -232,7 +232,7 @@ fun Preferences(
                 modifier = Modifier.padding(vertical = 8.dp)) // Top horizontal divider
             fetchedAnswers?.forEach { (question, answers) ->
               Text(text = question, style = TextStyle(fontSize = 16.sp))
-              answers.forEach { answer -> Chip(text = answer) }
+              answers.forEach { answer -> RemnantChip(text = answer) }
             }
             HorizontalDivider(
                 modifier = Modifier.padding(vertical = 8.dp)) // Bottom horizontal divider
@@ -242,7 +242,7 @@ fun Preferences(
 }
 
 @Composable
-fun Chip(text: String) {
+fun RemnantChip(text: String) {
   Surface(
       color =
           Color(android.graphics.Color.parseColor("#ADC178")), // Change the color to light green
