@@ -6,6 +6,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.clickable
@@ -18,7 +20,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -28,6 +29,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -39,6 +42,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -101,8 +106,8 @@ fun TopBar() {
       },
       colors =
           TopAppBarDefaults.topAppBarColors(
-              containerColor = MaterialTheme.colorScheme.surface, // App Bar background color
-              titleContentColor = Color.White, // App Bar title text color
+              containerColor = MaterialTheme.colorScheme.primary, // App Bar background color
+              titleContentColor = MaterialTheme.colorScheme.onPrimary, // App Bar title text color
               actionIconContentColor = Color.White // App Bar action icon color
               ),
   )
@@ -110,58 +115,157 @@ fun TopBar() {
 
 @Composable
 fun UsernameTextField(
-    initialValue: String,
     fetchedUsername: String,
     onUserNameChange: (String) -> Unit,
-    onUsernameClick: () -> Unit,
-    isEditing: Boolean
+    onSaveClick: () -> Unit,
+    isEditing: Boolean,
+    onTextFieldClicked: () -> Unit // Callback for when the text field is clicked
 ) {
-  var text by remember { mutableStateOf(initialValue) }
+    var text by remember { mutableStateOf(fetchedUsername) }
+    var isVisible by remember { mutableStateOf(false) } // Track visibility state
 
-  Box(
-      modifier = Modifier.clickable { onUsernameClick() },
-      content = {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Icon(
+            imageVector = Icons.Filled.Person,
+            contentDescription = "Person Icon",
+            modifier = Modifier.padding(end = 8.dp) // Adjust the padding as needed
+        )
         if (isEditing) {
-          OutlinedTextField(
-              value = text,
-              onValueChange = { newText ->
-                text = newText
-                onUserNameChange(newText)
-              },
-              label = { Text("Change Username?") },
-              singleLine = true,
-              keyboardOptions = KeyboardOptions.Default,
-              shape = RoundedCornerShape(12.dp),
-              colors =
-                  OutlinedTextFieldDefaults.colors(
-                      focusedBorderColor = MaterialTheme.colorScheme.secondary),
-              modifier = Modifier.fillMaxWidth())
+            OutlinedTextField(
+                value = text,
+                onValueChange = { newText ->
+                    text = newText
+                    onUserNameChange(newText)
+                    isVisible = true // Show the save button when text changes
+                },
+                label = { Text(if (isEditing) "Change Username?" else "Username") },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions.Default,
+                shape = RoundedCornerShape(4.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.secondary
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(end = 16.dp)
+                    .clickable {
+                        onTextFieldClicked() // Set isEditing to true when the text field is clicked
+                        onSaveClick()
+                    },
+                trailingIcon = {
+                    IconButton(
+                        onClick = onTextFieldClicked, // Trigger edit mode when the icon is clicked
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Edit,
+                            contentDescription = "Edit Icon",
+                            modifier = Modifier.padding(end = 8.dp) // Adjust padding as needed
+                        )
+                    }
+                }
+            )
         } else {
-          Text(
-              text = fetchedUsername,
-              style =
-                  TextStyle(
-                      fontSize = 24.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Start),
-          )
+            OutlinedTextField(
+                readOnly = true,
+                value = fetchedUsername,
+                onValueChange = { newText ->
+                    text = newText
+                    onUserNameChange(newText)
+                    isVisible = true // Show the save button when text changes
+                },
+                label = { Text(if (isEditing) "Change Username?" else "Username") },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions.Default,
+                shape = RoundedCornerShape(4.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.secondary
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(end = 16.dp),
+                trailingIcon = {
+                    IconButton(
+                        onClick = onTextFieldClicked, // Trigger edit mode when the icon is clicked
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Edit,
+                            contentDescription = "Edit Icon",
+                            modifier = Modifier.padding(end = 8.dp) // Adjust padding as needed
+                        )
+                    }
+                }
+            )
         }
-      })
+    }
 }
 
+
 @Composable
-private fun SaveButton(onClick: () -> Unit, modifier: Modifier = Modifier, isVisible: Boolean) {
-  if (isVisible) {
-    Button(
-        onClick = onClick,
-        colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-        shape = RoundedCornerShape(12.dp),
-        modifier = modifier.fillMaxWidth().height(56.dp),
-    ) {
-      Text(
-          "Save",
-          style = Typography.labelLarge,
-      )
+fun EmailTextField(
+    email: String,
+    modifier: Modifier = Modifier
+) {
+    var text by remember { mutableStateOf(email) }
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        // Email Icon
+        Icon(
+            imageVector = Icons.Default.Email,
+            contentDescription = "Email Icon",
+            tint = Color.Black,
+            modifier = Modifier.padding(end = 8.dp)
+        )
+
+        // OutlinedTextField
+        OutlinedTextField(
+            readOnly = true,
+            value = email,
+            onValueChange = { newText -> text = newText },
+            label = { Text("Email") },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions.Default,
+            shape = RoundedCornerShape(0.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = MaterialTheme.colorScheme.secondary
+            ),
+            modifier = Modifier
+                .weight(1f)
+                .padding(end = 16.dp)
+        )
     }
-  }
+}
+
+
+
+
+
+@Composable
+private fun SaveButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    isVisible: Boolean // Pass isVisible as a parameter
+) {
+    Spacer(modifier = Modifier.height(16.dp))
+    AnimatedVisibility(
+        visible = isVisible, // Use isVisible to control visibility
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        Button(
+            onClick = onClick,
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+            shape = RoundedCornerShape(8.dp),
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(end = 16.dp)
+                .padding(start = 32.dp)
+                .height(56.dp),
+        ) {
+            Text(
+                "Save",
+                style = Typography.labelLarge,
+            )
+        }
+    }
 }
 
 @Composable
@@ -247,7 +351,9 @@ fun Chip(text: String) {
       color =
           Color(android.graphics.Color.parseColor("#ADC178")), // Change the color to light green
       shape = RoundedCornerShape(16.dp),
-      modifier = Modifier.padding(4.dp).padding(horizontal = 8.dp, vertical = 4.dp)) {
+      modifier = Modifier
+          .padding(4.dp)
+          .padding(horizontal = 8.dp, vertical = 4.dp)) {
         Text(
             text = text,
             style = TextStyle(fontSize = 14.sp),
@@ -296,6 +402,35 @@ fun ShowEditConfirm(
 }
 
 @Composable
+fun NightModeSwitch(
+    modifier: Modifier = Modifier,
+    isNightModeEnabled: Boolean,
+    onToggle: (Boolean) -> Unit
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier.clickable { onToggle(!isNightModeEnabled) }
+    ) {
+        Text(
+            text = "Night Mode",
+            style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
+            modifier = Modifier.weight(1f)
+        )
+        Spacer(modifier = Modifier.weight(1f))
+        Switch(
+            checked = isNightModeEnabled,
+            onCheckedChange = { isChecked -> onToggle(isChecked) },
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = MaterialTheme.colorScheme.secondary,
+                uncheckedThumbColor = Color.Gray
+            )
+        )
+    }
+}
+
+
+
+@Composable
 fun UserProfileCard(
     modifier: Modifier = Modifier,
     fetchedUsername: String,
@@ -306,6 +441,8 @@ fun UserProfileCard(
     isPreferencesExpanded: Boolean,
     onPreferencesToggle: () -> Unit,
     onEditClick: () -> Unit,
+    isNightModeEnabled: Boolean,
+    onThemeToggle: (Boolean) -> Unit,
     currentContext: Context
 ) {
   var isEditing by remember { mutableStateOf(false) }
@@ -327,21 +464,21 @@ fun UserProfileCard(
               verticalArrangement = Arrangement.Top,
           ) {
             Spacer(modifier = Modifier.height(16.dp))
-
             Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.Start,
             ) {
               // Username
               UsernameTextField(
-                  initialValue = fetchedUsername, // You can set an initial value here if needed
                   fetchedUsername = fetchedUsername,
                   onUserNameChange = onUsernameChange,
-                  onUsernameClick = {
+                  onTextFieldClicked = { isEditing = true },
+                  onSaveClick = {
                     isEditing = true
                   }, // Update isEditing state when username is clicked
                   isEditing = isEditing // When save button is clicked disable the text box
                   )
+
               // Save button
               SaveButton(
                   onClick = {
@@ -350,16 +487,7 @@ fun UserProfileCard(
                   },
                   modifier = Modifier.fillMaxWidth(),
                   isVisible = isEditing)
-              // Email
-              Text(
-                  text = fetchedEmail,
-                  style =
-                      TextStyle(
-                          fontSize = 20.sp,
-                          fontWeight = FontWeight.Normal,
-                          textAlign = TextAlign.Start),
-                  modifier = Modifier.padding(start = 8.dp, top = 8.dp))
-
+              EmailTextField(email = fetchedEmail)
               Spacer(modifier = Modifier.height(16.dp))
               // Preferences dropdown
               Preferences(
@@ -367,6 +495,12 @@ fun UserProfileCard(
                   isPreferencesExpanded = isPreferencesExpanded,
                   fetchedAnswers = fetchedAnswers,
                   onEditClick = { showEditConfirmation.value = true })
+
+              Spacer(modifier = Modifier.height(16.dp))
+                NightModeSwitch(
+                    isNightModeEnabled = isNightModeEnabled,
+                    onToggle = onThemeToggle
+                )
             }
           }
         }
@@ -385,33 +519,31 @@ fun UserProfileCard(
 
 @Composable
 fun UserProfilePage(modifier: Modifier = Modifier) {
-  val showLogoutConfirmation = remember { mutableStateOf(false) } // Show Dialog for Logout
-  val showEditConfirmation = remember {
-    mutableStateOf(false)
-  } // Show Dialog for Editing Preferences
-  val currentContext = LocalContext.current
-  val view = AuthViewModel(currentContext)
-  val userView = UserProfileViewModel(currentContext)
-  var username by remember { mutableStateOf("") }
-  var fetchedUsername by remember { mutableStateOf("") }
-  var fetchedEmail by remember { mutableStateOf("") }
-  var fetchedAnswers by remember { mutableStateOf<Map<String, Set<String>>?>(null) }
-  var isPreferencesExpanded by remember {
-    mutableStateOf(false)
-  } // used to toggle up/down arrow for preferences
+    val showLogoutConfirmation = remember { mutableStateOf(false) } // Show Dialog for Logout
+    val showEditConfirmation = remember { mutableStateOf(false) } // Show Dialog for Editing Preferences
+    val currentContext = LocalContext.current
+    val view = AuthViewModel(currentContext)
+    val userView = UserProfileViewModel(currentContext)
+    var username by remember { mutableStateOf("") }
+    var fetchedUsername by remember { mutableStateOf("") }
+    var fetchedEmail by remember { mutableStateOf("") }
+    var fetchedAnswers by remember { mutableStateOf<Map<String, Set<String>>?>(null) }
+    var isPreferencesExpanded by remember { mutableStateOf(false) } // used to toggle up/down arrow for preferences
+    var isNightModeEnabled by remember { mutableStateOf(false) } // Night mode state
 
-  LaunchedEffect(Unit) {
-    withLogoutOnFailure(currentContext, userView, { userView.getProfileInfo() }) {
-      fetchedUsername = it.username
-      fetchedEmail = it.email
-      fetchedAnswers = it.answers
+    LaunchedEffect(Unit) {
+        withLogoutOnFailure(currentContext, userView, { userView.getProfileInfo() }) {
+            fetchedUsername = it.username
+            fetchedEmail = it.email
+            fetchedAnswers = it.answers
+        }
     }
-  }
 
-  Column(
-      modifier = Modifier.fillMaxSize(),
-      verticalArrangement = Arrangement.Top,
-      horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         TopBar()
         Spacer(modifier = Modifier.height(16.dp))
         UserProfileCard(
@@ -424,63 +556,70 @@ fun UserProfilePage(modifier: Modifier = Modifier) {
             isPreferencesExpanded = isPreferencesExpanded,
             onPreferencesToggle = { isPreferencesExpanded = !isPreferencesExpanded },
             onEditClick = { showEditConfirmation.value = true },
-            currentContext = currentContext)
+            isNightModeEnabled = isNightModeEnabled, // Pass night mode state to UserProfileCard
+            onThemeToggle = { isEnabled -> isNightModeEnabled = isEnabled }, // Callback to update night mode state
+            currentContext = currentContext
+        )
 
         Column(
-            modifier = Modifier.fillMaxWidth().padding(vertical = 64.dp, horizontal = 16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 64.dp, horizontal = 16.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally // Center horizontally
-            ) {
-              LogoutButton(
-                  onClick = { showLogoutConfirmation.value = true },
-                  modifier = Modifier.fillMaxWidth().padding(bottom = 64.dp))
+        ) {
+            LogoutButton(
+                onClick = { showLogoutConfirmation.value = true },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 64.dp)
+            )
 
-              Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-              if (showLogoutConfirmation.value) {
+            if (showLogoutConfirmation.value) {
                 AlertDialog(
                     onDismissRequest = { showLogoutConfirmation.value = false },
                     title = {
-                      Text(
-                          text = "Confirm",
-                          textAlign = TextAlign.Center,
-                          modifier = Modifier.padding(top = 16.dp, bottom = 8.dp),
-                      )
+                        Text(
+                            text = "Confirm",
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
+                        )
                     },
                     text = { Text("Are you sure you want to logout?") },
                     confirmButton = {
-                      Button(
-                          onClick = {
-                            showLogoutConfirmation.value = false
-                            val logoutResult = view.performLogout()
-                            if (logoutResult) {
-                              val intent = Intent(currentContext, LoginActivity::class.java)
-                              currentContext.startActivity(intent)
-                            }
-                          },
-                          colors =
-                              ButtonDefaults.buttonColors(
-                                  contentColor = Color.White,
-                                  containerColor = Color.Black,
-                              ),
-                      ) {
-                        Text("Logout")
-                      }
+                        Button(
+                            onClick = {
+                                showLogoutConfirmation.value = false
+                                val logoutResult = view.performLogout()
+                                if (logoutResult) {
+                                    val intent = Intent(currentContext, LoginActivity::class.java)
+                                    currentContext.startActivity(intent)
+                                }
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                contentColor = Color.White,
+                                containerColor = Color.Black
+                            )
+                        ) {
+                            Text("Logout")
+                        }
                     },
                     dismissButton = {
-                      Button(
-                          onClick = { showLogoutConfirmation.value = false },
-                          colors =
-                              ButtonDefaults.buttonColors(
-                                  contentColor = Color.White,
-                                  containerColor = Color.Black,
-                              ),
-                      ) {
-                        Text("Cancel")
-                      }
-                    },
+                        Button(
+                            onClick = { showLogoutConfirmation.value = false },
+                            colors = ButtonDefaults.buttonColors(
+                                contentColor = Color.White,
+                                containerColor = Color.Black
+                            )
+                        ) {
+                            Text("Cancel")
+                        }
+                    }
                 )
-              }
             }
-      }
+        }
+    }
 }
+
