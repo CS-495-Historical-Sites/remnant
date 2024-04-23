@@ -101,12 +101,15 @@ fun HomeAppBar(
                 "Remnant",
                 fontFamily = FontFamily.Serif,
                 fontWeight = FontWeight.Bold,
-                fontSize = 20.sp)
+                fontSize = 32.sp,
+                lineHeight = 32.sp)
             Text(
                 "Displaying $displayCount locations out of $totalCount within $radiusInMiles miles",
                 fontFamily = FontFamily.Serif,
                 fontWeight = FontWeight.Bold,
-                fontSize = 10.sp)
+                fontSize = 10.sp,
+                lineHeight = 8.sp,
+                )
           }
         },
         colors =
@@ -178,10 +181,10 @@ fun HomeMainContent(locationInfo: HsLocation, distance: Double, view: MainPageVi
   var userHasInteracted by remember { mutableStateOf(false) }
   var isExpanded by remember { mutableStateOf(false) }
   val longDescription = locationInfo.longDescription ?: ""
-  val words = longDescription.split("\\s+".toRegex())  // Split by any whitespace
+  val words = longDescription.split("\\s+".toRegex())
   val wordCount = words.filter { it.isNotEmpty() }.size
-  val needExpansion = wordCount > 60  // Example threshold
-    Log.d("Expansion", "${locationInfo.name} description length = ${longDescription.length} expansion = ${needExpansion}")
+  val needExpansion = wordCount > 30
+  Log.d("Expansion", "${locationInfo.name} description length = ${longDescription.length} expansion = ${needExpansion}")
 
   LaunchedEffect(isLiked, userHasInteracted) {
     if (userHasInteracted) {
@@ -240,7 +243,7 @@ fun HomeMainContent(locationInfo: HsLocation, distance: Double, view: MainPageVi
                   fontSize = 20.sp,
                   lineHeight = 22.sp)
 
-              val formattedDistance = String.format("%.1f", distance)
+              val formattedDistance = String.format("%.1f", distance + 1.0)
               Text(
                   text = "$formattedDistance Miles away",
                   fontWeight = FontWeight.Normal,
@@ -250,10 +253,10 @@ fun HomeMainContent(locationInfo: HsLocation, distance: Double, view: MainPageVi
                 if(locationInfo.longDescription != null) {
                     Text(
                         text = locationInfo.longDescription,
-                        fontWeight = FontWeight.Normal,
-                        lineHeight = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        lineHeight = 16.sp,
                         fontSize = 9.sp,
-                        maxLines = if (isExpanded || !needExpansion) Int.MAX_VALUE else 7,
+                        maxLines = if (isExpanded || !needExpansion) Int.MAX_VALUE else 4,
                         overflow = TextOverflow.Ellipsis
                     )
                     if (needExpansion) {
