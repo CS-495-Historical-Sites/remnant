@@ -5,7 +5,7 @@ import com.ua.historicalsitesapp.data.model.auth.LoginDetails
 import com.ua.historicalsitesapp.data.model.auth.RegistrationDetails
 import com.ua.historicalsitesapp.data.model.auth.RegistrationResponse
 import com.ua.historicalsitesapp.data.model.auth.RegistrationResult
-import com.ua.historicalsitesapp.util.Result
+import com.ua.historicalsitesapp.util.LoginResult
 import com.ua.historicalsitesapp.util.ServerConfig
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -25,31 +25,6 @@ import kotlinx.serialization.json.Json
 
 /** Class that handles authentication w/ login credentials and retrieves user information. */
 class LoginDataSource {
-  private suspend fun sendLoginRequest(details: LoginDetails): LoggedInUser {
-    val client =
-        HttpClient(CIO) {
-          install(ContentNegotiation) {
-            json(
-                Json {
-                  prettyPrint = true
-                  isLenient = true
-                },
-            )
-          }
-        }
-    val response: HttpResponse =
-        client.post(
-            ServerConfig.SERVER_URL + "/user/login",
-        ) {
-          contentType(ContentType.Application.Json)
-          setBody(details)
-        }
-    if (response.status.value != 200) {
-      throw java.lang.Exception("login request error")
-    }
-
-    return response.body()
-  }
 
   private suspend fun sendRegistrationRequest(regDetails: RegistrationDetails): RegistrationResult {
     val client =
@@ -82,12 +57,40 @@ class LoginDataSource {
     return RegistrationResult.FAILURE
   }
 
-  suspend fun login(userDetails: LoginDetails): Result<LoggedInUser> {
+  suspend fun login(userDetails: LoginDetails): LoginResult<LoggedInUser> {
     try {
-      val user = sendLoginRequest(userDetails)
-      return Result.Success(user)
+      val client =
+          HttpClient(CIO) {
+            install(ContentNegotiation) {
+              json(
+                  Json {
+                    prettyPrint = true
+                    isLenient = true
+                  },
+              )
+            }
+          }
+      val response: HttpResponse =
+          client.post(
+              ServerConfig.SERVER_URL + "/user/login",
+          ) {
+            contentType(ContentType.Application.Json)
+            setBody(userDetails)
+          }
+      if (response.status.value != 200) {
+        throw java.lang.Exception("login request error")
+      }
+
+      if (response.status.value == 429) {
+        // then coerce the body into a class that represents
+        val errorString = "a 429 error to return to the frontend"
+        return LoginResult.Error.MessageError(errorString)
+      }
+
+      val user: LoggedInUser = response.body()
+      return LoginResult.Success(user)
     } catch (e: Throwable) {
-      return Result.Error(IOException("Error logging in", e))
+      return LoginResult.Error.ExceptionError(IOException("Error logging in", e))
     }
   }
 

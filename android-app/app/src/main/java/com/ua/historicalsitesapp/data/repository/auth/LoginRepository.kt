@@ -12,7 +12,7 @@ import com.ua.historicalsitesapp.data.model.auth.LoginDetails
 import com.ua.historicalsitesapp.data.model.auth.RegistrationDetails
 import com.ua.historicalsitesapp.data.model.auth.RegistrationResult
 import com.ua.historicalsitesapp.data.repository.auth.LoginDataSource.LogoutResult
-import com.ua.historicalsitesapp.util.Result
+import com.ua.historicalsitesapp.util.LoginResult
 import java.security.KeyStore
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
@@ -73,10 +73,10 @@ class LoginRepository(
     }
   }
 
-  suspend fun login(userDetails: LoginDetails): Result<LoggedInUser> {
+  suspend fun login(userDetails: LoginDetails): LoginResult<LoggedInUser> {
     val result = dataSource.login(userDetails)
 
-    if (result is Result.Success) {
+    if (result is LoginResult.Success) {
       setLoggedInUser(result.data)
     }
 

@@ -8,7 +8,7 @@ import com.ua.historicalsitesapp.data.model.auth.RegistrationDetails
 import com.ua.historicalsitesapp.data.model.auth.RegistrationResult
 import com.ua.historicalsitesapp.data.repository.auth.LoginDataSource
 import com.ua.historicalsitesapp.data.repository.auth.LoginRepositoryProvider
-import com.ua.historicalsitesapp.util.Result
+import com.ua.historicalsitesapp.util.LoginResult
 import kotlinx.coroutines.runBlocking
 
 class AuthViewModel(context: Context) : ViewModel() {
@@ -35,8 +35,9 @@ class AuthViewModel(context: Context) : ViewModel() {
   fun performLogin(
       email: String,
       password: String,
-  ): Result<LoggedInUser> {
-    var result: Result<LoggedInUser> = Result.Error(Exception(("Unknown Error")))
+  ): LoginResult<LoggedInUser> {
+    var result: LoginResult<LoggedInUser> =
+        LoginResult.Error.ExceptionError(Exception(("Unknown Error")))
     runBlocking { result = loginRepository.login(LoginDetails(email, password)) }
     return result
   }
