@@ -82,7 +82,7 @@ private fun CustomRendererClustering(
           screenHeight.value.toInt(),
       )
 
-  algorithm.maxDistanceBetweenClusteredItems = 300
+  algorithm.maxDistanceBetweenClusteredItems = 100
 
   clusterManager?.setAlgorithm(
       algorithm,
@@ -159,7 +159,7 @@ fun GoogleMapsScreen(
       val cameraPosition = CameraPosition.fromLatLngZoom(coordinates, 15F)
       cameraPositionState.move(CameraUpdateFactory.newCameraPosition(cameraPosition))
       withLogoutOnFailure(
-          context, usersView, { view.getHistoricalLocationNearPoint(coordinates, 500.0f) }) {
+          context, usersView, { view.getHistoricalLocationNearPoint(coordinates, 50.0f) }) {
               historicalLocations ->
             for (location in historicalLocations) {
               val locationId = location.id
