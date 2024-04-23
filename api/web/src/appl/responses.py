@@ -17,9 +17,8 @@ def short_location_repr(location_tuple) -> ShortLocationDescription:
         "short_description": location.short_description,
         "image_link": location.image_link,
         "is_liked": is_liked,
-        "long_description": location.long_description
+        "long_description": location.long_description,
         "categories": location.categories,
-
     }
 
 
