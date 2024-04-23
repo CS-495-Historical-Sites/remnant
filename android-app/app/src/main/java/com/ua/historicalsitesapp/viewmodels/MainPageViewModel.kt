@@ -1,6 +1,8 @@
 package com.ua.historicalsitesapp.viewmodels
 
 import android.content.Context
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.google.android.gms.maps.model.LatLng
 import com.ua.historicalsitesapp.data.model.auth.LoggedInUser
@@ -27,11 +29,43 @@ import io.ktor.http.contentType
 import java.util.Base64
 import kotlinx.coroutines.runBlocking
 
+enum class SelectionState {
+  NOT_SELECTED,
+  INCLUSIVE,
+  EXCLUSIVE
+}
+
 class MainPageViewModel(context: Context) : ViewModel() {
   private val locationRepository = LocationRepository(LocationDataSource())
 
   private val loginRepository =
       LoginRepositoryProvider.provideLoginRepository(LoginDataSource(), context)
+
+  private val _categoriesState =
+      mutableStateOf(
+          listOf(
+                  "Heritage",
+                  "Maritime History",
+                  "Development",
+                  "Innovation",
+                  "Military",
+                  "History",
+                  "Infrastructure",
+                  "Recreation",
+                  "Diversity",
+                  "Architecture",
+                  "Prehistoric",
+                  "Settlement")
+              .associateWith { SelectionState.NOT_SELECTED })
+
+  val categoriesState: State<Map<String, SelectionState>> = _categoriesState
+
+  // Function to update category state
+
+  fun updateCategoryState(category: String, newState: SelectionState) {
+    _categoriesState.value =
+        _categoriesState.value.toMutableMap().apply { this[category] = newState }
+  }
 
   private fun getUser(): LoggedInUser {
     return loginRepository.user ?: throw Exception("MainPageViewModel could not retrieve user")

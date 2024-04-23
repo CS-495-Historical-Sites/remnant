@@ -23,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -44,35 +45,18 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.flowlayout.FlowRow
 import com.ua.historicalsitesapp.ui.theme.Typography
 import com.ua.historicalsitesapp.viewmodels.MainPageViewModel
+import com.ua.historicalsitesapp.viewmodels.SelectionState
 import kotlinx.coroutines.launch
 
 @Composable
 fun CategoriesRow(mainPageViewModel: MainPageViewModel) {
   val coroutineScope = rememberCoroutineScope()
   var showSettings by remember { mutableStateOf(false) }
-  val categories =
-      listOf(
-          "Heritage",
-          "Maritime History",
-          "Development",
-          "Innovation",
-          "Military",
-          "History",
-          "Infrastructure",
-          "Recreation",
-          "Diversity",
-          "Architecture",
-          "Prehistoric",
-          "Settlement")
-  val categoriesToDisplay =
-      listOf(
-          "Military",
-          "Diversity",
-          "Architecture",
-          "Prehistoric",
-          "Settlement",
-          "More",
-      )
+
+  // Get the current state of categories
+  val categories = mainPageViewModel.categoriesState
+  val categoriesToDisplay = categories.value.keys.take(5) + "More"
+
   Box(
       modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
       contentAlignment = Alignment.TopCenter) {
@@ -82,31 +66,48 @@ fun CategoriesRow(mainPageViewModel: MainPageViewModel) {
               items(categoriesToDisplay) { category ->
                 OutlinedButton(
                     onClick = {
-                      if (category == "More") {
-                        showSettings = true
-                      }
+                      val newState =
+                          when (categories.value[category]) {
+                            SelectionState.NOT_SELECTED -> SelectionState.INCLUSIVE
+                            SelectionState.INCLUSIVE -> SelectionState.EXCLUSIVE
+                            SelectionState.EXCLUSIVE -> SelectionState.NOT_SELECTED
+                            else -> SelectionState.NOT_SELECTED
+                          }
+                      mainPageViewModel.updateCategoryState(category, newState)
+                      showSettings = true
                     },
                     modifier = Modifier.padding(4.dp),
                     border =
                         BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)),
                     colors =
                         ButtonDefaults.buttonColors(
-                            containerColor = Color.White,
-                            contentColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f),
-                            disabledContainerColor =
-                                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
-                            disabledContentColor =
-                                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))) {
+                            containerColor =
+                                when (categories.value[category]) {
+                                  SelectionState.INCLUSIVE -> Color(0xFF90EE90) // Light green
+                                  SelectionState.EXCLUSIVE -> Color(0xFFFFCDD2) // Light red
+                                  else -> Color.White // Default white color for NOT_SELECTED
+                                },
+                            contentColor =
+                                when (categories.value[category]) {
+                                  SelectionState.NOT_SELECTED ->
+                                      MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+                                  else ->
+                                      Color.White // White text color for INCLUSIVE and EXCLUSIVE
+                                })) {
                       Text(text = category, style = Typography.labelLarge)
                     }
               }
             }
       }
-  SettingsSideSheet(show = showSettings, onDismiss = { showSettings = false })
+
+  SettingsSideSheet(
+      show = showSettings,
+      onDismiss = { showSettings = false },
+      mainPageViewModel = mainPageViewModel)
 }
 
 @Composable
-fun SettingsSideSheet(show: Boolean, onDismiss: () -> Unit) {
+fun SettingsSideSheet(show: Boolean, onDismiss: () -> Unit, mainPageViewModel: MainPageViewModel) {
   val screenWidth = LocalConfiguration.current.screenWidthDp.dp
   val slideIn = remember { Animatable(screenWidth.value) }
   val coroutineScope = rememberCoroutineScope()
@@ -121,38 +122,22 @@ fun SettingsSideSheet(show: Boolean, onDismiss: () -> Unit) {
 
   AnimatedVisibility(
       visible = show,
-      enter = slideInHorizontally { -screenWidth.value.toInt() }, // Slide in from the right
-      exit = slideOutHorizontally { screenWidth.value.toInt() }, // Slide out to the right
+      enter = slideInHorizontally { -screenWidth.value.toInt() },
+      exit = slideOutHorizontally { screenWidth.value.toInt() },
       modifier = Modifier.fillMaxSize()) {
         Box(
             modifier =
                 Modifier.background(MaterialTheme.colorScheme.surface)
-                    .fillMaxSize(fraction = 0.8f) // Controls the width of the side sheet
-                    .offset {
-                      IntOffset(slideIn.value.toInt(), 0)
-                    } // Animates the horizontal position
-            ) {
-              SettingsContent(onDismiss)
+                    .fillMaxSize(fraction = 0.8f)
+                    .offset { IntOffset(slideIn.value.toInt(), 0) }) {
+              SettingsContent(onDismiss, mainPageViewModel)
             }
       }
 }
 
 @Composable
-fun SettingsContent(onDismiss: () -> Unit) {
-  val categories =
-      listOf(
-          "Heritage",
-          "Maritime History",
-          "Development",
-          "Innovation",
-          "Military",
-          "History",
-          "Infrastructure",
-          "Recreation",
-          "Diversity",
-          "Architecture",
-          "Prehistoric",
-          "Settlement")
+fun SettingsContent(onDismiss: () -> Unit, mainPageViewModel: MainPageViewModel) {
+  val categories = mainPageViewModel.categoriesState.value
 
   Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -164,18 +149,32 @@ fun SettingsContent(onDismiss: () -> Unit) {
     Spacer(modifier = Modifier.height(16.dp))
     Text("Categories", style = MaterialTheme.typography.titleMedium)
     Spacer(modifier = Modifier.height(8.dp))
-    FlowRow(
-        modifier = Modifier.fillMaxWidth(),
-        mainAxisSpacing = 8.dp, // Spacing between chips horizontally
-        crossAxisSpacing = 8.dp // Spacing between chips vertically
-        ) {
-          categories.forEach { category ->
-            FilterChip(
-                onClick = { /* Handle category selection */},
-                label = { Text(category) },
-                selected = false)
-          }
-        }
+    FlowRow(modifier = Modifier.fillMaxWidth(), mainAxisSpacing = 8.dp, crossAxisSpacing = 8.dp) {
+      categories.forEach { (category, state) ->
+        FilterChip(
+            onClick = {
+              val newState =
+                  when (state) {
+                    SelectionState.NOT_SELECTED -> SelectionState.INCLUSIVE
+                    SelectionState.INCLUSIVE -> SelectionState.EXCLUSIVE
+                    SelectionState.EXCLUSIVE -> SelectionState.NOT_SELECTED
+                  }
+              mainPageViewModel.updateCategoryState(category, newState)
+            },
+            label = { Text(category) },
+            selected = state != SelectionState.NOT_SELECTED,
+            colors =
+                when (state) {
+                  SelectionState.INCLUSIVE ->
+                      FilterChipDefaults.filterChipColors(
+                          selectedContainerColor = Color(0xFF90EE90))
+                  SelectionState.EXCLUSIVE ->
+                      FilterChipDefaults.filterChipColors(
+                          selectedContainerColor = Color(0xFFFFCDD2))
+                  else -> FilterChipDefaults.filterChipColors() // Default colors
+                })
+      }
+    }
     // Add more settings items here if needed
   }
 }
