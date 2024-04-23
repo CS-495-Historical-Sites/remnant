@@ -5,15 +5,20 @@ package com.ua.historicalsitesapp.util
  *
  * @param <T>
  */
-sealed class Result<out T : Any> {
-  data class Success<out T : Any>(val data: T) : Result<T>()
+sealed class LoginResult<out T : Any> {
 
-  data class Error(val exception: Exception) : Result<Nothing>()
+  data class Success<out T : Any>(val data: T) : LoginResult<T>()
 
-  override fun toString(): String {
-    return when (this) {
-      is Success<*> -> "Success[data=$data]"
-      is Error -> "Error[exception=$exception]"
-    }
+  sealed class Error : LoginResult<Nothing>() {
+    data class ExceptionError(val exception: Exception) : Error()
+
+    data class MessageError(val message: String) : Error()
   }
+
+  override fun toString(): String =
+      when (this) {
+        is Success<*> -> "Success[data=$data]"
+        is Error.ExceptionError -> "Error[exception=${exception.message}]"
+        is Error.MessageError -> "Error[message=$message]"
+      }
 }
