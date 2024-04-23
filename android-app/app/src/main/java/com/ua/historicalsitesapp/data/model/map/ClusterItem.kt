@@ -10,6 +10,7 @@ data class ClusterItem(
     val itemSnippet: String,
     val itemZIndex: Float,
     val imageLink: String,
+    val categories: List<String>
 ) : ClusterItem {
   override fun getPosition(): LatLng = itemPosition
 

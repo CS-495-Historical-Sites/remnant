@@ -12,6 +12,7 @@ data class HsLocation(
     @SerialName("is_liked") val isLiked: Boolean,
     @SerialName("short_description") val shortDescription: String?,
     @SerialName("image_link") val imageLink: String,
+    @SerialName("categories") val associatedCategories: List<String>
 )
 
 @Serializable

@@ -14,7 +14,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddBox
 import androidx.compose.material.icons.filled.AddLocation
 import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.HorizontalDivider
@@ -27,12 +26,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
@@ -58,6 +59,7 @@ import com.google.maps.android.compose.clustering.rememberClusterManager
 import com.google.maps.android.compose.clustering.rememberClusterRenderer
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.ua.historicalsitesapp.data.model.map.ClusterItem
+import com.ua.historicalsitesapp.data.model.map.HsLocation
 import com.ua.historicalsitesapp.geofence.GeofenceBroadcastReceiver
 import com.ua.historicalsitesapp.ui.handlers.withLogoutOnFailure
 import com.ua.historicalsitesapp.ui.screens.TAG
@@ -130,8 +132,29 @@ private fun CustomRendererClustering(
 
 var geofenceList: ArrayList<Geofence> = ArrayList(100)
 
-@OptIn(ExperimentalMaterial3Api::class)
-@SuppressLint("MissingPermission")
+fun convertLocationsToClusterItems(
+    historicalLocations: List<HsLocation>
+): SnapshotStateList<ClusterItem> {
+  val clusterItems = mutableStateListOf<ClusterItem>()
+  for (location in historicalLocations) {
+    val locationId = location.id
+    val position = LatLng(location.latitude.toDouble(), location.longitude.toDouble())
+    val shortLocationDescription = location.shortDescription ?: ""
+    val clusterItem =
+        ClusterItem(
+            itemId = locationId,
+            itemPosition = position,
+            itemTitle = location.name,
+            itemSnippet = shortLocationDescription,
+            itemZIndex = 0f,
+            imageLink = location.imageLink,
+            categories = location.associatedCategories)
+    clusterItems.add(clusterItem)
+  }
+  return clusterItems
+}
+
+@SuppressLint("MissingPermission", "UnrememberedMutableState")
 @Composable
 fun GoogleMapsScreen(
     view: MainPageViewModel,
@@ -140,12 +163,29 @@ fun GoogleMapsScreen(
   var isPlacingLocation by remember { mutableStateOf(false) }
   var showAddLocationDialog by remember { mutableStateOf(false) }
   var selectedLocation: ClusterItem? = null
-  val items = remember { mutableStateListOf<ClusterItem>() }
-
+  var initialSearchRadiusKM = 50.0f
+  var usersCoordinatesFunctionGlobal: LatLng? = null
+  var items = remember { mutableStateListOf<ClusterItem>() }
+  val filteredItems by
+      remember(items, view.categoriesState) {
+        derivedStateOf {
+          val itemsToDisplay = view.filterClusterItems(items)
+          if (itemsToDisplay.size < 10 && usersCoordinatesFunctionGlobal != null) {
+            val largerRangeOfLocations =
+                view.getHistoricalLocationNearPoint(
+                    usersCoordinatesFunctionGlobal!!, initialSearchRadiusKM * 2)
+            val largerAsClusterItems = convertLocationsToClusterItems(largerRangeOfLocations)
+            items = largerAsClusterItems
+            return@derivedStateOf view.filterClusterItems(largerAsClusterItems)
+          }
+          return@derivedStateOf itemsToDisplay
+        }
+      }
   val onLocationInfoBoxClick: (ClusterItem) -> Unit = { item ->
     showBottomSheet = true // Update the state value
     selectedLocation = item
   }
+
   val context = LocalContext.current
   val usersView = UserProfileViewModel(context)
   val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
@@ -156,25 +196,14 @@ fun GoogleMapsScreen(
       usersLocation ->
     if (usersLocation != null) {
       val coordinates = LatLng(usersLocation.latitude, usersLocation.longitude)
+      usersCoordinatesFunctionGlobal = coordinates
       val cameraPosition = CameraPosition.fromLatLngZoom(coordinates, 15F)
       cameraPositionState.move(CameraUpdateFactory.newCameraPosition(cameraPosition))
       withLogoutOnFailure(
           context, usersView, { view.getHistoricalLocationNearPoint(coordinates, 50.0f) }) {
               historicalLocations ->
-            for (location in historicalLocations) {
-              val locationId = location.id
-              val position = LatLng(location.latitude.toDouble(), location.longitude.toDouble())
-              val shortLocationDescription = location.shortDescription ?: ""
-              items.add(
-                  ClusterItem(
-                      locationId,
-                      position,
-                      location.name,
-                      shortLocationDescription,
-                      0f,
-                      location.imageLink),
-              )
-            }
+            val clusterItems = convertLocationsToClusterItems(historicalLocations)
+            items = clusterItems
           }
       withLogoutOnFailure(
           context, usersView, { view.getHistoricalLocationNearPoint(coordinates, 0.5f) }) {
@@ -296,7 +325,7 @@ fun GoogleMapsScreen(
                   }
 
                   CustomRendererClustering(
-                      items = items,
+                      items = filteredItems,
                       onLocationInfoBoxClick,
                   )
                 }
