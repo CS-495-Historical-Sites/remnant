@@ -21,6 +21,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material.icons.outlined.FavoriteBorder
@@ -48,7 +50,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -62,13 +66,6 @@ import com.ua.historicalsitesapp.ui.foreignintents.createGoogleMapsDirectionsInt
 import com.ua.historicalsitesapp.util.hasLocationPermission
 import com.ua.historicalsitesapp.viewmodels.MainPageViewModel
 import kotlin.math.*
-import androidx.compose.ui.text.style.TextOverflow
-
-import androidx.compose.animation.core.animateIntAsState
-import androidx.compose.material.icons.filled.ExpandLess
-import androidx.compose.material.icons.filled.ExpandMore
-import androidx.compose.ui.text.font.FontStyle
-
 
 class FeedPageActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -109,7 +106,7 @@ fun HomeAppBar(
                 fontWeight = FontWeight.Bold,
                 fontSize = 10.sp,
                 lineHeight = 8.sp,
-                )
+            )
           }
         },
         colors =
@@ -184,7 +181,9 @@ fun HomeMainContent(locationInfo: HsLocation, distance: Double, view: MainPageVi
   val words = longDescription.split("\\s+".toRegex())
   val wordCount = words.filter { it.isNotEmpty() }.size
   val needExpansion = wordCount > 30
-  Log.d("Expansion", "${locationInfo.name} description length = ${longDescription.length} expansion = ${needExpansion}")
+  Log.d(
+      "Expansion",
+      "${locationInfo.name} description length = ${longDescription.length} expansion = ${needExpansion}")
 
   LaunchedEffect(isLiked, userHasInteracted) {
     if (userHasInteracted) {
@@ -238,7 +237,8 @@ fun HomeMainContent(locationInfo: HsLocation, distance: Double, view: MainPageVi
             }
 
             Column(Modifier.weight(4f).animateContentSize()) {
-              Text(text = locationInfo.name,
+              Text(
+                  text = locationInfo.name,
                   fontWeight = FontWeight.Normal,
                   fontSize = 20.sp,
                   lineHeight = 22.sp)
@@ -250,30 +250,27 @@ fun HomeMainContent(locationInfo: HsLocation, distance: Double, view: MainPageVi
                   fontStyle = FontStyle.Italic,
                   fontSize = 12.sp,
                   lineHeight = 20.sp)
-                if(locationInfo.longDescription != null) {
-                    Text(
-                        text = locationInfo.longDescription,
-                        fontWeight = FontWeight.Bold,
-                        lineHeight = 16.sp,
-                        fontSize = 9.sp,
-                        maxLines = if (isExpanded || !needExpansion) Int.MAX_VALUE else 4,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    if (needExpansion) {
-                        IconButton(
-                            onClick = { isExpanded = !isExpanded },
-                            modifier = Modifier
-                                .size(22.dp)
-                                .padding(0.dp)
-                        ) {
-                            Icon(
-                                imageVector = if (isExpanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
-                                contentDescription = if (isExpanded) "Collapse" else "Expand",
-                                modifier = Modifier.size(11.dp)
-                            )
-                        }
-                    }
+              if (locationInfo.longDescription != null) {
+                Text(
+                    text = locationInfo.longDescription,
+                    fontWeight = FontWeight.Bold,
+                    lineHeight = 16.sp,
+                    fontSize = 9.sp,
+                    maxLines = if (isExpanded || !needExpansion) Int.MAX_VALUE else 4,
+                    overflow = TextOverflow.Ellipsis)
+                if (needExpansion) {
+                  IconButton(
+                      onClick = { isExpanded = !isExpanded },
+                      modifier = Modifier.size(22.dp).padding(0.dp)) {
+                        Icon(
+                            imageVector =
+                                if (isExpanded) Icons.Filled.ExpandLess
+                                else Icons.Filled.ExpandMore,
+                            contentDescription = if (isExpanded) "Collapse" else "Expand",
+                            modifier = Modifier.size(11.dp))
+                      }
                 }
+              }
             }
           }
 
