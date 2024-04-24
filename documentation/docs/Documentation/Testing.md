@@ -24,10 +24,14 @@ We called the User table constructor and entered valid information and then comp
 - **Description** This was a test that we can add a valid location in our database.
 We called the location table constructor and entered valid information and then tested if our information was stored correctly.
 
-## 2. Visit Table
+## 3. Visit Table
 
 - **Description** This was a test that we can add a valid visit row in our database. A visit row ties a user and a location together and has a uniqueness constraint based on user_id and location_id foreign keys.
 We called the visit table constructor and entered valid information and then tested if our information was stored correctly.
+
+## 4. BlacklistToken Table
+
+- **Description** This table is made to store tokens when a user logs out. This ensures that these tokens are no longer valid or have access to our system. 
 
 # Functional Tests
 
