@@ -97,7 +97,11 @@ def register():
         return jsonify({"message": "Email already exists"}), 422
 
     if registration_info.email in Config.ADMIN_EMAILS:
-        user_queries.create_admin(registration_info)
+        admin = user_queries.create_admin(registration_info)
+        if not Config.TESTING:
+            send_success = send_welcome_email(admin)
+            if not send_success:
+                return jsonify({"message": "Failed to send email"}), 500
     else:
         user = user_queries.create_user(registration_info)
         if not Config.TESTING:
