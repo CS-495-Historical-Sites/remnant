@@ -3,7 +3,22 @@
 
 ## Overview
 
-Remnant was designed to connect users who love history to nearby historical locations. Sometimes you pass by a historically significant location and don't even know it. Our app is designed to let you know when you are near a sit that you might find interesting. 
+Our mobile app is a Android App. 
+
+## Languages and libraries
+
+The application is written in Kotlin, using the [Jetpack Compose](https://developer.android.com/develop/ui/compose) UI library.
+
+
+## Build System and Development Environment
+
+Android Studio is required. The Android SDK is required. Android Studio will walk you through installing the SDK. 
+
+We are using Gradle as a build system. It integrates with Android Studio.
+
+To set up your development environment, see the [development environment](Development_Environment.md) section.
+
+
 
 ### Screens
 
