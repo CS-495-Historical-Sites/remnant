@@ -33,6 +33,7 @@ To set up your development environment, see the [development environment](Develo
 
     View Models are used to store and UI related data and preserve it across different configurations such as screen changes. They also handle communication with the back end decoupling activities from data handling operations.
  - **AuthViewModel**
+ 
 
     AuthViewModel handles all the logic necessary for authorizing users. It contains functions that communicate with the backend for handling registration, login, and logout requests. 
 
