@@ -11,7 +11,7 @@ The app will provide a simple, easy to use UI, track the users "steps" through h
 - [Sprint 1 Presentation](https://docs.google.com/presentation/d/1N1un2fruCzJXbqARkHtwW_O_IlDZ9DslrHKXXw8md1M/edit#slide=id.p)
 - [Sprint 1 Demo Video](https://www.youtube.com/watch?v=YOHrRc_Cxek)
 - [Repositories](https://github.com/orgs/CS-495-Historical-Sites/repositories)
-
+- [Project Backlog](https://docs.google.com/spreadsheets/d/1HKF6ZJoivdn_3kVjFu1scWFq1TY2EBCMu3DLSpLrBJ4/edit#gid=0)
 
 ## Features
 - [x] Display landmark’s details
