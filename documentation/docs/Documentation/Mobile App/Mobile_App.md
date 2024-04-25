@@ -29,9 +29,13 @@ To set up your development environment, see the [development environment](Develo
  - **User Profile Page Activity**
  The User Profile Page displays info about the user. This information includes username, email, and preferences gathered from registration or questionnaire. You can edit the username and preferences by clicking on the pencil icon to the right of the text box respectively.
 
- ### View Models
 
-    View Models are used to store and UI related data and preserve it across different configurations such as screen changes. They also handle communication with the back end decoupling activities from data handling operations.
+### View Models
+
+
+View Models are used to store and UI related data and preserve it across different configurations such as screen changes. They also handle communication with the back end decoupling activities from data handling operations.
+
+
  - **AuthViewModel**
  
 
