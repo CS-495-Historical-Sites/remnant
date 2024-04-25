@@ -23,5 +23,5 @@ The app will launch a blank screen without an appropriate Google Maps API key. Y
 
 Replace `YOUR_API_KEY` with your actual key.
 
-You can access your API key in the Google Maps Platform under Keys & Credentials.
+You can access your API key in the [Google Maps Platform](https://developers.google.com/maps) under Keys & Credentials.
 
