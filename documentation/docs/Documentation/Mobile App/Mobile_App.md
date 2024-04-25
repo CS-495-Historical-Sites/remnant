@@ -1,6 +1,5 @@
 # Mobile App
 
-
 ## Overview
 
 Our mobile app is an Android App. 
