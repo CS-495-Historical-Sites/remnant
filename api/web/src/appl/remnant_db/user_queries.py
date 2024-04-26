@@ -36,6 +36,8 @@ def create_admin(registration_info: RegistrationRequest) -> None:
     db.session.add(user)
     db.session.commit()
 
+    return user
+
 
 def get_user(email: str) -> User | None:
     return User.query.filter_by(email=email).first()
