@@ -14,6 +14,7 @@ notifications.
 -   [Repositories](https://github.com/orgs/CS-495-Historical-Sites/repositories)
 -   [Project Backlog](https://docs.google.com/spreadsheets/d/1HKF6ZJoivdn_3kVjFu1scWFq1TY2EBCMu3DLSpLrBJ4/edit#gid=0)
 -   [Sprint 3 Demo Video](https://youtu.be/hj3qh6u96QM)
+-   [Automated Testing](Documentation/Backend/Testing.md)
 
 ## Features
 
