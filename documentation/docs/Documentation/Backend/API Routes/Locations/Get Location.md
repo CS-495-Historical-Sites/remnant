@@ -2,39 +2,41 @@
 
 ### Request
 
-- **URL:** `/api/locations/<location_id>`
-- **Method:** `GET`
+-   **URL:** `/api/locations/<location_id>`
+-   **Method:** `GET`
 
 #### Path Parameters
 
-| Parameter   | Type   | Description            |
-| ----------- | ------ | ----------------------|
-| location_id | string | ID of the location     |
+| Parameter   | Type   | Description        |
+| ----------- | ------ | ------------------ |
+| location_id | string | ID of the location |
 
 ### Responses
 
-- **200 OK**
-  ```json
-  {
-    "id": "<location_id>",
-    "name": "<location_name>",
-    "latitude": "<latitude>",
-    "longitude": "<longitude>",
-    "short_description": "<short_description>",
-    "long_description": "<long_description>"
-  }
-  ```
+-   **200 OK**
 
-- **400 Bad Request**
-  ```json
-  {
-    "message": "Invalid location ID"
-  }
-  ```
+    ```json
+    {
+        "id": "<location_id>",
+        "name": "<location_name>",
+        "latitude": "<latitude>",
+        "longitude": "<longitude>",
+        "short_description": "<short_description>",
+        "long_description": "<long_description>"
+    }
+    ```
 
-- **404 Not Found**
-  ```json
-  {
-    "message": "Location not found"
-  }
-  ```
+-   **400 Bad Request**
+
+    ```json
+    {
+        "message": "Invalid location ID"
+    }
+    ```
+
+-   **404 Not Found**
+    ```json
+    {
+        "message": "Location not found"
+    }
+    ```

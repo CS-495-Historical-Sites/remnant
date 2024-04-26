@@ -2,15 +2,15 @@
 
 ## Group Members
 
-- Aaron Bouttapanith
-- Cortland Peterson
-- Erich Reitz
-- Clay Truelove
+-   Aaron Bouttapanith
+-   Cortland Peterson
+-   Erich Reitz
+-   Clay Truelove
 
 ## Security Advisor
 
-- Tanner Baine
+-   Tanner Baine
 
 ## Sponsor
 
-- Dr. Travis Atkison
+-   Dr. Travis Atkison

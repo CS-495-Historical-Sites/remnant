@@ -293,5 +293,3 @@ class LocationHistory(db.Model):
     location = db.relationship(
         "Location", backref=db.backref("history", lazy="dynamic")
     )
-
-
