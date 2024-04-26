@@ -295,19 +295,3 @@ class LocationHistory(db.Model):
     )
 
 
-class AWSBucket(db.Model):
-    __tablename__ = "aws_bucket"
-    metadata = program_metadata
-    id = db.Column(db.Integer, primary_key=True)
-    bucket_name = db.Column(db.String(120), nullable=False)
-    bucket_url = db.Column(db.String(120), nullable=False)
-    access_key = db.Column(db.String(120), nullable=False)
-    secret_key = db.Column(db.String(120), nullable=False)
-    region = db.Column(db.String(120), nullable=False)
-
-    def __init__(self, bucket_name, bucket_url, access_key, secret_key, region):
-        self.bucket_name = bucket_name
-        self.bucket_url = bucket_url
-        self.access_key = access_key
-        self.secret_key = secret_key
-        self.region = region
