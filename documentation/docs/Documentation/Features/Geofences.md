@@ -10,6 +10,8 @@ settings, then "Location" settings and click "Allow all the time".
 
 #### Development Modification
 
+#### Android
+
 To Modify the Geofencing implementation all code related to Geofencing is
 located in the functions
 [GoogleMapsScreen()](https://github.com/CS-495-Historical-Sites/remnant/blob/docs/android-app/app/src/main/java/com/ua/historicalsitesapp/ui/components/GoogleMapsScreen.kt#L159),
@@ -23,3 +25,8 @@ in
 For more information regarding Geofences, the Geofencing Client, and the
 Geofencing API on Android follow the link here:
 [Android Geofence Documentation](https://developer.android.com/develop/sensors-and-location/location/geofencing).
+
+#### Backend
+
+The locations are sourced from
+[Get All Locations](/Documentation/Backend/API%20Routes/Locations/Get%20Locations/)
