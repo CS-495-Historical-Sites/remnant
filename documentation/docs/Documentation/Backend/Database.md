@@ -57,7 +57,9 @@ erDiagram
         string email
         datetime attempt_time
         bool success
+        int lockout
     }
+
     SuggestionApproval {
         int id PK
         string suggestion_type
