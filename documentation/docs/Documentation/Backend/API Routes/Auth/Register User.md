@@ -2,8 +2,8 @@
 
 ### Request
 
-- **URL:** `/api/register`
-- **Method:** `POST`
+-   **URL:** `/api/register`
+-   **Method:** `POST`
 
 #### Body Parameters
 
@@ -16,32 +16,32 @@ The request body should be in JSON format and contain the following fields:
 
 ### Responses
 
-- **200 OK**
-  ```json
-  {
-    "email": "<user_email>",
-    "errorString": ""
-  }
-  ```
-- **400 Bad Request**
+-   **200 OK**
+    ```json
+    {
+        "email": "<user_email>",
+        "errorString": ""
+    }
+    ```
+-   **400 Bad Request**
 
-  ```json
-  {
-    "message": "Incomplete request"
-  }
-  ```
+    ```json
+    {
+        "message": "Incomplete request"
+    }
+    ```
 
-- **400 Bad Request**
+-   **400 Bad Request**
 
-  ```json
-  {
-    "message": "No data supplied"
-  }
-  ```
+    ```json
+    {
+        "message": "No data supplied"
+    }
+    ```
 
-- **422 Unprocessable Entity**
-  ```json
-  {
-    "message": "Email already exists"
-  }
-  ```
+-   **422 Unprocessable Entity**
+    ```json
+    {
+        "message": "Email already exists"
+    }
+    ```
