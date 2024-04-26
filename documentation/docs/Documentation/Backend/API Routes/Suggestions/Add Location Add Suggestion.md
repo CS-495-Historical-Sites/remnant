@@ -2,9 +2,9 @@
 
 ### Request
 
-- **URL:** `/api/suggestions/location_add_suggestions`
-- **Method:** `POST`
-- **Authorization:** Requires JWT token
+-   **URL:** `/api/suggestions/location_add_suggestions`
+-   **Method:** `POST`
+-   **Authorization:** Requires JWT token
 
 #### Body Parameters
 
@@ -20,17 +20,17 @@ The request body should contain the following data:
 
 ### Responses
 
-- **200 OK**
+-   **200 OK**
 
-  ```json
-  {
-    "message": "Suggestion Successfully Added"
-  }
-  ```
+    ```json
+    {
+        "message": "Suggestion Successfully Added"
+    }
+    ```
 
-- **400 Bad Request**
-  ```json
-  {
-  "message": "Invalid location ID" | "Incomplete request" | "Invalid data submitted"
-  }
-  ```
+-   **400 Bad Request**
+    ```json
+    {
+    "message": "Invalid location ID" | "Incomplete request" | "Invalid data submitted"
+    }
+    ```
