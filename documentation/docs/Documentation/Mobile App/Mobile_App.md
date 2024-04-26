@@ -74,6 +74,7 @@ This section provides a detailed breakdown of the key functions used within the 
       - Current Query `searchQuery`
   - **Customization**: Allows adjustments to size, color, and overall style.
 
+
 #### HomeAppBar
 
   - **Purpose**: Manages the top bar of the page.
