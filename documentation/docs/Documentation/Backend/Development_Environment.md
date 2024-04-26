@@ -58,6 +58,8 @@ These commands are for a UNIX environment, some have a Windows equivalent in the
 
 #### Ansible things
 
+To deploy the website on an EC2 server.
+
 - need to install ansible
 - run the playbook with 
     - `ansible-playbook -i ansible/inventory.ini ansible/ec2_setup.yml --private-key=<path>.pem --user=ubuntu`

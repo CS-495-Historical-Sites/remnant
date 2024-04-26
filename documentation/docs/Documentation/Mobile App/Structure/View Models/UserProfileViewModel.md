@@ -4,7 +4,7 @@
 
 The `viewmodels/UserProfileViewModel` directory contains a view model for handling the user profile page. This includes logout, getting user information, getting user preferences, and updating user info.
 
-### View Model Details
+### View Model Methods
 
 - **submitRegistrationQuestionnaire**
   - For use in `ui/screens/QuestionnaireActivity.kt`.

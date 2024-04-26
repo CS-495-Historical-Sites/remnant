@@ -10,7 +10,8 @@ dependencies. [npm](https://www.npmjs.com/) is needed.
 
 ### Run
 
-To run the website in development mode, run `npm run dev`.
+To run the website in development mode, run `npm run dev`. The app is configured to send requests to our 
+AWS server, but that can be changed by editing the file `website/src/ServerUtil.ts`
 
 ### Build
 

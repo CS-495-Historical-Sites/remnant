@@ -30,7 +30,7 @@ The code for the clustering lives at `android-app/app/src/main/java/com/ua/histo
 
 Location Filtering is located at the top of the maps screen clicking on any of
 the filters opens the settings page and allows for filtering of locations based
-on Heritage, Maritime History, Development, among others.
+on Military, Maritime History, Architecture, and more.
 
 #### Development Modification
 
