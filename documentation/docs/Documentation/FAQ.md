@@ -1,6 +1,6 @@
 # Frequency Asked Questions
 
-### How to you get the locations?
+### How do you get the locations?
 
 We retrieve our location information from Wikidata. The first step in the
 process is to query Wikidata for candidate locations. This is done using this
