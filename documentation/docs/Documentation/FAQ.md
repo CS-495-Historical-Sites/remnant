@@ -44,7 +44,5 @@ More information about setting up backend dependencies can be found in the
 
 We are dependent on
 [Maps SDK for Android](https://developers.google.com/maps/documentation/android-sdk/overview).
-Information about setting up the Google Maps API key can be found in [Android
-App Readme](More information about setting up backend dependencies can be found
-in the
+Information about setting up the Google Maps API key can be found in
 [Android README](https://github.com/CS-495-Historical-Sites/remnant/blob/main/android-app/README.md).

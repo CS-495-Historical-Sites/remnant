@@ -37,6 +37,8 @@ verifies the entered email/password against stored credentials in the database.
 If the user does not have an account they can navigate to the registration
 activity.
 
+It is also the landing page for when the user recieves a 401 error.
+
 -   **RegistrationActivity.kt**
 
 This screen is designed to allow a user to create an account in our database.
@@ -46,8 +48,4 @@ login activity.
 
 -   **MainPageActivity.**
 
-This screen is designed to show you locations near you. We take a users location
-and display a list of the closest historical sites in a selected radius. You can
-save locations or get directions through Google maps. Users can adjust their
-radius to allow for more or less nearby locations and also search for specific
-locations.
+This screen is our google maps screen, as well as its popups and side bars.
