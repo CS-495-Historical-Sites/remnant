@@ -3,11 +3,15 @@
 ``` mermaid
 erDiagram
     User {
-        int id  PK
+        int id PK
+        string username
         string email UK
-        string password_hash 
-        string interested_eras
+        string password_hash
+        JSONB answers
+        string email_confirmation_token
+        int lockout
         bool is_admin
+        bool has_confirmed_email
     }
     Location {
         int id  PK
