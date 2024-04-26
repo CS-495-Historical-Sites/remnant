@@ -22,7 +22,7 @@ To set up your development environment, see the [development environment](Develo
 ### **For Users:**
 
 
-**Nearby Activity**
+### Nearby Activity
  This screen is designed to show you locations near you. We take a users location when the home button is pressed and display a list of the closest historical sites in a selected radius. You can save locations or get directions through Google maps using the two buttons underneath the location card. Users can adjust their radius to allow for more or less nearby locations and also search for specific locations.
 
 
@@ -87,6 +87,8 @@ To set up your development environment, see the [development environment](Develo
       - Displays the count of rendered location cards and the total number of nearby locations.
       - Includes a filter button to update the search radius (options: 5, 10, 25, 50 kilometers).
       - Converts distance to kilometers for compatibility with the backend.
+
+##
 
  
 
