@@ -4,6 +4,7 @@
 
 Using the google maps screen in app is like any other map app. Zoom by pinching or pulling with two fingers. Move around the map with one finger and tap on locations to select.
 
+
 #### Development Modification
 
 
