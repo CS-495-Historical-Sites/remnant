@@ -39,8 +39,8 @@ To set up your development environment, see the [development environment](Develo
 
   - **Purpose**: Fetches locations and handles location data.
   - **Parameters**:
-      - `context`: Current context of the application.
-      - `viewModel`: Used to track data.
+      -  Current context of the application `context`
+      -  View model to track data `viewModel`
   - **Default Settings**:
       - Search Radius: 16.09 kilometers (approximately 10 miles).
       - Search Query: Empty by default.
@@ -60,7 +60,7 @@ To set up your development environment, see the [development environment](Develo
   - **Purpose**: Decorates each location card displayed in the feed.
   - **Parameters**: 
       - Receives a variable containing all card information (images, title, description, liked status, etc.) `locationInfo`
-      - Distance in milses `distance`
+      - Distance in miles `distance`
       - View model `view`.
   - **Features**:
       - Two buttons per card:
