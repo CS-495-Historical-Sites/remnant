@@ -1,4 +1,4 @@
-# Frequency asked questions
+# Frequently asked questions
 
 ### How to you get the locations?
 
