@@ -45,3 +45,10 @@ After navigating to our [Admin Website](https://app.uahistoricalsites.com/),
 only admins (via allowlisted and confirmed email addresses) can view users
 suggestions. They can click approve or deny on users suggestions after viewing
 their details.
+
+
+### Development 
+
+The code for the edit / add suggestion approval pages can be found at `/website/src/pages/AddSuggestionPage.tsx` and `EditSuggestionPage.tsx`.
+
+The functions to interface with the backend can be found at `website/src/remnantAPI`.
