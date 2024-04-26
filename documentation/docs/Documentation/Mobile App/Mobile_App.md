@@ -21,6 +21,7 @@ To set up your development environment, see the [development environment](Develo
 
 #### **For Users:**
 
+
 **Nearby Activity**
  This screen is designed to show you locations near you. We take a users location when the home button is pressed and display a list of the closest historical sites in a selected radius. You can save locations or get directions through Google maps using the two buttons underneath the location card. Users can adjust their radius to allow for more or less nearby locations and also search for specific locations.
 
