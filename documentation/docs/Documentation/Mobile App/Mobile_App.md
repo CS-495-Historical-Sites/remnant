@@ -17,7 +17,7 @@ We are using Gradle as a build system. It integrates with Android Studio.
 
 To set up your development environment, see the [development environment](Development_Environment.md) section.
 
-### Screens
+## Screens
 
 ### **For Users:**
 
