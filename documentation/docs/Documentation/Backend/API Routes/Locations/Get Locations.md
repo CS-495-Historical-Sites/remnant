@@ -7,11 +7,11 @@
 
 #### Query Parameters
 
-| Parameter        | Type   | Description                               |
-|------------------|--------|-------------------------------------------|
-| lat              | string | Latitude of the location.                 |
-| long             | string | Longitude of the location.                |
-| kilometer_radius | string | Radius in kilometers around given lat/long|
+| Parameter        | Type   | Description                                |
+| ---------------- | ------ | ------------------------------------------ |
+| lat              | string | Latitude of the location.                  |
+| long             | string | Longitude of the location.                 |
+| kilometer_radius | string | Radius in kilometers around given lat/long |
 
 ### Responses
 

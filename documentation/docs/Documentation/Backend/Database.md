@@ -1,6 +1,6 @@
 # Database
 
-``` mermaid
+```mermaid
 erDiagram
     User {
         int id PK
@@ -15,7 +15,7 @@ erDiagram
     }
     Location {
         int id  PK
-        string name 
+        string name
         float latitude
         float longitude
         string short_description
@@ -25,7 +25,7 @@ erDiagram
     }
     Visit {
         int id  PK
-        datetime visit_time 
+        datetime visit_time
         int user_id  FK
         int location_id  FK
     }
@@ -42,7 +42,7 @@ erDiagram
         datetime suggestion_time
         float latitude
         float longitude
-        string name 
+        string name
         string short_description
         string wikipedia_link
         string image_link
@@ -52,7 +52,7 @@ erDiagram
         int user_id FK
         int location_id FK
         datetime suggestion_time
-        string name 
+        string name
         string short_description
         string long_description
     }
@@ -77,7 +77,7 @@ erDiagram
     LocationHistory {
         int id PK
         int location_id FK
-        string name 
+        string name
         float latitude
         float longitude
         string short_description

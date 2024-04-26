@@ -9,10 +9,10 @@
 
 The request body should be in JSON format and contain the following fields:
 
-| Field    | Type   | Description        |
-| -------- | ------ | ------------------ |
-| email    | string | User's email       |
-| password | string | User's password    |
+| Field    | Type   | Description     |
+| -------- | ------ | --------------- |
+| email    | string | User's email    |
+| password | string | User's password |
 
 ### Responses
 

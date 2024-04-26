@@ -7,16 +7,15 @@
 
 #### Path Parameters
 
-| Parameter   | Type   | Description            |
-| ----------- | ------ | ----------------------|
-| suggestion_id | string | Edit suggestion ID    |
-
+| Parameter     | Type   | Description        |
+| ------------- | ------ | ------------------ |
+| suggestion_id | string | Edit suggestion ID |
 
 ### Responses
 
 - **200 OK**
-  ```json
 
+  ```json
   {
     "id": "<suggestion_id>",
     "location_id": "<location_id>",
@@ -29,8 +28,8 @@
   ```
 
 - **400 Bad Request**
-    ```json
-    {
-        "message": "Invalid suggestion ID"
-    }
-    ```
+  ```json
+  {
+    "message": "Invalid suggestion ID"
+  }
+  ```

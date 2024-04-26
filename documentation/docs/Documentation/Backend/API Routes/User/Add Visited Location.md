@@ -10,9 +10,9 @@
 
 The request body should be in JSON format and contain the following field:
 
-| Field | Type   | Description           |
-| ----- | ------ | --------------------- |
-| id    | string | ID of the location    |
+| Field | Type   | Description        |
+| ----- | ------ | ------------------ |
+| id    | string | ID of the location |
 
 ### Responses
 
@@ -40,4 +40,3 @@ The request body should be in JSON format and contain the following field:
     "message": "Location not found"
   }
   ```
-

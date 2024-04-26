@@ -7,13 +7,14 @@
 
 #### Path Parameters
 
-| Parameter   | Type   | Description            |
-| ----------- | ------ | ----------------------|
-| location_id | string | ID of the location     |
+| Parameter   | Type   | Description        |
+| ----------- | ------ | ------------------ |
+| location_id | string | ID of the location |
 
 ### Responses
 
 - **200 OK**
+
   ```json
   {
     "id": "<location_id>",
@@ -26,6 +27,7 @@
   ```
 
 - **400 Bad Request**
+
   ```json
   {
     "message": "Invalid location ID"

@@ -9,11 +9,10 @@
 
 The request body should be in JSON format and contain the following fields:
 
-| Field    | Type   | Description        |
-| -------- | ------ | ------------------ |
-| email    | string | User's email       |
-| password | string | User's password    |
-
+| Field    | Type   | Description     |
+| -------- | ------ | --------------- |
+| email    | string | User's email    |
+| password | string | User's password |
 
 ### Responses
 
@@ -25,6 +24,7 @@ The request body should be in JSON format and contain the following fields:
   }
   ```
 - **400 Bad Request**
+
   ```json
   {
     "message": "Incomplete request"
@@ -32,6 +32,7 @@ The request body should be in JSON format and contain the following fields:
   ```
 
 - **400 Bad Request**
+
   ```json
   {
     "message": "No data supplied"
@@ -44,4 +45,3 @@ The request body should be in JSON format and contain the following fields:
     "message": "Email already exists"
   }
   ```
-
