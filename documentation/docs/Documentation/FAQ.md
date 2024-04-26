@@ -27,9 +27,9 @@ We are dependent on Postmark for sending welcome / email confirmation emails.
 When the attempts to upload a photo to accompany a location add suggestion, the photo will be sent to AWS S3. 
 This makes the backend dependent on AWS.
 
-More information about setting up backend dependencies can be found in the [Backend Readme](https://github.com/CS-495-Historical-Sites/remnant/blob/main/api/README.md)
+More information about setting up backend dependencies can be found in the [Backend README](https://github.com/CS-495-Historical-Sites/remnant/blob/main/api/README.md)
 
 #### Mobile App
 
 We are dependent on [Maps SDK for Android](https://developers.google.com/maps/documentation/android-sdk/overview).
-Information about setting up the Google Maps API key can be found in [Android App Readme](More information about setting up backend dependencies can be found in the [Backend Readme](https://github.com/CS-495-Historical-Sites/remnant/blob/main/android-app/README.md). 
+Information about setting up the Google Maps API key can be found in [Android App Readme](More information about setting up backend dependencies can be found in the [Android README](https://github.com/CS-495-Historical-Sites/remnant/blob/main/android-app/README.md). 
