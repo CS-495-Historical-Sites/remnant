@@ -17,17 +17,18 @@ We are using Gradle as a build system. It integrates with Android Studio.
 
 To set up your development environment, see the [development environment](Development_Environment.md) section.
 
-### Screens
+## Screens
 
-#### **For Users:**
+### **For Users:**
+
 
 **Nearby Activity**
  This screen is designed to show you locations near you. We take a users location when the home button is pressed and display a list of the closest historical sites in a selected radius. You can save locations or get directions through Google maps using the two buttons underneath the location card. Users can adjust their radius to allow for more or less nearby locations and also search for specific locations.
 
 
-#### **For Devs:**
-**Functions Overview**
-This section provides a detailed breakdown of the key functions used within the nearby screen.
+### **For Devs:**
+**Functions Overview:**
+ - This section provides a detailed breakdown of the key functions used within the nearby screen.
 
 #### CheckScreen
 
@@ -38,8 +39,8 @@ This section provides a detailed breakdown of the key functions used within the 
 
   - **Purpose**: Fetches locations and handles location data.
   - **Parameters**:
-      - `context`: Current context of the application.
-      - `viewModel`: Used to track data.
+      -  Current context of the application `context`
+      -  View model to track data `viewModel`
   - **Default Settings**:
       - Search Radius: 16.09 kilometers (approximately 10 miles).
       - Search Query: Empty by default.
@@ -59,7 +60,7 @@ This section provides a detailed breakdown of the key functions used within the 
   - **Purpose**: Decorates each location card displayed in the feed.
   - **Parameters**: 
       - Receives a variable containing all card information (images, title, description, liked status, etc.) `locationInfo`
-      - Distance in milses `distance`
+      - Distance in miles `distance`
       - View model `view`.
   - **Features**:
       - Two buttons per card:
@@ -73,6 +74,7 @@ This section provides a detailed breakdown of the key functions used within the 
   - **Parameters** 
       - Current Query `searchQuery`
   - **Customization**: Allows adjustments to size, color, and overall style.
+
 
 #### HomeAppBar
 
