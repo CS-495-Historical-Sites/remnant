@@ -28,5 +28,5 @@ Geofencing API on Android follow the link here:
 
 #### Backend
 
-The locations are sourced from
-[Get All Locations](/Documentation/Backend/API%20Routes/Locations/Get%20Locations/)
+The locations are sourced from [Get All Locations](../Backend/API
+Routes/Locations/Get Locations.md)

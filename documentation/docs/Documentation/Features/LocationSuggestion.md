@@ -34,6 +34,13 @@ The location suggestion is prompted from
 
 #### Backend
 
+Assosiated routes are documented in the API routes documentation.
+
+-   [Suggestion to Add Location](../Backend/API Routes/Suggestions/Add Location
+    Add Suggestion.md)
+-   [Suggestion to Edit Location](../Backend/API Routes/Suggestions/Add Location
+    Edit Suggestion.md)
+
 ### Usage (Admin)
 
 After navigating to our [Admin Website](https://app.uahistoricalsites.com/),

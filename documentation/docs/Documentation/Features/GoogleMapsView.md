@@ -26,3 +26,11 @@ the filters opens the settings page and allows for filtering of locations based
 on Heritage, Maritime History, Development, among others.
 
 #### Development Modification
+
+#### Android APp
+
+The code for the filter chips on the main view, and the settings side sheet can
+be found at
+`android-app/app/src/main/java/com/ua/historicalsitesapp/ui/components/CategoriesRow.kt`.
+It interacts with the main page view model as a source truth accross UI
+components.
