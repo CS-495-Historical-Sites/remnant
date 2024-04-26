@@ -96,9 +96,15 @@ def register():
     if user_queries.email_exists(registration_info.email):
         return jsonify({"message": "Email already exists"}), 422
 
+    # TODO: we should be mocking this route in our tests
     if registration_info.email in Config.ADMIN_EMAILS:
-        user_queries.create_admin(registration_info)
+        admin = user_queries.create_admin(registration_info)
+        if not Config.TESTING:
+            send_success = send_welcome_email(admin)
+            if not send_success:
+                return jsonify({"message": "Failed to send email"}), 500
     else:
+        # TODO: we should be mocking this route in our tests
         user = user_queries.create_user(registration_info)
         if not Config.TESTING:
             send_success = send_welcome_email(user)
@@ -239,6 +245,17 @@ def login():
     refresh_token = create_refresh_token(identity=user.email)
     is_first_login = user_queries.successful_login_attempts(email=login_info.email) == 1
 
+    # TODO: we should be mocking this route in our tests
+    if not Config.TESTING and not user.has_confirmed_email:
+        return (
+            jsonify(
+                access_token="",
+                refresh_token="",
+                first_login=False,
+                has_confirmed_email=user.has_confirmed_email,
+            ),
+            403,
+        )
     return (
         jsonify(
             access_token=access_token,
